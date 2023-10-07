@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbDataSynchronizationTaskMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbDataSynchronizationTaskMap" type="com.castle.fortress.admin.knowledge.entity.KbDataSynchronizationTaskEntity">
+        <result column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="sql" property="sql"/>
+        <result column="auth" property="auth"/>
+        <result column="dept" property="dept"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="mode_id" property="modeId"/>
+        <result column="status" property="status"/>
+    </resultMap>
+	<select id="queryList" resultMap="kbDataSynchronizationTaskMap">
+		SELECT
+		t.*
+		FROM
+		kb_data_synchronization_task t
+		WHERE
+		1 = 1
+		<if test='kbDataSynchronizationTaskEntity.id != null'>
+			AND t.id like concat('%',#{kbDataSynchronizationTaskEntity.id},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.type != null and kbDataSynchronizationTaskEntity.type != ""'>
+			AND t.type like concat('%',#{kbDataSynchronizationTaskEntity.type},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.sql != null and kbDataSynchronizationTaskEntity.sql != ""'>
+			AND t.sql like concat('%',#{kbDataSynchronizationTaskEntity.sql},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.auth != null'>
+			AND t.auth like concat('%',#{kbDataSynchronizationTaskEntity.auth},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.dept != null'>
+			AND t.dept like concat('%',#{kbDataSynchronizationTaskEntity.dept},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.categoryId != null'>
+			AND t.category_id like concat('%',#{kbDataSynchronizationTaskEntity.categoryId},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.modeId != null'>
+			AND t.mode_id like concat('%',#{kbDataSynchronizationTaskEntity.modeId},'%')
+		</if>
+		<if test='kbDataSynchronizationTaskEntity.status != null'>
+			AND t.status like concat('%',#{kbDataSynchronizationTaskEntity.status},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="runSQL" resultType="java.util.Map" parameterType="java.lang.String">
+		${taskEntitySql}
+	</select>
+
+</mapper>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="<%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>mapper.${className}Mapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="${entityKey}Map" type="<%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity">
+        <% for(col in colList){%>
+        <result column="${col.colName}" property="${col.propName}"/>
+        <%}%>
+    </resultMap>
+    <% if (hasSuperEntity){ %>
+    <% if (superEntity == "BaseEntity"){ %>
+    <resultMap id="${entityKey}ExtendsMap" extends="${entityKey}Map" type="<%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="${entityKey}ExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        ${tbConfig.tbName} t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <%for(field in colList){
+            if(field.propType =="String"){%>
+        <if test='${entityKey}Entity.${field.propName} != null and ${entityKey}Entity.${field.propName} != ""'>
+            <%}else{%>
+        <if test='${entityKey}Entity.${field.propName} != null'>
+            <%}%>
+            <%switch(field.queryType){%>
+            <%case "2":%>
+            AND t.${field.colName} != #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "3":%>
+            AND t.${field.colName} &lt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "4":%>
+            AND t.${field.colName} &lt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "5":%>
+            AND t.${field.colName} &gt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "6":%>
+            AND t.${field.colName} &gt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "7":%>
+            AND t.${field.colName} like concat('%',#{${entityKey}Entity.${field.propName}},'%')
+            <%break;%>
+            <%default:%>
+            AND t.${field.colName} = #{${entityKey}Entity.${field.propName}}
+            <%break;}%>
+        </if>
+        <%}%>
+        <% if (hasSuperEntity){ %>
+            order by create_time desc
+        <%}%>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        ${tbConfig.tbName} t
+        WHERE
+            t.is_deleted = 2
+        <%for(field in colList){
+        if(field.propType =="String"){%>
+        <if test='${entityKey}Entity.${field.propName} != null and ${entityKey}Entity.${field.propName} != ""'>
+        <%}else{%>
+        <if test='${entityKey}Entity.${field.propName} != null'>
+            <%}%>
+            <%switch(field.queryType){%>
+            <%case "2":%>
+            AND t.${field.colName} != #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "3":%>
+            AND t.${field.colName} &lt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "4":%>
+            AND t.${field.colName} &lt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "5":%>
+            AND t.${field.colName} &gt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "6":%>
+            AND t.${field.colName} &gt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "7":%>
+            AND t.${field.colName} like concat('%',#{${entityKey}Entity.${field.propName}},'%')
+            <%break;%>
+            <%default:%>
+            AND t.${field.colName} = #{${entityKey}Entity.${field.propName}}
+            <%break;}%>
+        </if>
+        <%}%>
+    </select>
+    <select id="getByIdExtends" resultMap="${entityKey}ExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        ${tbConfig.tbName} t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <%}else if(superEntity == "DataAuthBaseEntity"){%>
+    <resultMap id="${entityKey}ExtendsMap" extends="${entityKey}Map" type="<%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity">
+        <result column="create_user_name" property="createUserName" />
+        <result column="create_dept_name" property="createDeptName" />
+        <result column="create_post_name" property="createPostName" />
+    </resultMap>
+    <select id="extendsList" resultMap="${entityKey}ExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name,
+        t2.name create_dept_name,
+        t3.name create_post_name
+        FROM
+        ${tbConfig.tbName} t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        LEFT OUTER JOIN castle_sys_dept t2 ON t.create_dept  = t2.id
+        LEFT OUTER JOIN castle_sys_post t3 ON t.create_post = t3.id
+        WHERE
+        t.is_deleted = 2
+        <%for(field in colList){
+        if(field.propType =="String"){%>
+        <if test='${entityKey}Entity.${field.propName} != null and ${entityKey}Entity.${field.propName} != ""'>
+        <%}else{%>
+        <if test='${entityKey}Entity.${field.propName} != null'>
+            <%}%>
+            <%switch(field.queryType){%>
+            <%case "2":%>
+            AND t.${field.colName} != #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "3":%>
+            AND t.${field.colName} &lt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "4":%>
+            AND t.${field.colName} &lt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "5":%>
+            AND t.${field.colName} &gt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "6":%>
+            AND t.${field.colName} &gt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "7":%>
+            AND t.${field.colName} like concat('%',#{${entityKey}Entity.${field.propName}},'%')
+            <%break;%>
+            <%default:%>
+            AND t.${field.colName} = #{${entityKey}Entity.${field.propName}}
+            <%break;}%>
+        </if>
+        <%}%>
+        <% if (hasSuperEntity){ %>
+            order by create_time desc
+        <%}%>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        ${tbConfig.tbName} t
+        WHERE
+        t.is_deleted = 2
+        <%for(field in colList){
+        if(field.propType =="String"){%>
+        <if test='${entityKey}Entity.${field.propName} != null and ${entityKey}Entity.${field.propName} != ""'>
+        <%}else{%>
+        <if test='${entityKey}Entity.${field.propName} != null'>
+            <%}%>
+            <%switch(field.queryType){%>
+            <%case "2":%>
+            AND t.${field.colName} != #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "3":%>
+            AND t.${field.colName} &lt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "4":%>
+            AND t.${field.colName} &lt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "5":%>
+            AND t.${field.colName} &gt; #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "6":%>
+            AND t.${field.colName} &gt;= #{${entityKey}Entity.${field.propName}}
+            <%break;
+            case "7":%>
+            AND t.${field.colName} like concat('%',#{${entityKey}Entity.${field.propName}},'%')
+            <%break;%>
+            <%default:%>
+            AND t.${field.colName} = #{${entityKey}Entity.${field.propName}}
+            <%break;}%>
+        </if>
+        <%}%>
+    </select>
+    <select id="getByIdExtends" resultMap="${entityKey}ExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        ${tbConfig.tbName} t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        LEFT OUTER JOIN castle_sys_dept t2 ON t.create_dept  = t2.id
+        LEFT OUTER JOIN castle_sys_post t3 ON t.create_post = t3.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+
+    <%} %>
+    <% }%>
+	<% else{%>
+	<select id="queryList" resultMap="${entityKey}Map">
+		SELECT
+		t.*
+		FROM
+		${tbConfig.tbName} t
+		WHERE
+		1 = 1
+		<%for(field in colList){
+		if(field.propType =="String"){%>
+		<if test='${entityKey}Entity.${field.propName} != null and ${entityKey}Entity.${field.propName} != ""'>
+		<%}else{%>
+		<if test='${entityKey}Entity.${field.propName} != null'>
+			<%}%>
+			<%switch(field.queryType){%>
+			<%case "2":%>
+			AND t.${field.colName} != #{${entityKey}Entity.${field.propName}}
+			<%break;
+			case "3":%>
+			AND t.${field.colName} &lt; #{${entityKey}Entity.${field.propName}}
+			<%break;
+			case "4":%>
+			AND t.${field.colName} &lt;= #{${entityKey}Entity.${field.propName}}
+			<%break;
+			case "5":%>
+			AND t.${field.colName} &gt; #{${entityKey}Entity.${field.propName}}
+			<%break;
+			case "6":%>
+			AND t.${field.colName} &gt;= #{${entityKey}Entity.${field.propName}}
+			<%break;
+			case "7":%>
+			AND t.${field.colName} like concat('%',#{${entityKey}Entity.${field.propName}},'%')
+			<%break;%>
+			<%default:%>
+			AND t.${field.colName} = #{${entityKey}Entity.${field.propName}}
+			<%break;}%>
+		</if>
+		<%}%>
+        <% if (hasSuperEntity){ %>
+            order by create_time desc
+        <%}%>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>		
+	<%}%>
+
+</mapper>

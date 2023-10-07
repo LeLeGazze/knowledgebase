@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberGoodsCollectMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberGoodsCollectMap" type="com.castle.fortress.admin.member.entity.MemberGoodsCollectEntity">
+        <result column="id" property="id"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="memberGoodsCollectExtendsMap" extends="memberGoodsCollectMap" type="com.castle.fortress.admin.member.entity.MemberGoodsCollectEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberGoodsCollectExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_goods_collect t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberGoodsCollectEntity.id != null'>
+            AND t.id like concat('%',#{memberGoodsCollectEntity.id},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.goodsId != null'>
+            AND t.goods_id like concat('%',#{memberGoodsCollectEntity.goodsId},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberGoodsCollectEntity.memberId},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberGoodsCollectEntity.createUser},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberGoodsCollectEntity.createTime},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberGoodsCollectEntity.updateUser},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberGoodsCollectEntity.updateTime},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.status != null'>
+            AND t.status like concat('%',#{memberGoodsCollectEntity.status},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberGoodsCollectEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_goods_collect t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberGoodsCollectEntity.id != null'>
+            AND t.id like concat('%',#{memberGoodsCollectEntity.id},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.goodsId != null'>
+            AND t.goods_id like concat('%',#{memberGoodsCollectEntity.goodsId},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberGoodsCollectEntity.memberId},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberGoodsCollectEntity.createUser},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberGoodsCollectEntity.createTime},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberGoodsCollectEntity.updateUser},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberGoodsCollectEntity.updateTime},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.status != null'>
+            AND t.status like concat('%',#{memberGoodsCollectEntity.status},'%')
+        </if>
+        <if test='memberGoodsCollectEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberGoodsCollectEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberGoodsCollectExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_goods_collect t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

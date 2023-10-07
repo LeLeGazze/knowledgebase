@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.SysMenuMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysMenuMap" type="com.castle.fortress.admin.system.entity.SysMenu">
+        <result column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="permissions" property="permissions"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="icon" property="icon"/>
+        <result column="type" property="type"/>
+        <result column="sort" property="sort"/>
+        <result column="view_path" property="viewPath" />
+        <result column="remark" property="remark"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <select id="authorityMenu" resultMap="sysMenuMap">
+        select t.*
+        from castle_sys_menu t
+        where t.is_deleted = 2
+        and t.`status`= 1
+        and t.type = 1
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.menu_id FROM castle_sys_role_menu t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        order by sort 
+    </select>
+
+    <select id="authorityButton" resultMap="sysMenuMap">
+        select t.*
+        from castle_sys_menu t
+        where t.is_deleted = 2
+        and t.`status`= 1
+        and (t.type = 2 or t.type = 3)
+        <if test="roleIds!=null  and roleIds.size > 0 ">
+            AND t.id IN
+            ( SELECT distinct t1.menu_id FROM castle_sys_role_menu t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+    <select id="authorityAllData" resultMap="sysMenuMap">
+        select t.*
+        from castle_sys_menu t
+        where t.is_deleted = 2
+        and t.`status`= 1
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.menu_id FROM castle_sys_role_menu t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        order by sort
+
+    </select>
+    <select id="authorityRouters" resultMap="sysMenuMap">
+        select t.*
+        from castle_sys_menu t
+        where t.is_deleted = 2
+        and t.`status`= 1
+        and (t.type = 1 or t.type = 2)
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.menu_id FROM castle_sys_role_menu t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        order by sort
+    </select>
+</mapper>

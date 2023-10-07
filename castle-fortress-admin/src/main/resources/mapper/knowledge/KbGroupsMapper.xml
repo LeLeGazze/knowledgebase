@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbGroupsMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbGroupsMap" type="com.castle.fortress.admin.knowledge.entity.KbGroupsEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pId"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="kbGroupsExtendsMap" extends="kbGroupsMap" type="com.castle.fortress.admin.knowledge.entity.KbGroupsEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="kbGroupsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_groups t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbGroupsEntity.id != null'>
+            AND t.id like concat('%',#{kbGroupsEntity.id},'%')
+        </if>
+        <if test='kbGroupsEntity.name != null and kbGroupsEntity.name != ""'>
+            AND t.name like concat('%',#{kbGroupsEntity.name},'%')
+        </if>
+        <if test='kbGroupsEntity.sort != null'>
+            AND t.sort like concat('%',#{kbGroupsEntity.sort},'%')
+        </if>
+        <if test='kbGroupsEntity.status != null'>
+            AND t.status like concat('%',#{kbGroupsEntity.status},'%')
+        </if>
+        <if test='kbGroupsEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbGroupsEntity.createTime},'%')
+        </if>
+        <if test='kbGroupsEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbGroupsEntity.createUser},'%')
+        </if>
+        <if test='kbGroupsEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbGroupsEntity.updateUser},'%')
+        </if>
+        <if test='kbGroupsEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbGroupsEntity.updateTime},'%')
+        </if>
+        <if test='kbGroupsEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbGroupsEntity.isDeleted},'%')
+        </if>
+        <if test='kbGroupsEntity.pId != null'>
+            AND t.p_id = #{kbGroupsEntity.pId}
+        </if>
+            order by sort desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        kb_groups t
+        WHERE
+            t.is_deleted = 2
+        <if test='kbGroupsEntity.id != null'>
+            AND t.id like concat('%',#{kbGroupsEntity.id},'%')
+        </if>
+        <if test='kbGroupsEntity.name != null and kbGroupsEntity.name != ""'>
+            AND t.name like concat('%',#{kbGroupsEntity.name},'%')
+        </if>
+        <if test='kbGroupsEntity.sort != null'>
+            AND t.sort like concat('%',#{kbGroupsEntity.sort},'%')
+        </if>
+        <if test='kbGroupsEntity.status != null'>
+            AND t.status like concat('%',#{kbGroupsEntity.status},'%')
+        </if>
+        <if test='kbGroupsEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbGroupsEntity.createTime},'%')
+        </if>
+        <if test='kbGroupsEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbGroupsEntity.createUser},'%')
+        </if>
+        <if test='kbGroupsEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbGroupsEntity.updateUser},'%')
+        </if>
+        <if test='kbGroupsEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbGroupsEntity.updateTime},'%')
+        </if>
+        <if test='kbGroupsEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbGroupsEntity.isDeleted},'%')
+        </if>
+        <if test='kbGroupsEntity.pId != null'>
+            AND t.p_id = #{kbGroupsEntity.pId}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbGroupsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_groups t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="findGroupBypIdPage" resultType="com.castle.fortress.admin.knowledge.dto.KbGroupsDto">
+        select * from kb_groups where p_id = #{id}
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="findGroupBypIdPageCount" resultType="java.lang.Integer">
+        select count(1) from kb_groups where p_id = #{id}
+    </select>
+
+</mapper>

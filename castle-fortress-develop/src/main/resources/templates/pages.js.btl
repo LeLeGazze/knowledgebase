@@ -1,0 +1,45 @@
+"use strict";
+var ${entityKey};
+(function (${entityKey}) {
+    var option = {
+        urls: {
+            init: "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/page",
+            info: "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/info",
+            add: "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/save",
+            edit: "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/edit",
+            delete: "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/delete",
+        },
+        btns: {
+            check: true,
+            add: true,
+            edit: true,
+            delete: true,
+        },
+        columns: [
+            {
+                selection: true,
+            },
+
+            <% for(field in colList){%>
+
+                {
+                    prop: "${field.propName}",
+                    <% if(isNotEmpty(field.propDesc)){%>
+                    title: "${field.propDesc}",
+                    label: "${field.propDesc}"
+                    <%}else{%>
+                    title: "${field.propName}",
+                    label: "${field.propName}"
+                    <%}%>
+                },
+            <%}%>
+        ],
+        search: {
+            title: {
+                type: "input",
+                dictUrl: "",
+            },
+        },
+    };
+    var table = new Table("scms-table", option);
+})(${entityKey} || (${entityKey} = {}));

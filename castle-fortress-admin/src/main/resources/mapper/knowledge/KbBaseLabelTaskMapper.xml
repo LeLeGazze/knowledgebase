@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbBaseLabelTaskMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbBaseLabelTaskMap" type="com.castle.fortress.admin.knowledge.entity.KbBaseLabelTaskEntity">
+        <result column="id" property="id"/>
+        <result column="l_id" property="lId"/>
+        <result column="status" property="status"/>
+        <result column="message" property="message"/>
+        <result column="create_time" property="createTime"/>
+        <result column="task_time" property="taskTime"/>
+    </resultMap>
+	<update id="updateByIds" parameterType="java.util.List">
+        update kb_base_label_task set status=2 where id in
+        <foreach collection="kbBaseLabelTaskEntities" item="kbBaseLabelTaskEntitie" separator="," open="(" close=")">
+            #{kbBaseLabelTaskEntitie.id}
+        </foreach>
+    </update>
+	<delete id="deleteByBid" parameterType="java.util.ArrayList">
+        delete from kb_base_label_task where l_id in
+		<foreach collection="arrayList" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+    </delete>
+	<select id="queryList" resultMap="kbBaseLabelTaskMap">
+		SELECT
+		t.*
+		FROM
+		kb_base_label_task t
+		WHERE
+		1 = 1
+		<if test='kbBaseLabelTaskEntity.id != null'>
+			AND t.id = #{kbBaseLabelTaskEntity.id}
+		</if>
+		<if test='kbBaseLabelTaskEntity.lId != null'>
+			AND t.l_id = #{kbBaseLabelTaskEntity.lId}
+		</if>
+		<if test='kbBaseLabelTaskEntity.status != null'>
+			AND t.status = #{kbBaseLabelTaskEntity.status}
+		</if>
+		<if test='kbBaseLabelTaskEntity.message != null and kbBaseLabelTaskEntity.message != ""'>
+			AND t.message like concat('%',#{kbBaseLabelTaskEntity.message},'%')
+		</if>
+		<if test='kbBaseLabelTaskEntity.createTime != null'>
+			AND t.create_time like concat('%',#{kbBaseLabelTaskEntity.createTime},'%')
+		</if>
+		<if test='kbBaseLabelTaskEntity.taskTime != null'>
+			AND t.task_time like concat('%',#{kbBaseLabelTaskEntity.taskTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="findByLid" resultType="java.util.Map"
+			parameterType="java.util.List">
+        SELECT id, l_id
+        FROM kb_base_label_task
+        WHERE l_id IN
+        <foreach collection="labelTaskEntities" item="item" separator="," open="(" close=")">
+            #{item.lId}
+        </foreach>
+    </select>
+
+</mapper>

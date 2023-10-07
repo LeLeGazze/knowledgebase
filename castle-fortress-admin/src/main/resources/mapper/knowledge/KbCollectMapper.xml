@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbCollectMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbCollectMap" type="com.castle.fortress.admin.knowledge.entity.KbCollectEntity">
+        <result column="id" property="id"/>
+        <result column="basic_id" property="basicId"/>
+        <result column="status" property="collectStatus"/>
+        <result column="user_id" property="userId"/>
+        <result column="create_time" property="createTime"/>
+		<result column="type" property="type"/>
+	</resultMap>
+	<delete id="removeCollect">
+		delete from kb_collect where basic_id = #{basicId} and user_id = #{userId}
+	</delete>
+	<delete id="deleteByBid">
+		delete from kb_collect where basic_id = #{basicId}
+	</delete>
+	<select id="queryList" resultMap="kbCollectMap">
+		SELECT
+		t.*
+		FROM
+		kb_collect t
+		WHERE
+		1 = 1
+		<if test='kbCollectEntity.id != null'>
+			AND t.id like concat('%',#{kbCollectEntity.id},'%')
+		</if>
+		<if test='kbCollectEntity.basicId != null'>
+			AND t.basic_id like concat('%',#{kbCollectEntity.basicId},'%')
+		</if>
+		<if test='kbCollectEntity.status != null'>
+			AND t.status like concat('%',#{kbCollectEntity.status},'%')
+		</if>
+		<if test='kbCollectEntity.userId != null'>
+			AND t.user_id like concat('%',#{kbCollectEntity.userId},'%')
+		</if>
+		<if test='kbCollectEntity.createTime != null'>
+			AND t.create_time like concat('%',#{kbCollectEntity.createTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+    <select id="checkExites" resultType="com.castle.fortress.admin.knowledge.entity.KbCollectEntity">
+		select * from kb_collect where user_id = #{userId} and basic_id = #{basicId}
+	</select>
+	<select id="findBasicByLike" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_basic kb on kb.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+		LEFT JOIN kb_category kc on kb.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth != #{kbBaseShowDto.createUser}
+			and kb.status = 1
+			and kco.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		union
+		select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_basic kb on kb.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+		LEFT JOIN kb_category kc on kb.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth = #{kbBaseShowDto.createUser}
+			and kco.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="findBasicByLikeCount" resultType="java.lang.Integer">
+		select count(1) from (
+		select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_basic kb on kb.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+		LEFT JOIN kb_category kc on kb.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth != #{kbBaseShowDto.createUser}
+			and kb.status = 1
+			and kco.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		union
+		select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_basic kb on kb.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+		LEFT JOIN kb_category kc on kb.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth = #{kbBaseShowDto.createUser}
+			and kco.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where> ) t2
+
+	</select>
+	<select id="findByid" resultType="com.castle.fortress.admin.knowledge.entity.KbCollectEntity">
+		select * from kb_collect where basic_id = #{basicId} and user_id = #{userId}
+	</select>
+	<select id="findBasicByVideo" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select *from (select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_video kv on kv.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+		LEFT JOIN kb_category kc on kv.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kv.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kv.auth != #{kbBaseShowDto.createUser}
+			and kv.status = 1
+			and kco.type = 2
+			and kv.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kv.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		union
+		select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_video kv on kv.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+		LEFT JOIN kb_category kc on kv.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kv.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kv.auth = #{kbBaseShowDto.createUser}
+			and kco.type = 2
+			and kv.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kv.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>) t2
+		order by t2.pubTime desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="findBasicByVideoCount" resultType="java.lang.Integer">
+		select count(1)
+		from (select *from (select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_video kv on kv.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+		LEFT JOIN kb_category kc on kv.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kv.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kv.auth != #{kbBaseShowDto.createUser}
+			and kv.status = 1
+			and kco.type = 2
+			and kv.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kv.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		union
+		select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_video kv on kv.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+		LEFT JOIN kb_category kc on kv.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kv.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kv.auth = #{kbBaseShowDto.createUser}
+			and kco.type = 2
+			and kv.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kv.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>) t2 )t3
+	</select>
+	<select id="findBasicByLikeAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_basic kb on kb.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+		LEFT JOIN kb_category kc on kb.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kco.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		order by kco.create_time desc
+	</select>
+	<select id="findBasicByLikeAdminCount" resultType="java.lang.Integer">
+		select count(1) from(
+		select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_basic kb on kb.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+		LEFT JOIN kb_category kc on kb.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		where
+		kco.user_id = #{kbBaseShowDto.createUser}
+		and kco.type = 1
+		and kb.is_deleted = 2
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+			and kc.sw_id in (
+			<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+				#{swId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+		</if>) t1
+	</select>
+	<select id="findBasicByVideoAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kco.create_time as pubTime,ksw.id as swId,kco.id as collectId,ku.readCount
+		from kb_collect kco
+		left join kb_video kv on kv.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+		LEFT JOIN kb_category kc on kv.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kv.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kco.type = 2
+			and kv.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kv.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		order by kco.create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="findBasicByVideoAdminCount" resultType="java.lang.Integer">
+		select count(1)
+		from kb_collect kco
+		left join kb_video kv on kv.id = kco.basic_id
+		LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+		LEFT JOIN kb_category kc on kv.category_id = kc.id
+		left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kv.id = ku.b_id
+		<where>
+			kco.user_id = #{kbBaseShowDto.createUser}
+			and kco.type = 2
+			and kv.is_deleted = 2
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kv.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kco.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+	</select>
+
+
+</mapper>

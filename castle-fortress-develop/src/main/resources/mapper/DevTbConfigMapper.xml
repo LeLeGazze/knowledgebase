@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.develop.mapper.DevTbConfigMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysMenuMap" type="com.castle.fortress.develop.entity.DevTbConfig">
+        <result column="id" property="id"/>
+        <result column="db_id" property="dbId"/>
+        <result column="tb_name" property="tbName"/>
+        <result column="tb_desc" property="tbDesc"/>
+        <result column="back_out_put_dir" property="backOutPutDir"/>
+        <result column="front_out_put_dir" property="frontOutPutDir" />
+        <result column="module_name" property="moduleName"/>
+        <result column="sub_module_name" property="subModuleName"/>
+        <result column="package_base" property="packageBase"/>
+        <result column="tb_prefix" property="tbPrefix"/>
+        <result column="author" property="author"/>
+        <result column="super_entity_class" property="superEntityClass"/>
+        <result column="swagger2_flag" property="swagger2Flag"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+</mapper>

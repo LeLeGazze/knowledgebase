@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbColConfigMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbColConfigMap" type="com.castle.fortress.admin.knowledge.entity.KbPropertyDesignEntity">
+        <result column="id" property="id"/>
+        <result column="model_id" property="modelId"/>
+        <result column="name" property="name"/>
+        <result column="prop_name" property="propName"/>
+        <result column="sort" property="sort"/>
+        <result column="is_requir" property="isRequired"/>
+        <result column="is_filtrate" property="isFiltrate"/>
+        <result column="form_type" property="dataType"/>
+        <result column="data_type" property="dataType"/>
+        <result column="attachment" property="attachment"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <delete id="removeAll">
+        delete from kb_property_design where model_id = #{modelId}
+    </delete>
+
+    <select id="allTableNames" resultType="java.lang.String">
+        select table_name from information_schema.tables where table_schema = (select database()) order by table_name asc
+    </select>
+    <update id="createTable">
+        create table  ${tbName} (
+        id bigint(64) primary  key  auto_increment comment 'id',
+        data_id bigint(64) comment 'data_id',
+        constraint ${tbName} foreign key (data_id) references kb_basic(id),
+        <foreach collection="cols" item="col" separator=",">
+            ${col.propName} ${col.dataType}
+                <if test="col.isRequired != null and col.isRequired == 1">
+                     not null
+                </if>
+                COMMENT #{col.name}
+        </foreach>
+        ) COMMENT #{tbComment}
+    </update>
+    <update id="createHistoryTable">
+        create table  ${tbName} (
+        id bigint(64) primary  key  auto_increment comment 'id',
+        data_id bigint(64) comment 'data_id',
+        constraint ${tbName} foreign key (data_id) references kb_basic_history(id),
+        <foreach collection="cols" item="col" separator=",">
+            ${col.propName} ${col.dataType}
+            <if test="col.isRequired != null and col.isRequired == 1">
+                not null
+            </if>
+            COMMENT #{col.name}
+        </foreach>
+        ) COMMENT #{tbComment}
+    </update>
+    <update id="dropTable">
+        drop table if exists ${tbName}
+    </update>
+    <update id="alterTableAdd">
+        alter table ${tbName}
+        <foreach collection="cols" item="col" separator="," >
+            add column ${col.propName} ${col.dataType}
+            <if test="col.isRequired != null and col.isRequired == 1">
+                not null
+            </if>
+            COMMENT #{col.name}
+        </foreach>
+    </update>
+    <update id="alterTableModify">
+        alter ${tbName}
+        <foreach collection="cols" item="col" separator=",">
+            modify column ${col.propName} ${col.dataType}
+            COMMENT #{col.name}
+        </foreach>
+    </update>
+    <update id="alterTableDrop">
+        alter table ${tbName}
+        <foreach collection="cols" item="col" separator="," >
+            drop column ${col.propName}
+        </foreach>
+    </update>
+    <update id="alterTable">
+        ALTER TABLE ${tbName} MODIFY ${propName} VARCHAR (255) NULL;
+    </update>
+</mapper>

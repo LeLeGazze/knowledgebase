@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.DevViewListConfigMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="viewListMap" type="com.castle.fortress.admin.system.entity.DevViewListConfig">
+        <result column="id" property="id"/>
+        <result column="tb_name" property="tbName"/>
+        <result column="prop_name" property="propName"/>
+        <result column="prop_desc" property="propDesc"/>
+    </resultMap>
+    <insert id="init">
+        insert into castle_sys_view_table_list(tb_name,prop_name,prop_desc)
+        select <![CDATA['${tbName}']]>,prop_name,prop_desc
+        from castle_dev_col_config
+        where tb_id in (
+        select id from castle_dev_tb_config where tb_name =#{tbName}
+        ) and is_list = 1
+    </insert>
+
+    <delete id="delByTbName">
+        delete from castle_sys_view_table_list
+        where tb_name = #{tbName}
+    </delete>
+
+</mapper>

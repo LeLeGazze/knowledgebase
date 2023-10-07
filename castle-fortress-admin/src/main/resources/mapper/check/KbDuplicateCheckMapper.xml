@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.check.mapper.KbDuplicateCheckMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbDuplicateCheckMap" type="com.castle.fortress.admin.check.entity.KbDuplicateCheckEntity">
+        <result column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="author" property="author"/>
+        <result column="file_suffix" property="fileSuffix"/>
+        <result column="upload_path" property="uploadPath"/>
+        <result column="status" property="status"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="pdf_path" property="pdfPath"/>
+        <result column="detection_time" property="detectionTime"/>
+        <result column="deadline_time" property="deadlineTime"/>
+    </resultMap>
+	<select id="queryList" resultMap="kbDuplicateCheckMap">
+		SELECT
+		t.*
+		FROM
+		kb_duplicate_check t
+		WHERE
+		1 = 1
+		<if test='kbDuplicateCheckEntity.id != null and kbDuplicateCheckEntity.id != ""'>
+			AND t.id like concat('%',#{kbDuplicateCheckEntity.id},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.title != null and kbDuplicateCheckEntity.title != ""'>
+			AND t.title like concat('%',#{kbDuplicateCheckEntity.title},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.author != null and kbDuplicateCheckEntity.author != ""'>
+			AND t.author like concat('%',#{kbDuplicateCheckEntity.author},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.fileSuffix != null and kbDuplicateCheckEntity.fileSuffix != ""'>
+			AND t.file_suffix like concat('%',#{kbDuplicateCheckEntity.fileSuffix},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.uploadPath != null and kbDuplicateCheckEntity.uploadPath != ""'>
+			AND t.upload_path like concat('%',#{kbDuplicateCheckEntity.uploadPath},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.status != null'>
+			AND t.status like concat('%',#{kbDuplicateCheckEntity.status},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.type != null and kbDuplicateCheckEntity.type != ""'>
+			AND t.type like concat('%',#{kbDuplicateCheckEntity.type},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.createTime != null'>
+			AND t.create_time like concat('%',#{kbDuplicateCheckEntity.createTime},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.pdfPath != null and kbDuplicateCheckEntity.pdfPath != ""'>
+			AND t.pdf_path like concat('%',#{kbDuplicateCheckEntity.pdfPath},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.detectionTime != null'>
+			AND t.detection_time like concat('%',#{kbDuplicateCheckEntity.detectionTime},'%')
+		</if>
+		<if test='kbDuplicateCheckEntity.deadlineTime != null'>
+			AND t.deadline_time like concat('%',#{kbDuplicateCheckEntity.deadlineTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>		
+
+</mapper>

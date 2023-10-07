@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbCategoryLabelMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbCategoryLabelMap" type="com.castle.fortress.admin.knowledge.entity.KbCategoryLabelEntity">
+        <result column="id" property="id"/>
+        <result column="ct_id" property="ctId"/>
+        <result column="l_id" property="lId"/>
+    </resultMap>
+	<delete id="removeByLabelId">
+		delete from kb_category_label where l_id = #{labelId}
+	</delete>
+    <delete id="deleteBylId">
+		delete
+		from kb_category_label where l_id in <foreach collection="kbCategoryLabelEntities" item="kbCategoryLabelEntitie" separator="," open="(" close=")">
+		#{kbCategoryLabelEntitie.lId}
+	</foreach>
+	</delete>
+    <select id="queryList" resultMap="kbCategoryLabelMap">
+		SELECT
+		t.*
+		FROM
+		kb_category_label t
+		WHERE
+		1 = 1
+		<if test='kbCategoryLabelEntity.id != null'>
+			AND t.id like concat('%',#{kbCategoryLabelEntity.id},'%')
+		</if>
+		<if test='kbCategoryLabelEntity.ctId != null'>
+			AND t.ct_id like concat('%',#{kbCategoryLabelEntity.ctId},'%')
+		</if>
+		<if test='kbCategoryLabelEntity.lId != null'>
+			AND t.l_id like concat('%',#{kbCategoryLabelEntity.lId},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+    <select id="findLabelByCategory" resultType="com.castle.fortress.admin.knowledge.dto.KbModelLabelDto">
+		select kml.* ,case when lb.count is null then 0 else lb.count end as count
+		from kb_category_label kcl
+		left join kb_model_label kml on kcl.l_id = kml.id
+		left join (select l_id, count(1) as count from kb_basic_label group by l_id) lb
+		on lb.l_id = kml.id
+		<where>
+		kml.is_deleted = 2
+			<if test="ctId != null and ctId != ''">
+				and kcl.ct_id = #{ctId}
+			</if>
+			<if test="kbModelLabelDto.name != null and kbModelLabelDto.name != ''">
+				and kml.name like concat('%',#{kbModelLabelDto.name},'%')
+			</if>
+		</where>
+		order by kml.sort desc ,kml.create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="findLabelByCategoryCount" resultType="java.lang.Integer">
+		select count(1) from kb_category_label kcl
+		left join kb_model_label kml on kcl.l_id = kml.id
+		left join (select l_id, count(1) as count from kb_basic_label group by l_id) lb
+		on lb.l_id = kml.id
+		<where>
+			kml.is_deleted = 2
+			<if test="ctId != null and ctId != ''">
+				and kcl.ct_id = #{ctId}
+			</if>
+			<if test="kbModelLabelDto.name != null and kbModelLabelDto.name != ''">
+				and kml.name like concat('%',#{kbModelLabelDto.name},'%')
+			</if>
+		</where>
+	</select>
+	<select id="findAllLabelByCategory" resultType="com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity">
+		select kml.* from kb_category_label kcl left join kb_model_label kml on kcl.l_id = kml.id
+		<where>
+			kml.is_deleted = 2
+			<if test="ctId != null and ctId != ''">
+				and kcl.ct_id = #{ctId}
+			</if>
+		</where>
+	</select>
+	<select id="findCategoryByLabel"
+			resultType="com.castle.fortress.admin.knowledge.entity.KbLabelCategoryEntity">
+		select klc.* from kb_category_label kcl left join kb_label_category klc on kcl.l_id = klc.id
+		where kcl.l_id = #{labelId}
+	</select>
+	<select id="findCategoryByLabelIds" resultType="com.castle.fortress.admin.knowledge.entity.KbLabelCategoryEntity">
+		select klc.* from kb_category_label kcl left join kb_label_category klc on kcl.ct_id = klc.id
+		where kcl.l_id in
+		<foreach collection="ids" item="labelId" separator="," open="(" close=")">
+			#{labelId}
+		</foreach>
+	</select>
+	<select id="isExistLabel" resultType="com.castle.fortress.admin.knowledge.entity.KbCategoryLabelEntity">
+		select * from kb_category_label where l_id in
+		<foreach collection="ids" item="id" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</select>
+	<select id="findAllLabelByCategorys" resultType="com.castle.fortress.admin.knowledge.dto.KbModelLabelDto">
+		select kml.*,klc.name as ctName
+		from kb_category_label kcl
+		left join kb_model_label kml on kcl.l_id = kml.id
+		left join kb_label_category klc on kcl.ct_id = klc.id
+		where kml.is_deleted = 2
+		 and kcl.ct_id in
+		<foreach collection="ids" item="id" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</select>
+	<select id="findByIds" resultType="com.castle.fortress.admin.knowledge.entity.KbLabelCategoryEntity">
+		select * from kb_label_category where id in
+		<foreach collection="ids" item="id" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</select>
+	<select id="isExiteName" resultType="com.castle.fortress.admin.knowledge.entity.KbLabelCategoryEntity">
+		select * from kb_label_category
+		where name in
+		<foreach collection="names" item="name" separator="," open="(" close=")">
+			#{name}
+		</foreach>
+	</select>
+
+</mapper>

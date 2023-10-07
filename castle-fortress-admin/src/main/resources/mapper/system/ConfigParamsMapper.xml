@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.ConfigParamsMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="configParamsMap" type="com.castle.fortress.admin.system.entity.ConfigParamsEntity">
+        <result column="id" property="id"/>
+        <result column="param_code" property="paramCode"/>
+        <result column="param_value" property="paramValue"/>
+        <result column="param_type" property="paramType"/>
+        <result column="param_remark" property="paramRemark"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_dept" property="createDept"/>
+        <result column="create_post" property="createPost"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="configParamsExtendsMap" extends="configParamsMap" type="com.castle.fortress.admin.system.entity.ConfigParamsEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="configParamsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_params t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='configParamsEntity.id != null'>
+            AND t.id like concat('%',#{configParamsEntity.id},'%')
+        </if>
+        <if test='configParamsEntity.paramCode != null and configParamsEntity.paramCode != ""'>
+            AND t.param_code like concat('%',#{configParamsEntity.paramCode},'%')
+        </if>
+        <if test='configParamsEntity.paramValue != null and configParamsEntity.paramValue != ""'>
+            AND t.param_value like concat('%',#{configParamsEntity.paramValue},'%')
+        </if>
+        <if test='configParamsEntity.paramType != null'>
+            AND t.param_type like concat('%',#{configParamsEntity.paramType},'%')
+        </if>
+        <if test='configParamsEntity.paramRemark != null and configParamsEntity.paramRemark != ""'>
+            AND t.param_remark like concat('%',#{configParamsEntity.paramRemark},'%')
+        </if>
+        <if test='configParamsEntity.status != null'>
+            AND t.status like concat('%',#{configParamsEntity.status},'%')
+        </if>
+        <if test='configParamsEntity.createUser != null'>
+            AND t.create_user like concat('%',#{configParamsEntity.createUser},'%')
+        </if>
+        <if test='configParamsEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{configParamsEntity.createDept},'%')
+        </if>
+        <if test='configParamsEntity.createPost != null'>
+            AND t.create_post like concat('%',#{configParamsEntity.createPost},'%')
+        </if>
+        <if test='configParamsEntity.createTime != null'>
+            AND t.create_time like concat('%',#{configParamsEntity.createTime},'%')
+        </if>
+        <if test='configParamsEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{configParamsEntity.updateUser},'%')
+        </if>
+        <if test='configParamsEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{configParamsEntity.updateTime},'%')
+        </if>
+        <if test='configParamsEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{configParamsEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_config_params t
+        WHERE
+            t.is_deleted = 2
+        <if test='configParamsEntity.id != null'>
+            AND t.id like concat('%',#{configParamsEntity.id},'%')
+        </if>
+        <if test='configParamsEntity.paramCode != null and configParamsEntity.paramCode != ""'>
+            AND t.param_code like concat('%',#{configParamsEntity.paramCode},'%')
+        </if>
+        <if test='configParamsEntity.paramValue != null and configParamsEntity.paramValue != ""'>
+            AND t.param_value like concat('%',#{configParamsEntity.paramValue},'%')
+        </if>
+        <if test='configParamsEntity.paramType != null'>
+            AND t.param_type like concat('%',#{configParamsEntity.paramType},'%')
+        </if>
+        <if test='configParamsEntity.paramRemark != null and configParamsEntity.paramRemark != ""'>
+            AND t.param_remark like concat('%',#{configParamsEntity.paramRemark},'%')
+        </if>
+        <if test='configParamsEntity.status != null'>
+            AND t.status like concat('%',#{configParamsEntity.status},'%')
+        </if>
+        <if test='configParamsEntity.createUser != null'>
+            AND t.create_user like concat('%',#{configParamsEntity.createUser},'%')
+        </if>
+        <if test='configParamsEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{configParamsEntity.createDept},'%')
+        </if>
+        <if test='configParamsEntity.createPost != null'>
+            AND t.create_post like concat('%',#{configParamsEntity.createPost},'%')
+        </if>
+        <if test='configParamsEntity.createTime != null'>
+            AND t.create_time like concat('%',#{configParamsEntity.createTime},'%')
+        </if>
+        <if test='configParamsEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{configParamsEntity.updateUser},'%')
+        </if>
+        <if test='configParamsEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{configParamsEntity.updateTime},'%')
+        </if>
+        <if test='configParamsEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{configParamsEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="configParamsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_params t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,30 @@
+.d2h-file-list-title{
+  display: none;
+}
+.d2h-file-switch{
+  display: none !important;
+}
+.d2h-file-list{
+  display: none !important;
+}
+.d2h-tag{
+  display: none !important;
+}
+/* .d2h-file-name{
+  display: none;
+} */
+.div-item{
+  width: 50.4vw;
+  display: flex;
+  justify-content: space-between;
+}
+.d2h-diff-table {
+  width: 95%;
+}
+.d2h-emptyplaceholder {
+  background-color: inherit;
+}
+.d2h-code-side-line {
+  padding-left: 4.5rem;
+  width: inherit;
+}

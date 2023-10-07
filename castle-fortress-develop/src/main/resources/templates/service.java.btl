@@ -1,0 +1,50 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}%><%if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>dto.${className}Dto;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Map;
+import java.util.List;
+
+/**
+ * ${classDdsc} 服务类
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+public interface ${className}Service extends IService<${className}Entity> {
+
+    /**
+     * 分页展示${classDdsc}列表
+     * @param page
+     * @param ${entityKey}Dto
+     * @return
+     */
+    IPage<${className}Dto> page${className}(Page<${className}Dto> page, ${className}Dto ${entityKey}Dto);
+
+    <%if(hasSuperEntity){%>
+    /**
+    * 分页展示${classDdsc}扩展列表
+    * @param page
+    * @param ${entityKey}Dto
+    * @return
+    */
+    IPage<${className}Dto> page${className}Extends(Page<${className}Dto> page, ${className}Dto ${entityKey}Dto);
+    /**
+    * ${classDdsc}扩展详情
+    * @param id ${classDdsc}id
+    * @return
+    */
+    ${className}Dto getByIdExtends(Long id);
+    <%}%>
+
+    /**
+     * 展示${classDdsc}列表
+     * @param ${entityKey}Dto
+     * @return
+     */
+    List<${className}Dto> list${className}(${className}Dto ${entityKey}Dto);
+
+}

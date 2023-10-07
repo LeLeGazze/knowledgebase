@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.ProtocolMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="protocolMap" type="com.castle.fortress.admin.system.entity.ProtocolEntity">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="protocolExtendsMap" extends="protocolMap" type="com.castle.fortress.admin.system.entity.ProtocolEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="protocolExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_protocol t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='protocolEntity.id != null'>
+            AND t.id like concat('%',#{protocolEntity.id},'%')
+        </if>
+        <if test='protocolEntity.code != null and protocolEntity.code != ""'>
+            AND t.code like concat('%',#{protocolEntity.code},'%')
+        </if>
+        <if test='protocolEntity.title != null and protocolEntity.title != ""'>
+            AND t.title like concat('%',#{protocolEntity.title},'%')
+        </if>
+        <if test='protocolEntity.content != null and protocolEntity.content != ""'>
+            AND t.content like concat('%',#{protocolEntity.content},'%')
+        </if>
+        <if test='protocolEntity.status != null'>
+            AND t.status like concat('%',#{protocolEntity.status},'%')
+        </if>
+        <if test='protocolEntity.createUser != null'>
+            AND t.create_user like concat('%',#{protocolEntity.createUser},'%')
+        </if>
+        <if test='protocolEntity.createTime != null'>
+            AND t.create_time like concat('%',#{protocolEntity.createTime},'%')
+        </if>
+        <if test='protocolEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{protocolEntity.updateUser},'%')
+        </if>
+        <if test='protocolEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{protocolEntity.updateTime},'%')
+        </if>
+        <if test='protocolEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{protocolEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_protocol t
+        WHERE
+            t.is_deleted = 2
+        <if test='protocolEntity.id != null'>
+            AND t.id like concat('%',#{protocolEntity.id},'%')
+        </if>
+        <if test='protocolEntity.code != null and protocolEntity.code != ""'>
+            AND t.code like concat('%',#{protocolEntity.code},'%')
+        </if>
+        <if test='protocolEntity.title != null and protocolEntity.title != ""'>
+            AND t.title like concat('%',#{protocolEntity.title},'%')
+        </if>
+        <if test='protocolEntity.content != null and protocolEntity.content != ""'>
+            AND t.content like concat('%',#{protocolEntity.content},'%')
+        </if>
+        <if test='protocolEntity.status != null'>
+            AND t.status like concat('%',#{protocolEntity.status},'%')
+        </if>
+        <if test='protocolEntity.createUser != null'>
+            AND t.create_user like concat('%',#{protocolEntity.createUser},'%')
+        </if>
+        <if test='protocolEntity.createTime != null'>
+            AND t.create_time like concat('%',#{protocolEntity.createTime},'%')
+        </if>
+        <if test='protocolEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{protocolEntity.updateUser},'%')
+        </if>
+        <if test='protocolEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{protocolEntity.updateTime},'%')
+        </if>
+        <if test='protocolEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{protocolEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="protocolExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_protocol t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="selectDataList" resultType="com.castle.fortress.admin.system.entity.ProtocolEntity">
+        SELECT
+            *
+        FROM
+            castle_protocol
+        WHERE
+            is_deleted = 2
+        <if test="status != null and status != ''">
+            and status = #{status}
+        </if>
+        <if test="code != null and code != ''">
+            and code = #{code}
+        </if>
+        order by create_time desc
+    </select>
+
+</mapper>

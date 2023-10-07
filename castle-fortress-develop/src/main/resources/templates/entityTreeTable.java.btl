@@ -1,0 +1,46 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}%><%if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity;
+
+<% for(pkg in imports){%>
+import ${pkg};
+<% }%>
+/**
+ * ${classDdsc} 实体类
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+@TableName("${tbConfig.tbName}")
+<% if (hasSuperEntity){ %>
+@EqualsAndHashCode(callSuper = true)
+<% } %>
+<% if (hasSuperEntity){ %>
+public class ${className}Entity extends ${superEntity}  {
+<% }else{ %>
+public class ${className}Entity implements Serializable {
+<% } %>
+	private static final long serialVersionUID = 1L;
+<% for(field in colList){
+	if(isNotEmpty(field.propDesc)){%>
+	/**
+	 * ${field.propDesc}
+	*/
+	<%}
+	if(field.propType == "Long"){%>
+	@JsonSerialize(using = ToStringSerializer.class)
+	<%}%>
+	<%if(field.propName == "id"){%>
+	@TableId(
+			value = "id",
+			type = IdType.ASSIGN_ID
+	)
+	<%}%>
+	private ${field.propType} ${field.propName};
+<%}%>
+	@TableField(exist = false)
+	/**
+	* 关联的树形名称
+	*/
+	private String ${tableCol}Name;
+
+}

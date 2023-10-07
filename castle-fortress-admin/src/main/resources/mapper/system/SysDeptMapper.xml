@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.SysDeptMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysDeptMap" type="com.castle.fortress.admin.system.entity.SysDeptEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="remark" property="remark"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="parents" property="parents"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="sysDeptExtendsMap" extends="sysDeptMap" type="com.castle.fortress.admin.system.entity.SysDeptEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="authorityAllDept" resultType="com.castle.fortress.admin.system.entity.SysDeptEntity">
+
+        <if test="roleIds!=null and roleIds.size > 0">
+            select  *
+            from (
+            select t1.*,
+            #                 t1.parent_id,
+            if(find_in_set(parent_id, @parentId) > 0 or find_in_set(id, @parentId) > 0 , @parentId := concat(@parentId, ',', id), 0) as ischild
+            from (
+            select  *
+            from castle_sys_dept t
+            where is_deleted=2
+            ) t1,
+            (select @parentId := (SELECT  group_concat(distinct t1.dept_id ) FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )) t2
+            ) t3
+            where ischild != 0
+            <if test="name!=null and name !='' ">
+                and t3.name like concat('%',#{name},'%')
+            </if>
+        </if>
+        <if test="roleIds==null ">
+            select t.*
+            from castle_sys_dept t
+            where t.is_deleted = 2
+            <if test="name!=null and name !='' ">
+                and t.name like concat('%',#{name},'%')
+            </if>
+        </if>
+        <if test="parentId!=null and parentId !='' ">
+            and parent_id=#{parentId}
+        </if>
+    </select>
+<!--            select t.*
+        from castle_sys_dept t
+        where t.is_deleted = 2
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.dept_id FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="parentId!=null and parentId !='' ">
+           and parent_id=#{parentId}
+        </if>-->
+    <select id="authorityComponentList" resultType="com.castle.fortress.admin.system.entity.SysDeptEntity">
+        select t.*
+        from castle_sys_dept t
+        where t.is_deleted = 2
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.dept_id FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="deptId!=null">
+            and t.parent_id = #{deptId}
+        </if>
+        <if test="deptId == null">
+            and t.parent_id is null
+        </if>
+    </select>
+    <select id="countChild" resultType="java.util.Map">
+        select t.dept_id id,count(1) num from (
+           select id,name,parent_id dept_id from castle_sys_dept where parent_id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+           union
+           select id,login_name name,dept_id from castle_sys_user where dept_id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+       ) t
+        group by t.dept_id
+
+    </select>
+    <select id="authoritySearchForComponent"
+            resultType="com.castle.fortress.admin.system.entity.SysDeptEntity">
+        select t.*
+        from castle_sys_dept t
+        where t.is_deleted = 2
+        <if test="name!=null">
+            AND t.name like concat('%',#{name},'%')
+        </if>
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.dept_id FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+    <select id="authorityNameForComponent" resultType="com.castle.fortress.admin.system.entity.SysDeptEntity">
+        select t.*
+        from castle_sys_dept t
+        where t.is_deleted = 2
+        AND t.id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="roleIds!=null and roleIds.size > 0">
+            AND t.id IN
+            ( SELECT distinct t1.dept_id FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+    <select id="listToName" resultType="com.castle.fortress.admin.system.entity.SysDeptEntity">
+
+    </select>
+    <select id="myselfBelowDept" resultType="com.castle.fortress.admin.system.dto.SysDeptDto"
+            parameterType="java.lang.Long">
+        select *
+        from (select t1.*,
+                     #                 t1.parent_id,
+                      if(find_in_set(parent_id, @parentId) > 0 or find_in_set(id, @parentId) > 0,
+                         @parentId := concat(@parentId, ',', id), 0) as ischild
+              from (select *
+                    from castle_sys_dept t
+                    where is_deleted = 2) t1,
+                   (select @parentId := #{deptId}
+                   ) t2) t3
+        where ischild != 0
+    </select>
+
+</mapper>

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.demo.mapper.TmpDemoGenerateMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="tmpDemoGenerateMap" type="com.castle.fortress.admin.demo.entity.TmpDemoGenerateEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="content" property="content"/>
+        <result column="auth" property="auth"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="images" property="images"/>
+        <result column="files" property="files"/>
+        <result column="video" property="video"/>
+        <result column="vue_number" property="vueNumber"/>
+        <result column="vue_radio" property="vueRadio"/>
+        <result column="vue_textarea" property="vueTextarea"/>
+        <result column="vue_checkbox" property="vueCheckbox"/>
+        <result column="vue_select" property="vueSelect"/>
+        <result column="select_enum" property="selectEnum"/>
+        <result column="select_url" property="selectUrl"/>
+        <result column="select_json" property="selectJson"/>
+        <result column="vue_date" property="vueDate"/>
+        <result column="vue_datetime" property="vueDatetime"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_dept" property="createDept"/>
+        <result column="create_post" property="createPost"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="redio_enum" property="redioEnum"/>
+        <result column="radio_url" property="radioUrl"/>
+        <result column="radio_json" property="radioJson"/>
+        <result column="checkbox_enum" property="checkboxEnum"/>
+        <result column="checkbox_url" property="checkboxUrl"/>
+        <result column="checkbox_json" property="checkboxJson"/>
+    </resultMap>
+    <resultMap id="tmpDemoGenerateExtendsMap" extends="tmpDemoGenerateMap" type="com.castle.fortress.admin.demo.entity.TmpDemoGenerateEntity">
+        <result column="create_user_name" property="createUserName" />
+        <result column="create_dept_name" property="createDeptName" />
+        <result column="create_post_name" property="createPostName" />
+    </resultMap>
+    <select id="extendsList" resultMap="tmpDemoGenerateExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name,
+        t2.name create_dept_name,
+        t3.name create_post_name
+        FROM
+        tmp_demo_generate t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        LEFT OUTER JOIN castle_sys_dept t2 ON t.create_dept  = t2.id
+        LEFT OUTER JOIN castle_sys_post t3 ON t.create_post = t3.id
+        WHERE
+        t.is_deleted = 2
+        <if test='tmpDemoGenerateEntity.id != null'>
+            AND t.id like concat('%',#{tmpDemoGenerateEntity.id},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.name != null and tmpDemoGenerateEntity.name != ""'>
+            AND t.name like concat('%',#{tmpDemoGenerateEntity.name},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.content != null and tmpDemoGenerateEntity.content != ""'>
+            AND t.content like concat('%',#{tmpDemoGenerateEntity.content},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.auth != null and tmpDemoGenerateEntity.auth != ""'>
+            AND t.auth like concat('%',#{tmpDemoGenerateEntity.auth},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.phone != null and tmpDemoGenerateEntity.phone != ""'>
+            AND t.phone like concat('%',#{tmpDemoGenerateEntity.phone},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.email != null and tmpDemoGenerateEntity.email != ""'>
+            AND t.email like concat('%',#{tmpDemoGenerateEntity.email},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.images != null and tmpDemoGenerateEntity.images != ""'>
+            AND t.images like concat('%',#{tmpDemoGenerateEntity.images},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.files != null and tmpDemoGenerateEntity.files != ""'>
+            AND t.files like concat('%',#{tmpDemoGenerateEntity.files},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.video != null and tmpDemoGenerateEntity.video != ""'>
+            AND t.video like concat('%',#{tmpDemoGenerateEntity.video},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueNumber != null'>
+            AND t.vue_number like concat('%',#{tmpDemoGenerateEntity.vueNumber},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueRadio != null and tmpDemoGenerateEntity.vueRadio != ""'>
+            AND t.vue_radio like concat('%',#{tmpDemoGenerateEntity.vueRadio},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueTextarea != null and tmpDemoGenerateEntity.vueTextarea != ""'>
+            AND t.vue_textarea like concat('%',#{tmpDemoGenerateEntity.vueTextarea},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueCheckbox != null and tmpDemoGenerateEntity.vueCheckbox != ""'>
+            AND t.vue_checkbox like concat('%',#{tmpDemoGenerateEntity.vueCheckbox},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueSelect != null and tmpDemoGenerateEntity.vueSelect != ""'>
+            AND t.vue_select like concat('%',#{tmpDemoGenerateEntity.vueSelect},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.selectEnum != null and tmpDemoGenerateEntity.selectEnum != ""'>
+            AND t.select_enum like concat('%',#{tmpDemoGenerateEntity.selectEnum},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.selectUrl != null and tmpDemoGenerateEntity.selectUrl != ""'>
+            AND t.select_url like concat('%',#{tmpDemoGenerateEntity.selectUrl},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.selectJson != null and tmpDemoGenerateEntity.selectJson != ""'>
+            AND t.select_json like concat('%',#{tmpDemoGenerateEntity.selectJson},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueDate != null'>
+            AND t.vue_date like concat('%',#{tmpDemoGenerateEntity.vueDate},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueDatetime != null'>
+            AND t.vue_datetime like concat('%',#{tmpDemoGenerateEntity.vueDatetime},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.status != null'>
+            AND t.status like concat('%',#{tmpDemoGenerateEntity.status},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createUser != null'>
+            AND t.create_user like concat('%',#{tmpDemoGenerateEntity.createUser},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{tmpDemoGenerateEntity.createDept},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createPost != null'>
+            AND t.create_post like concat('%',#{tmpDemoGenerateEntity.createPost},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createTime != null'>
+            AND t.create_time like concat('%',#{tmpDemoGenerateEntity.createTime},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{tmpDemoGenerateEntity.updateUser},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{tmpDemoGenerateEntity.updateTime},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{tmpDemoGenerateEntity.isDeleted},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.redioEnum != null and tmpDemoGenerateEntity.redioEnum != ""'>
+            AND t.redio_enum like concat('%',#{tmpDemoGenerateEntity.redioEnum},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.radioUrl != null and tmpDemoGenerateEntity.radioUrl != ""'>
+            AND t.radio_url like concat('%',#{tmpDemoGenerateEntity.radioUrl},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.radioJson != null and tmpDemoGenerateEntity.radioJson != ""'>
+            AND t.radio_json like concat('%',#{tmpDemoGenerateEntity.radioJson},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.checkboxEnum != null and tmpDemoGenerateEntity.checkboxEnum != ""'>
+            AND t.checkbox_enum like concat('%',#{tmpDemoGenerateEntity.checkboxEnum},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.checkboxUrl != null and tmpDemoGenerateEntity.checkboxUrl != ""'>
+            AND t.checkbox_url like concat('%',#{tmpDemoGenerateEntity.checkboxUrl},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.checkboxJson != null and tmpDemoGenerateEntity.checkboxJson != ""'>
+            AND t.checkbox_json like concat('%',#{tmpDemoGenerateEntity.checkboxJson},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        tmp_demo_generate t
+        WHERE
+        t.is_deleted = 2
+        <if test='tmpDemoGenerateEntity.id != null'>
+            AND t.id like concat('%',#{tmpDemoGenerateEntity.id},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.name != null and tmpDemoGenerateEntity.name != ""'>
+            AND t.name like concat('%',#{tmpDemoGenerateEntity.name},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.content != null and tmpDemoGenerateEntity.content != ""'>
+            AND t.content like concat('%',#{tmpDemoGenerateEntity.content},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.auth != null and tmpDemoGenerateEntity.auth != ""'>
+            AND t.auth like concat('%',#{tmpDemoGenerateEntity.auth},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.phone != null and tmpDemoGenerateEntity.phone != ""'>
+            AND t.phone like concat('%',#{tmpDemoGenerateEntity.phone},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.email != null and tmpDemoGenerateEntity.email != ""'>
+            AND t.email like concat('%',#{tmpDemoGenerateEntity.email},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.images != null and tmpDemoGenerateEntity.images != ""'>
+            AND t.images like concat('%',#{tmpDemoGenerateEntity.images},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.files != null and tmpDemoGenerateEntity.files != ""'>
+            AND t.files like concat('%',#{tmpDemoGenerateEntity.files},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.video != null and tmpDemoGenerateEntity.video != ""'>
+            AND t.video like concat('%',#{tmpDemoGenerateEntity.video},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueNumber != null'>
+            AND t.vue_number like concat('%',#{tmpDemoGenerateEntity.vueNumber},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueRadio != null and tmpDemoGenerateEntity.vueRadio != ""'>
+            AND t.vue_radio like concat('%',#{tmpDemoGenerateEntity.vueRadio},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueTextarea != null and tmpDemoGenerateEntity.vueTextarea != ""'>
+            AND t.vue_textarea like concat('%',#{tmpDemoGenerateEntity.vueTextarea},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueCheckbox != null and tmpDemoGenerateEntity.vueCheckbox != ""'>
+            AND t.vue_checkbox like concat('%',#{tmpDemoGenerateEntity.vueCheckbox},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueSelect != null and tmpDemoGenerateEntity.vueSelect != ""'>
+            AND t.vue_select like concat('%',#{tmpDemoGenerateEntity.vueSelect},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.selectEnum != null and tmpDemoGenerateEntity.selectEnum != ""'>
+            AND t.select_enum like concat('%',#{tmpDemoGenerateEntity.selectEnum},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.selectUrl != null and tmpDemoGenerateEntity.selectUrl != ""'>
+            AND t.select_url like concat('%',#{tmpDemoGenerateEntity.selectUrl},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.selectJson != null and tmpDemoGenerateEntity.selectJson != ""'>
+            AND t.select_json like concat('%',#{tmpDemoGenerateEntity.selectJson},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueDate != null'>
+            AND t.vue_date like concat('%',#{tmpDemoGenerateEntity.vueDate},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.vueDatetime != null'>
+            AND t.vue_datetime like concat('%',#{tmpDemoGenerateEntity.vueDatetime},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.status != null'>
+            AND t.status like concat('%',#{tmpDemoGenerateEntity.status},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createUser != null'>
+            AND t.create_user like concat('%',#{tmpDemoGenerateEntity.createUser},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{tmpDemoGenerateEntity.createDept},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createPost != null'>
+            AND t.create_post like concat('%',#{tmpDemoGenerateEntity.createPost},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.createTime != null'>
+            AND t.create_time like concat('%',#{tmpDemoGenerateEntity.createTime},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{tmpDemoGenerateEntity.updateUser},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{tmpDemoGenerateEntity.updateTime},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{tmpDemoGenerateEntity.isDeleted},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.redioEnum != null and tmpDemoGenerateEntity.redioEnum != ""'>
+            AND t.redio_enum like concat('%',#{tmpDemoGenerateEntity.redioEnum},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.radioUrl != null and tmpDemoGenerateEntity.radioUrl != ""'>
+            AND t.radio_url like concat('%',#{tmpDemoGenerateEntity.radioUrl},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.radioJson != null and tmpDemoGenerateEntity.radioJson != ""'>
+            AND t.radio_json like concat('%',#{tmpDemoGenerateEntity.radioJson},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.checkboxEnum != null and tmpDemoGenerateEntity.checkboxEnum != ""'>
+            AND t.checkbox_enum like concat('%',#{tmpDemoGenerateEntity.checkboxEnum},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.checkboxUrl != null and tmpDemoGenerateEntity.checkboxUrl != ""'>
+            AND t.checkbox_url like concat('%',#{tmpDemoGenerateEntity.checkboxUrl},'%')
+        </if>
+        <if test='tmpDemoGenerateEntity.checkboxJson != null and tmpDemoGenerateEntity.checkboxJson != ""'>
+            AND t.checkbox_json like concat('%',#{tmpDemoGenerateEntity.checkboxJson},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="tmpDemoGenerateExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        tmp_demo_generate t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        LEFT OUTER JOIN castle_sys_dept t2 ON t.create_dept  = t2.id
+        LEFT OUTER JOIN castle_sys_post t3 ON t.create_post = t3.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+
+
+</mapper>

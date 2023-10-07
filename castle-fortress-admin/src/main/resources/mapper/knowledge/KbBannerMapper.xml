@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbBannerMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbBannerMap" type="com.castle.fortress.admin.knowledge.entity.KbBannerEntity">
+        <result column="id" property="id"/>
+        <result column="pc_image" property="pcImage"/>
+        <result column="app_image" property="appImage"/>
+        <result column="tags" property="tags"/>
+        <result column="status" property="status"/>
+        <result column="url" property="url"/>
+        <result column="weight" property="weight"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+	<select id="queryList" resultMap="kbBannerMap">
+		SELECT
+		t.*
+		FROM
+		kb_banner t
+		WHERE
+		1 = 1
+		<if test='kbBannerEntity.id != null'>
+			AND t.id like concat('%',#{kbBannerEntity.id},'%')
+		</if>
+		<if test='kbBannerEntity.pcImage != null and kbBannerEntity.pcImage != ""'>
+			AND t.pc_image like concat('%',#{kbBannerEntity.pcImage},'%')
+		</if>
+		<if test='kbBannerEntity.appImage != null and kbBannerEntity.appImage != ""'>
+			AND t.app_image like concat('%',#{kbBannerEntity.appImage},'%')
+		</if>
+		<if test='kbBannerEntity.tags != null and kbBannerEntity.tags != ""'>
+			AND t.tags like concat('%',#{kbBannerEntity.tags},'%')
+		</if>
+		<if test='kbBannerEntity.status != null'>
+			AND t.status like concat('%',#{kbBannerEntity.status},'%')
+		</if>
+		<if test='kbBannerEntity.url != null and kbBannerEntity.url != ""'>
+			AND t.url like concat('%',#{kbBannerEntity.url},'%')
+		</if>
+		<if test='kbBannerEntity.weight != null'>
+			AND t.weight like concat('%',#{kbBannerEntity.weight},'%')
+		</if>
+		<if test='kbBannerEntity.updateUser != null'>
+			AND t.update_user like concat('%',#{kbBannerEntity.updateUser},'%')
+		</if>
+		<if test='kbBannerEntity.updateTime != null'>
+			AND t.update_time like concat('%',#{kbBannerEntity.updateTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>		
+
+</mapper>

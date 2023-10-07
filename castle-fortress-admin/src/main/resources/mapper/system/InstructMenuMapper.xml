@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.InstructMenuMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="instructMenuMap" type="com.castle.fortress.admin.system.entity.InstructMenuEntity">
+        <result column="id" property="id"/>
+        <result column="instruct_pre" property="instructPre"/>
+        <result column="instruct_keys" property="instructKeys"/>
+        <result column="menu_id" property="menuId"/>
+        <result column="title" property="title"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+    </resultMap>
+	<select id="queryList" resultMap="instructMenuMap">
+		SELECT
+		t.*
+		FROM
+		castle_instruct_menu t
+		WHERE
+		t.is_deleted = 2
+		<if test='instructMenuEntity.id != null'>
+			AND t.id like concat('%',#{instructMenuEntity.id},'%')
+		</if>
+		<if test='instructMenuEntity.instructPre != null and instructMenuEntity.instructPre != ""'>
+			AND t.instruct_pre like concat('%',#{instructMenuEntity.instructPre},'%')
+		</if>
+		<if test='instructMenuEntity.instructKeys != null and instructMenuEntity.instructKeys != ""'>
+			AND t.instruct_keys like concat('%',#{instructMenuEntity.instructKeys},'%')
+		</if>
+		<if test='instructMenuEntity.menuId != null'>
+			AND t.menu_id like concat('%',#{instructMenuEntity.menuId},'%')
+		</if>
+		<if test='instructMenuEntity.title != null and instructMenuEntity.title != ""'>
+			AND t.title like concat('%',#{instructMenuEntity.title},'%')
+		</if>
+		<if test='instructMenuEntity.remark != null and instructMenuEntity.remark != ""'>
+			AND t.remark like concat('%',#{instructMenuEntity.remark},'%')
+		</if>
+		<if test='instructMenuEntity.status != null'>
+			AND t.status like concat('%',#{instructMenuEntity.status},'%')
+		</if>
+			order by create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>		
+
+</mapper>

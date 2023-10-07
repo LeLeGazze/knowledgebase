@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.CastleSysUserWeComMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleSysUserWeComMap" type="com.castle.fortress.admin.system.entity.CastleSysUserWeComEntity">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="we_com_userid" property="weComUserid"/>
+        <result column="name" property="name"/>
+        <result column="department" property="department"/>
+        <result column="position" property="position"/>
+        <result column="mobile" property="mobile"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <result column="status" property="status"/>
+        <result column="avatar" property="avatar"/>
+        <result column="isleader" property="isleader"/>
+        <result column="extattr" property="extattr"/>
+        <result column="english_name" property="englishName"/>
+        <result column="telephone" property="telephone"/>
+        <result column="enable" property="enable"/>
+        <result column="hide_mobile" property="hideMobile"/>
+        <result column="sort" property="sort"/>
+        <result column="external_profile" property="externalProfile"/>
+        <result column="main_department" property="mainDepartment"/>
+        <result column="qr_code" property="qrCode"/>
+        <result column="alias" property="alias"/>
+        <result column="is_leader_in_dept" property="isLeaderInDept"/>
+        <result column="address" property="address"/>
+        <result column="thumb_avatar" property="thumbAvatar"/>
+        <result column="direct_leader" property="directLeader"/>
+        <result column="biz_mail" property="bizMail"/>
+        <result column="open_userid" property="openUserid"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    <delete id="removeAll">
+		delete from castle_sys_user_we_com
+	</delete>
+    <select id="queryList" resultMap="castleSysUserWeComMap">
+		SELECT
+		t.*
+		FROM
+		castle_sys_user_we_com t
+		WHERE
+		1 = 1
+		<if test='castleSysUserWeComEntity.id != null'>
+			AND t.id like concat('%',#{castleSysUserWeComEntity.id},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.userId != null'>
+			AND t.user_id like concat('%',#{castleSysUserWeComEntity.userId},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.weComUserid != null and castleSysUserWeComEntity.weComUserid != ""'>
+			AND t.we_com_userid like concat('%',#{castleSysUserWeComEntity.weComUserid},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.name != null and castleSysUserWeComEntity.name != ""'>
+			AND t.name like concat('%',#{castleSysUserWeComEntity.name},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.department != null and castleSysUserWeComEntity.department != ""'>
+			AND t.department like concat('%',#{castleSysUserWeComEntity.department},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.position != null and castleSysUserWeComEntity.position != ""'>
+			AND t.position like concat('%',#{castleSysUserWeComEntity.position},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.mobile != null and castleSysUserWeComEntity.mobile != ""'>
+			AND t.mobile like concat('%',#{castleSysUserWeComEntity.mobile},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.email != null and castleSysUserWeComEntity.email != ""'>
+			AND t.email like concat('%',#{castleSysUserWeComEntity.email},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.gender != null and castleSysUserWeComEntity.gender != ""'>
+			AND t.gender like concat('%',#{castleSysUserWeComEntity.gender},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.status != null and castleSysUserWeComEntity.status != ""'>
+			AND t.status like concat('%',#{castleSysUserWeComEntity.status},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.avatar != null and castleSysUserWeComEntity.avatar != ""'>
+			AND t.avatar like concat('%',#{castleSysUserWeComEntity.avatar},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.isleader != null and castleSysUserWeComEntity.isleader != ""'>
+			AND t.isleader like concat('%',#{castleSysUserWeComEntity.isleader},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.extattr != null and castleSysUserWeComEntity.extattr != ""'>
+			AND t.extattr like concat('%',#{castleSysUserWeComEntity.extattr},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.englishName != null and castleSysUserWeComEntity.englishName != ""'>
+			AND t.english_name like concat('%',#{castleSysUserWeComEntity.englishName},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.telephone != null and castleSysUserWeComEntity.telephone != ""'>
+			AND t.telephone like concat('%',#{castleSysUserWeComEntity.telephone},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.enable != null and castleSysUserWeComEntity.enable != ""'>
+			AND t.enable like concat('%',#{castleSysUserWeComEntity.enable},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.hideMobile != null and castleSysUserWeComEntity.hideMobile != ""'>
+			AND t.hide_mobile like concat('%',#{castleSysUserWeComEntity.hideMobile},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.sort != null and castleSysUserWeComEntity.sort != ""'>
+			AND t.sort like concat('%',#{castleSysUserWeComEntity.sort},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.externalProfile != null and castleSysUserWeComEntity.externalProfile != ""'>
+			AND t.external_profile like concat('%',#{castleSysUserWeComEntity.externalProfile},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.mainDepartment != null and castleSysUserWeComEntity.mainDepartment != ""'>
+			AND t.main_department like concat('%',#{castleSysUserWeComEntity.mainDepartment},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.qrCode != null and castleSysUserWeComEntity.qrCode != ""'>
+			AND t.qr_code like concat('%',#{castleSysUserWeComEntity.qrCode},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.alias != null'>
+			AND t.alias like concat('%',#{castleSysUserWeComEntity.alias},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.isLeaderInDept != null and castleSysUserWeComEntity.isLeaderInDept != ""'>
+			AND t.is_leader_in_dept like concat('%',#{castleSysUserWeComEntity.isLeaderInDept},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.address != null and castleSysUserWeComEntity.address != ""'>
+			AND t.address like concat('%',#{castleSysUserWeComEntity.address},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.thumbAvatar != null and castleSysUserWeComEntity.thumbAvatar != ""'>
+			AND t.thumb_avatar like concat('%',#{castleSysUserWeComEntity.thumbAvatar},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.directLeader != null and castleSysUserWeComEntity.directLeader != ""'>
+			AND t.direct_leader like concat('%',#{castleSysUserWeComEntity.directLeader},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.bizMail != null and castleSysUserWeComEntity.bizMail != ""'>
+			AND t.biz_mail like concat('%',#{castleSysUserWeComEntity.bizMail},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.openUserid != null and castleSysUserWeComEntity.openUserid != ""'>
+			AND t.open_userid like concat('%',#{castleSysUserWeComEntity.openUserid},'%')
+		</if>
+		<if test='castleSysUserWeComEntity.createTime != null'>
+			AND t.create_time like concat('%',#{castleSysUserWeComEntity.createTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectByUserId" resultType="com.castle.fortress.admin.system.entity.CastleSysUserWeComEntity">
+		SELECT
+			*
+		FROM
+			castle_sys_user_we_com
+		WHERE
+			user_id = #{id} limit 0,1
+	</select>
+
+</mapper>

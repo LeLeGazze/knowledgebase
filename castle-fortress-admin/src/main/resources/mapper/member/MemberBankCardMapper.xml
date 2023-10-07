@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberBankCardMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberBankCardMap" type="com.castle.fortress.admin.member.entity.MemberBankCardEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="card_num" property="cardNum"/>
+        <result column="open_account" property="openAccount"/>
+        <result column="bank_name" property="bankName"/>
+        <result column="phone" property="phone"/>
+        <result column="card_url" property="cardUrl"/>
+        <result column="valid_date" property="validDate"/>
+        <result column="card_type" property="cardType"/>
+        <result column="bank_type" property="bankType"/>
+        <result column="city" property="city"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="memberBankCardExtendsMap" extends="memberBankCardMap" type="com.castle.fortress.admin.member.entity.MemberBankCardEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberBankCardExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_bank_card t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberBankCardEntity.id != null'>
+            AND t.id like concat('%',#{memberBankCardEntity.id},'%')
+        </if>
+        <if test='memberBankCardEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberBankCardEntity.memberId},'%')
+        </if>
+        <if test='memberBankCardEntity.cardNum != null and memberBankCardEntity.cardNum != ""'>
+            AND t.card_num like concat('%',#{memberBankCardEntity.cardNum},'%')
+        </if>
+        <if test='memberBankCardEntity.openAccount != null and memberBankCardEntity.openAccount != ""'>
+            AND t.open_account like concat('%',#{memberBankCardEntity.openAccount},'%')
+        </if>
+        <if test='memberBankCardEntity.bankName != null and memberBankCardEntity.bankName != ""'>
+            AND t.bank_name like concat('%',#{memberBankCardEntity.bankName},'%')
+        </if>
+        <if test='memberBankCardEntity.phone != null and memberBankCardEntity.phone != ""'>
+            AND t.phone like concat('%',#{memberBankCardEntity.phone},'%')
+        </if>
+        <if test='memberBankCardEntity.cardUrl != null and memberBankCardEntity.cardUrl != ""'>
+            AND t.card_url like concat('%',#{memberBankCardEntity.cardUrl},'%')
+        </if>
+        <if test='memberBankCardEntity.validDate != null'>
+            AND t.valid_date like concat('%',#{memberBankCardEntity.validDate},'%')
+        </if>
+        <if test='memberBankCardEntity.cardType != null and memberBankCardEntity.cardType != ""'>
+            AND t.card_type like concat('%',#{memberBankCardEntity.cardType},'%')
+        </if>
+        <if test='memberBankCardEntity.bankType != null and memberBankCardEntity.bankType != ""'>
+            AND t.bank_type like concat('%',#{memberBankCardEntity.bankType},'%')
+        </if>
+        <if test='memberBankCardEntity.city != null and memberBankCardEntity.city != ""'>
+            AND t.city like concat('%',#{memberBankCardEntity.city},'%')
+        </if>
+        <if test='memberBankCardEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberBankCardEntity.createUser},'%')
+        </if>
+        <if test='memberBankCardEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberBankCardEntity.createTime},'%')
+        </if>
+        <if test='memberBankCardEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberBankCardEntity.updateUser},'%')
+        </if>
+        <if test='memberBankCardEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberBankCardEntity.updateTime},'%')
+        </if>
+        <if test='memberBankCardEntity.status != null'>
+            AND t.status like concat('%',#{memberBankCardEntity.status},'%')
+        </if>
+        <if test='memberBankCardEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberBankCardEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_bank_card t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberBankCardEntity.id != null'>
+            AND t.id like concat('%',#{memberBankCardEntity.id},'%')
+        </if>
+        <if test='memberBankCardEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberBankCardEntity.memberId},'%')
+        </if>
+        <if test='memberBankCardEntity.cardNum != null and memberBankCardEntity.cardNum != ""'>
+            AND t.card_num like concat('%',#{memberBankCardEntity.cardNum},'%')
+        </if>
+        <if test='memberBankCardEntity.openAccount != null and memberBankCardEntity.openAccount != ""'>
+            AND t.open_account like concat('%',#{memberBankCardEntity.openAccount},'%')
+        </if>
+        <if test='memberBankCardEntity.bankName != null and memberBankCardEntity.bankName != ""'>
+            AND t.bank_name like concat('%',#{memberBankCardEntity.bankName},'%')
+        </if>
+        <if test='memberBankCardEntity.phone != null and memberBankCardEntity.phone != ""'>
+            AND t.phone like concat('%',#{memberBankCardEntity.phone},'%')
+        </if>
+        <if test='memberBankCardEntity.cardUrl != null and memberBankCardEntity.cardUrl != ""'>
+            AND t.card_url like concat('%',#{memberBankCardEntity.cardUrl},'%')
+        </if>
+        <if test='memberBankCardEntity.validDate != null'>
+            AND t.valid_date like concat('%',#{memberBankCardEntity.validDate},'%')
+        </if>
+        <if test='memberBankCardEntity.cardType != null and memberBankCardEntity.cardType != ""'>
+            AND t.card_type like concat('%',#{memberBankCardEntity.cardType},'%')
+        </if>
+        <if test='memberBankCardEntity.bankType != null and memberBankCardEntity.bankType != ""'>
+            AND t.bank_type like concat('%',#{memberBankCardEntity.bankType},'%')
+        </if>
+        <if test='memberBankCardEntity.city != null and memberBankCardEntity.city != ""'>
+            AND t.city like concat('%',#{memberBankCardEntity.city},'%')
+        </if>
+        <if test='memberBankCardEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberBankCardEntity.createUser},'%')
+        </if>
+        <if test='memberBankCardEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberBankCardEntity.createTime},'%')
+        </if>
+        <if test='memberBankCardEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberBankCardEntity.updateUser},'%')
+        </if>
+        <if test='memberBankCardEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberBankCardEntity.updateTime},'%')
+        </if>
+        <if test='memberBankCardEntity.status != null'>
+            AND t.status like concat('%',#{memberBankCardEntity.status},'%')
+        </if>
+        <if test='memberBankCardEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberBankCardEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberBankCardExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_bank_card t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="selectDataList" resultType="com.castle.fortress.admin.member.entity.MemberBankCardEntity">
+        select
+            *
+        from
+            member_bank_card
+        where
+            is_deleted = 2
+        <if test="cardNum != null and cardNum != ''">
+            and card_num = #{cardNum}
+        </if>
+        <if test="memberId != null and memberId != ''">
+            and member_id = #{memberId}
+        </if>
+            order by create_time desc
+    </select>
+
+</mapper>

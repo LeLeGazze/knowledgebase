@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.log.mapper.LogSmsMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="logSmsMap" type="com.castle.fortress.admin.log.entity.LogSmsEntity">
+        <result column="id" property="id"/>
+        <result column="sms_code" property="smsCode"/>
+        <result column="platform" property="platform"/>
+        <result column="mobile" property="mobile"/>
+        <result column="params1" property="params1"/>
+        <result column="params2" property="params2"/>
+        <result column="params3" property="params3"/>
+        <result column="params4" property="params4"/>
+        <result column="status" property="status"/>
+        <result column="create_date" property="createDate"/>
+        <result column="type" property="type"/>
+    </resultMap>
+    <resultMap id="logSmsExtendsMap" extends="logSmsMap" type="com.castle.fortress.admin.log.entity.LogSmsEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="logSmsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_log_sms t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='logSmsEntity.id != null'>
+            AND t.id like concat('%',#{logSmsEntity.id},'%')
+        </if>
+        <if test='logSmsEntity.smsCode != null and logSmsEntity.smsCode != ""'>
+            AND t.sms_code like concat('%',#{logSmsEntity.smsCode},'%')
+        </if>
+        <if test='logSmsEntity.platform != null'>
+            AND t.platform like concat('%',#{logSmsEntity.platform},'%')
+        </if>
+        <if test='logSmsEntity.mobile != null and logSmsEntity.mobile != ""'>
+            AND t.mobile like concat('%',#{logSmsEntity.mobile},'%')
+        </if>
+        <if test='logSmsEntity.params1 != null and logSmsEntity.params1 != ""'>
+            AND t.params1 like concat('%',#{logSmsEntity.params1},'%')
+        </if>
+        <if test='logSmsEntity.params2 != null and logSmsEntity.params2 != ""'>
+            AND t.params2 like concat('%',#{logSmsEntity.params2},'%')
+        </if>
+        <if test='logSmsEntity.params3 != null and logSmsEntity.params3 != ""'>
+            AND t.params3 like concat('%',#{logSmsEntity.params3},'%')
+        </if>
+        <if test='logSmsEntity.params4 != null and logSmsEntity.params4 != ""'>
+            AND t.params4 like concat('%',#{logSmsEntity.params4},'%')
+        </if>
+        <if test='logSmsEntity.status != null'>
+            AND t.status like concat('%',#{logSmsEntity.status},'%')
+        </if>
+        <if test='logSmsEntity.createDate != null'>
+            AND t.create_date like concat('%',#{logSmsEntity.createDate},'%')
+        </if>
+        <if test='logSmsEntity.type != null'>
+            AND t.type like concat('%',#{logSmsEntity.type},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_log_sms t
+        WHERE
+            t.is_deleted = 2
+        <if test='logSmsEntity.id != null'>
+            AND t.id like concat('%',#{logSmsEntity.id},'%')
+        </if>
+        <if test='logSmsEntity.smsCode != null and logSmsEntity.smsCode != ""'>
+            AND t.sms_code like concat('%',#{logSmsEntity.smsCode},'%')
+        </if>
+        <if test='logSmsEntity.platform != null'>
+            AND t.platform like concat('%',#{logSmsEntity.platform},'%')
+        </if>
+        <if test='logSmsEntity.mobile != null and logSmsEntity.mobile != ""'>
+            AND t.mobile like concat('%',#{logSmsEntity.mobile},'%')
+        </if>
+        <if test='logSmsEntity.params1 != null and logSmsEntity.params1 != ""'>
+            AND t.params1 like concat('%',#{logSmsEntity.params1},'%')
+        </if>
+        <if test='logSmsEntity.params2 != null and logSmsEntity.params2 != ""'>
+            AND t.params2 like concat('%',#{logSmsEntity.params2},'%')
+        </if>
+        <if test='logSmsEntity.params3 != null and logSmsEntity.params3 != ""'>
+            AND t.params3 like concat('%',#{logSmsEntity.params3},'%')
+        </if>
+        <if test='logSmsEntity.params4 != null and logSmsEntity.params4 != ""'>
+            AND t.params4 like concat('%',#{logSmsEntity.params4},'%')
+        </if>
+        <if test='logSmsEntity.status != null'>
+            AND t.status like concat('%',#{logSmsEntity.status},'%')
+        </if>
+        <if test='logSmsEntity.createDate != null'>
+            AND t.create_date like concat('%',#{logSmsEntity.createDate},'%')
+        </if>
+        <if test='logSmsEntity.type != null'>
+            AND t.type like concat('%',#{logSmsEntity.type},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="logSmsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_log_sms t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+    <select id="selectDataList" resultType="com.castle.fortress.admin.log.entity.LogSmsEntity">
+        select
+        *
+        from
+        castle_log_sms
+        <where>
+            <if test="mobile != null and mobile !=''">
+                and mobile = #{mobile}
+            </if>
+            <if test="status != null ">
+                and status = #{status}
+            </if>
+            <if test="type != null and type !=''">
+                and type = #{type}
+            </if>
+        </where>
+        order by create_date desc
+    </select>
+
+
+</mapper>

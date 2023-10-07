@@ -1,0 +1,138 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}%><%if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>rest;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.castle.fortress.admin.core.constants.GlobalConstants;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>dto.${className}Dto;
+import com.castle.fortress.admin.system.entity.SysUser;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>service.${className}Service;
+import com.castle.fortress.common.utils.ConvertUtil;
+import com.castle.fortress.admin.utils.WebUtil;
+import com.castle.fortress.common.entity.RespBody;
+import com.castle.fortress.common.exception.BizException;
+import com.castle.fortress.common.respcode.GlobalRespCode;
+import com.castle.fortress.common.enums.OperationTypeEnum;
+import com.castle.fortress.admin.core.annotation.CastleLog;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.logging.log4j.util.Strings;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * ${classDdsc} api 控制器
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Api(tags="${classDdsc}api管理控制器")
+@RestController
+@RequestMapping("/api/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}")
+public class Api${className}Controller {
+    @Autowired
+    private ${className}Service ${entityKey}Service;
+
+
+    /**
+     * ${classDdsc}的分页展示
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @param currentPage 当前页
+     * @param size  每页记录数
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}-api",operType = OperationTypeEnum.QUERY)
+    @ApiOperation("${classDdsc}分页展示")
+    @GetMapping("/page")
+    public RespBody<IPage<${className}Dto>> page${className}(${className}Dto ${entityKey}Dto, @RequestParam(required = false) Integer currentPage, @RequestParam(required = false)Integer size){
+        Integer pageIndex= currentPage==null? GlobalConstants.DEFAULT_PAGE_INDEX:currentPage;
+        Integer pageSize= size==null? GlobalConstants.DEFAULT_PAGE_SIZE:size;
+        Page<${className}Dto> page = new Page(pageIndex, pageSize);
+
+        IPage<${className}Dto> pages = ${entityKey}Service.page${className}(page, ${entityKey}Dto);
+        return RespBody.data(pages);
+    }
+
+    /**
+     * ${classDdsc}保存
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}-api",operType = OperationTypeEnum.INSERT)
+    @ApiOperation("${classDdsc}保存")
+    @PostMapping("/save")
+    public RespBody<String> save${className}(@RequestBody ${className}Dto ${entityKey}Dto){
+        if(${entityKey}Dto == null ){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+            ${className}Entity ${entityKey}Entity = ConvertUtil.transformObj(${entityKey}Dto,${className}Entity.class);
+        if(${entityKey}Service.save(${entityKey}Entity)){
+            return RespBody.data("保存成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+    /**
+     * ${classDdsc}编辑
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}-api",operType = OperationTypeEnum.UPDATE)
+    @ApiOperation("${classDdsc}编辑")
+    @PostMapping("/edit")
+    public RespBody<String> update${className}(@RequestBody ${className}Dto ${entityKey}Dto){
+        if(${entityKey}Dto == null || ${entityKey}Dto.getId() == null || ${entityKey}Dto.getId().equals(0L)){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+            ${className}Entity ${entityKey}Entity = ConvertUtil.transformObj(${entityKey}Dto,${className}Entity.class);
+        if(${entityKey}Service.updateById(${entityKey}Entity)){
+            return RespBody.data("保存成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+    /**
+     * ${classDdsc}删除
+     * @param ids ${classDdsc}id集合
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}-api",operType = OperationTypeEnum.DELETE)
+    @ApiOperation("${classDdsc}删除")
+    @PostMapping("/delete")
+    public RespBody<String> delete${className}(@RequestBody List<Long> ids){
+        if(ids == null || ids.isEmpty()){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+        if(${entityKey}Service.removeByIds(ids)) {
+            return RespBody.data("保存成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+    /**
+     * ${classDdsc}详情
+     * @param id ${classDdsc}id
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}-api",operType = OperationTypeEnum.QUERY)
+    @ApiOperation("${classDdsc}详情")
+    @GetMapping("/info")
+    public RespBody<${className}Dto> info${className}(@RequestParam Long id){
+        if(id == null){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+            ${className}Entity ${entityKey}Entity = ${entityKey}Service.getById(id);
+            ${className}Dto ${entityKey}Dto = ConvertUtil.transformObj(${entityKey}Entity,${className}Dto.class);
+        return RespBody.data(${entityKey}Dto);
+    }
+
+
+}

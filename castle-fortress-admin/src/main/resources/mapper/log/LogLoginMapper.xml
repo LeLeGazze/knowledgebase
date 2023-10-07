@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.log.mapper.LogLoginMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="logLoginMap" type="com.castle.fortress.admin.log.entity.LogLoginEntity">
+        <result column="id" property="id"/>
+        <result column="invoke_url" property="invokeUrl"/>
+        <result column="remote_addr" property="remoteAddr"/>
+        <result column="address" property="address"/>
+        <result column="cus_browser" property="cusBrowser"/>
+        <result column="cus_os" property="cusOs"/>
+        <result column="invoke_params" property="invokeParams"/>
+        <result column="invoke_status" property="invokeStatus"/>
+        <result column="invoke_time" property="invokeTime"/>
+        <result column="result_data" property="resultData"/>
+        <result column="elapsed_time" property="elapsedTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="login_method" property="loginMethod"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <select id="logLoginList" resultType="com.castle.fortress.admin.log.entity.LogLoginEntity">
+        SELECT t1.*,t2.real_name userName FROM castle_log_login t1
+        LEFT JOIN castle_sys_user t2 ON t1.user_id = t2.id
+        <where>
+        <if test='logLoginEntity.invokeUrl != null and logLoginEntity.invokeUrl !="" '>
+            AND t1.invoke_url LIKE concat('%',#{logLoginEntity.invokeUrl},'%')
+        </if>
+        <if test='logLoginEntity.remoteAddr != null and logLoginEntity.remoteAddr !="" '>
+            AND t1.remote_addr LIKE concat('%',#{logLoginEntity.remoteAddr},'%')
+        </if>
+        <if test='logLoginEntity.invokeParams != null and logLoginEntity.invokeParams !="" '>
+            AND t1.invoke_params LIKE concat('%',#{logLoginEntity.invokeParams},'%')
+        </if>
+        <if test='logLoginEntity.invokeStatus != null and logLoginEntity.invokeStatus !="" '>
+            AND t1.invoke_status = #{logLoginEntity.invokeStatus}
+        </if>
+        <if test='logLoginEntity.invokeTimeStart != null and logLoginEntity.invokeTimeEnd != null '>
+            AND t1.invoke_time BETWEEN #{logLoginEntity.invokeTimeStart} AND #{logLoginEntity.invokeTimeEnd}
+        </if>
+        <if test='logLoginEntity.elapsedTime != null'>
+            AND t1.elapsed_time LIKE concat('%',#{logLoginEntity.elapsedTime},'%')
+        </if>
+        <if test='logLoginEntity.userId != null'>
+            AND t1.user_id = #{logLoginEntity.userId}
+        </if>
+        <if test='logLoginEntity.loginMethod != null'>
+            AND t1.login_method = #{logLoginEntity.loginMethod}
+        </if>
+        </where>
+        ORDER BY invoke_time DESC
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+
+    <select id="logLoginCount" resultType="java.lang.Long">
+        SELECT count(1) FROM castle_log_login
+        <where>
+            <if test='logLoginEntity.invokeUrl != null and logLoginEntity.invokeUrl !="" '>
+                AND invoke_url LIKE concat('%',#{logLoginEntity.invokeUrl},'%')
+            </if>
+            <if test='logLoginEntity.remoteAddr != null and logLoginEntity.remoteAddr !="" '>
+                AND remote_addr LIKE concat('%',#{logLoginEntity.remoteAddr},'%')
+            </if>
+            <if test='logLoginEntity.invokeParams != null and logLoginEntity.invokeParams !="" '>
+                AND invoke_params LIKE concat('%',#{logLoginEntity.invokeParams},'%')
+            </if>
+            <if test='logLoginEntity.invokeStatus != null and logLoginEntity.invokeStatus !="" '>
+                AND invoke_status = #{logLoginEntity.invokeStatus}
+            </if>
+            <if test='logLoginEntity.invokeTimeStart != null and logLoginEntity.invokeTimeEnd != null '>
+                AND invoke_time BETWEEN #{logLoginEntity.invokeTimeStart} AND #{logLoginEntity.invokeTimeEnd}
+            </if>
+            <if test='logLoginEntity.elapsedTime != null'>
+                AND elapsed_time LIKE concat('%',#{logLoginEntity.elapsedTime},'%')
+            </if>
+            <if test='logLoginEntity.userId != null'>
+                AND user_id = #{logLoginEntity.userId}
+            </if>
+            <if test='logLoginEntity.loginMethod != null'>
+                AND login_method = #{logLoginEntity.loginMethod}
+            </if>
+        </where>
+    </select>
+
+</mapper>

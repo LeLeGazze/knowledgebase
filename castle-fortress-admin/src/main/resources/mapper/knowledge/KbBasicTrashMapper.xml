@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbBasicTrashMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbBasicTrashMap" type="com.castle.fortress.admin.knowledge.entity.KbBasicTrashEntity">
+        <result column="id" property="id"/>
+        <result column="basic_id" property="basicId"/>
+        <result column="user_id" property="userId"/>
+		<result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    <delete id="deleteByid">
+		delete from kb_basic_trash t where t.basic_id = #{id}
+	</delete>
+    <select id="queryList" resultMap="kbBasicTrashMap">
+		SELECT
+		t.*
+		FROM
+		kb_basic_trash t
+		WHERE
+		1 = 1
+		<if test='kbBasicTrashEntity.id != null'>
+			AND t.id like concat('%',#{kbBasicTrashEntity.id},'%')
+		</if>
+		<if test='kbBasicTrashEntity.basicId != null'>
+			AND t.basic_id like concat('%',#{kbBasicTrashEntity.basicId},'%')
+		</if>
+		<if test='kbBasicTrashEntity.userId != null'>
+			AND t.user_id like concat('%',#{kbBasicTrashEntity.userId},'%')
+		</if>
+		<if test='kbBasicTrashEntity.createTime != null'>
+			AND t.create_time like concat('%',#{kbBasicTrashEntity.createTime},'%')
+		</if>
+		<if test="kbBasicTrashEntity.type != null">
+			and t.type like  concat('%',#{kbBasicTrashEntity.type},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectTrashAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,
+		       kbt.id as trashId,
+			   kb.title as title,
+			   ct.sw_id as swId,
+			   user.real_name as createUser,
+			   kbt.create_time as pubTime,
+			   ct.name as ctName
+		from kb_basic_trash kbt
+				 left join kb_basic kb on kbt.basic_id = kb.id
+				 left join castle_sys_user user on user.id = kbt.user_id
+			left join kb_category ct on kb.category_id = ct.id
+		where
+		kbt.type = 1
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != '' and kbBaseShowDto.categoryIds.size">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+		order by kbt.create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectTrashCountAdmin" resultType="java.lang.Integer">
+		select count(1)
+		from kb_basic_trash kbt
+				 left join kb_basic kb on kbt.basic_id = kb.id
+				 left join castle_sys_user user on user.id = kbt.user_id
+			left join kb_category ct on kb.category_id = ct.id
+		where kbt.type = 1
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+	</select>
+	<select id="selectTrashVideoAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,
+		kbt.id as trashId,
+		kb.title as title,
+		ct.sw_id as swId,
+		user.real_name as createUser,
+		kbt.create_time as pubTime,
+		ct.name as ctName
+		from kb_basic_trash kbt
+		left join kb_video kb on kbt.basic_id = kb.id
+		left join castle_sys_user user on user.id = kbt.user_id
+		left join kb_category ct on kb.category_id = ct.id
+		where
+		kbt.type = 2
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+		order by kbt.create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectTrashVideoAdminCount" resultType="java.lang.Integer">
+		select count(1)
+		from  kb_basic_trash kbt
+		left join kb_video kb on kbt.basic_id = kb.id
+		left join castle_sys_user user on user.id = kbt.user_id
+		left join kb_category ct on kb.category_id = ct.id
+		where
+		kbt.type = 2
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+	</select>
+	<select id="selectTrash" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,
+		kbt.id as trashId,
+		kb.title as title,
+		ct.sw_id as swId,
+		user.real_name as createUser,
+		kbt.create_time as pubTime,
+		ct.name as ctName
+		from kb_basic_trash kbt
+		left join kb_basic kb on kbt.basic_id = kb.id
+		left join castle_sys_user user on user.id = kbt.user_id
+		left join kb_category ct on kb.category_id = ct.id
+		where
+		kbt.type = 1
+		and kbt.user_id = #{userId}
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+		order by kbt.create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectTrashCount" resultType="java.lang.Integer">
+		select count(1)
+		from kb_basic_trash kbt
+		left join kb_basic kb on kbt.basic_id = kb.id
+		left join castle_sys_user user on user.id = kbt.user_id
+		left join kb_category ct on kb.category_id = ct.id
+		where kbt.type = 1
+		and kbt.user_id = #{userId}
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+	</select>
+	<select id="selectTrashVideo" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,
+		kbt.id as trashId,
+		kb.title as title,
+		ct.sw_id as swId,
+		user.real_name as createUser,
+		kbt.create_time as pubTime,
+		ct.name as ctName
+		from kb_basic_trash kbt
+		left join kb_video kb on kbt.basic_id = kb.id
+		left join castle_sys_user user on user.id = kbt.user_id
+		left join kb_category ct on kb.category_id = ct.id
+		where
+		kbt.type = 2
+		and kbt.user_id =#{userId}
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+		order by kbt.create_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectTrashVideoCount" resultType="java.lang.Integer">
+		select count(1)
+		from kb_basic_trash kbt
+		left join kb_video kb on kbt.basic_id = kb.id
+		left join castle_sys_user user on user.id = kbt.user_id
+		left join kb_category ct on kb.category_id = ct.id
+		where kbt.type = 1
+		and kbt.user_id = #{userId}
+		<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+			and kb.category_id in (
+			<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+				#{kcId}
+			</foreach>
+			)
+		</if>
+		<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+			and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+		</if>
+		<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+			and kbt.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+		</if>
+	</select>
+
+
+</mapper>

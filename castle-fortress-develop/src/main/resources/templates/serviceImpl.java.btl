@@ -1,0 +1,107 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}%><%if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>service.impl;
+
+import cn.hutool.core.util.StrUtil;
+<%if(hasSuperEntity){%>import com.castle.fortress.admin.utils.BizCommonUtil;<%}%>
+import com.castle.fortress.common.utils.ConvertUtil;
+import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>dto.${className}Dto;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>mapper.${className}Mapper;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>service.${className}Service;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Map;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.List;
+
+/**
+ * ${classDdsc} 服务实现类
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Service
+public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${className}Entity> implements ${className}Service {
+    /**
+    * 获取查询条件
+    * @param ${entityKey}Dto
+    * @return
+    */
+    public QueryWrapper<${className}Entity> getWrapper(${className}Dto ${entityKey}Dto){
+        QueryWrapper<${className}Entity> wrapper= new QueryWrapper();
+        if(${entityKey}Dto != null){
+            ${className}Entity ${entityKey}Entity = ConvertUtil.transformObj(${entityKey}Dto,${className}Entity.class);
+            <% for(field in colList){
+                if(field.isQuery == 1){
+                	if(field.propType == "Boolean"){%>
+			wrapper.eq(${entityKey}Entity.get${field.propNameUpperFirst}() != null,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                    <%}else{
+                    switch(field.queryType){
+                        case "1":%>
+            wrapper.eq(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                        <%break;
+                        case "2":%>
+            wrapper.ne(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                        <%break;
+                        case "3":%>
+            wrapper.lt(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                        <%break;
+                        case "4":%>
+            wrapper.le(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                        <%break;
+                        case "5":%>
+            wrapper.gt(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                        <%break;
+                        case "6":%>
+            wrapper.ge(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                        <%break;
+                        case "7":%>
+            wrapper.like(<%if(field.propType == "String"){%>StrUtil.isNotEmpty(${entityKey}Entity.get${field.propNameUpperFirst}())<%}else{%>${entityKey}Entity.get${field.propNameUpperFirst}() != null<%}%>,"${field.colName}",${entityKey}Entity.get${field.propNameUpperFirst}());
+                    <%break;}}%>
+	                <%}%>
+            <%}%>
+            <%if(hasSuperEntity){%>
+            wrapper.orderByDesc("create_time");
+            <%}%>
+        }
+        return wrapper;
+    }
+
+
+    @Override
+    public IPage<${className}Dto> page${className}(Page<${className}Dto> page, ${className}Dto ${entityKey}Dto) {
+        QueryWrapper<${className}Entity> wrapper = getWrapper(${entityKey}Dto);
+        Page<${className}Entity> pageEntity = new Page(page.getCurrent(), page.getSize());
+        Page<${className}Entity> ${entityKey}Page=baseMapper.selectPage(pageEntity,wrapper);
+        Page<${className}Dto> pageDto = new Page(${entityKey}Page.getCurrent(), ${entityKey}Page.getSize(),${entityKey}Page.getTotal());
+        pageDto.setRecords(ConvertUtil.transformObjList(${entityKey}Page.getRecords(),${className}Dto.class));
+        return pageDto;
+    }
+
+    <%if(hasSuperEntity){%>
+    @Override
+    public IPage<${className}Dto> page${className}Extends(Page<${className}Dto> page, ${className}Dto ${entityKey}Dto){
+        Map<String,Long> pageMap = BizCommonUtil.getPageParam(page);
+        ${className}Entity ${entityKey}Entity = ConvertUtil.transformObj(${entityKey}Dto,${className}Entity.class);
+        List<${className}Entity> ${entityKey}List=baseMapper.extendsList(pageMap,${entityKey}Entity);
+        Long total = baseMapper.extendsCount(${entityKey}Entity);
+        Page<${className}Dto> pageDto = new Page(page.getCurrent(), page.getSize(),total);
+        pageDto.setRecords(ConvertUtil.transformObjList(${entityKey}List,${className}Dto.class));
+        return pageDto;
+    }
+    @Override
+    public ${className}Dto getByIdExtends(Long id){
+        ${className}Entity  ${entityKey}Entity = baseMapper.getByIdExtends(id);
+        return ConvertUtil.transformObj(${entityKey}Entity,${className}Dto.class);
+    }
+    <%}%>
+
+    @Override
+    public List<${className}Dto> list${className}(${className}Dto ${entityKey}Dto){
+        QueryWrapper<${className}Entity> wrapper = getWrapper(${entityKey}Dto);
+        List<${className}Entity> list = baseMapper.selectList(wrapper);
+        return ConvertUtil.transformObjList(list,${className}Dto.class);
+    }
+}
+

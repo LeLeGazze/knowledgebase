@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberExtendFieldConfigMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberExtendFieldConfigMap"
+               type="com.castle.fortress.admin.member.entity.MemberExtendFieldConfigEntity">
+        <result column="id" property="id"/>
+        <result column="col_title" property="colTitle"/>
+        <result column="col_name" property="colName"/>
+        <result column="prop_name" property="propName"/>
+        <result column="col_type" property="colType"/>
+        <result column="form_type" property="formType"/>
+        <result column="sort" property="sort"/>
+        <result column="data_type" property="dataType"/>
+        <result column="data_config" property="dataConfig"/>
+    </resultMap>
+    <insert id="createTable">
+        create table member_extend_field (
+        id bigint(64) primary key auto_increment COMMENT '主键',
+        member_id bigint(64) unsigned COMMENT '关联会员',
+        <foreach collection="fields" item="field" separator=",">
+            ${field.colName} ${field.colType} COMMENT #{field.colTitle}
+        </foreach>
+        ) COMMENT '会员扩展字段'
+    </insert>
+    <insert id="addField">
+        alter table ${tableName}
+            add column ${field.colName} ${field.colType} COMMENT #{field.colTitle}
+    </insert>
+
+    <insert id="createByMemberId">
+        insert into member_extend_field (member_id) VALUE (#{memberId})
+    </insert>
+    <update id="updateByMemberId">
+        update member_extend_field
+        set
+        <foreach collection="params" index="key" item="value" separator=",">
+            `${key}`=#{value}
+        </foreach>
+        where member_id=#{memberId}
+    </update>
+    <delete id="deleteField">
+        alter table ${tableName} drop column ${colName}
+    </delete>
+    <select id="queryList" resultMap="memberExtendFieldConfigMap">
+        SELECT
+        t.*
+        FROM
+        member_extend_field_config t
+        WHERE
+        1 = 1
+        <if test='memberExtendFieldConfigEntity.id != null'>
+            AND t.id = #{memberExtendFieldConfigEntity.id}
+        </if>
+        <if test='memberExtendFieldConfigEntity.colTitle != null and memberExtendFieldConfigEntity.colTitle != ""'>
+            AND t.col_title like concat('%',#{memberExtendFieldConfigEntity.colTitle},'%')
+        </if>
+        <if test='memberExtendFieldConfigEntity.colName != null and memberExtendFieldConfigEntity.colName != ""'>
+            AND t.col_name like concat('%',#{memberExtendFieldConfigEntity.colName},'%')
+        </if>
+        <if test='memberExtendFieldConfigEntity.propName != null and memberExtendFieldConfigEntity.propName != ""'>
+            AND t.prop_name like concat('%',#{memberExtendFieldConfigEntity.propName},'%')
+        </if>
+        <if test='memberExtendFieldConfigEntity.colType != null and memberExtendFieldConfigEntity.colType != ""'>
+            AND t.col_type = #{memberExtendFieldConfigEntity.colType}
+        </if>
+        <if test='memberExtendFieldConfigEntity.propType != null and memberExtendFieldConfigEntity.propType != ""'>
+            AND t.prop_type like concat('%',#{memberExtendFieldConfigEntity.propType},'%')
+        </if>
+        <if test='memberExtendFieldConfigEntity.isFormRequire != null'>
+            AND t.is_form_require = #{memberExtendFieldConfigEntity.isFormRequire}
+        </if>
+        <if test='memberExtendFieldConfigEntity.validateType != null'>
+            AND t.validate_type = #{memberExtendFieldConfigEntity.validateType}
+        </if>
+        <if test='memberExtendFieldConfigEntity.formType != null'>
+            AND t.form_type = #{memberExtendFieldConfigEntity.formType}
+        </if>
+        <if test='memberExtendFieldConfigEntity.limitSize != null'>
+            AND t.limit_size = #{memberExtendFieldConfigEntity.limitSize}
+        </if>
+        <if test='memberExtendFieldConfigEntity.listdataConfig != null and memberExtendFieldConfigEntity.listdataConfig != ""'>
+            AND t.listdata_config = #{memberExtendFieldConfigEntity.listdataConfig}
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="allTableNames" resultType="java.lang.String">
+        select table_name
+        from information_schema.tables
+        where table_schema = (select database())
+        order by table_name asc
+    </select>
+    <select id="allFieldNames" resultType="java.lang.String">
+        SELECT COLUMN_NAME
+        FROM information_schema.`COLUMNS`
+        WHERE TABLE_NAME = #{tableName}
+          and table_schema = (select database())
+    </select>
+    <select id="allFieldMap" resultType="com.castle.fortress.admin.member.dto.FieldTypeMapDto">
+        SELECT COLUMN_NAME as name,
+               COLUMN_TYPE as type
+        FROM information_schema.`COLUMNS`
+        WHERE TABLE_NAME = #{tableName}
+          and table_schema = (select database())
+    </select>
+    <select id="getField" resultType="com.castle.fortress.admin.member.dto.FieldTypeMapDto">
+        SELECT COLUMN_NAME as name,
+               COLUMN_TYPE as type
+        FROM information_schema.`COLUMNS`
+        WHERE TABLE_NAME = #{tableName}
+          AND COLUMN_NAME = #{colName}
+          and table_schema = (select database()) LIMIT 1
+    </select>
+    <select id="getRow" resultType="java.util.HashMap">
+        select field.${colName} as colValue, config.col_title, config.col_name, config.prop_name, config.form_type,config.sort,config.data_type,config.data_config
+        from member_extend_field field
+                 left join member_extend_field_config config on config.col_name = #{colName}
+        where field.member_id = #{memberId} limit 1
+    </select>
+    <select id="existsByMemberId" resultType="java.lang.Long">
+        select id
+        from member_extend_field
+        where member_id = #{memberId}
+    </select>
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.CastleVersionMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleVersionMap" type="com.castle.fortress.admin.system.entity.CastleVersionEntity">
+        <result column="id" property="id"/>
+        <result column="version" property="version"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="app_url" property="appUrl"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    <resultMap id="castleVersionExtendsMap" extends="castleVersionMap" type="com.castle.fortress.admin.system.entity.CastleVersionEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="castleVersionExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_version t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='castleVersionEntity.id != null'>
+            AND t.id like concat('%',#{castleVersionEntity.id},'%')
+        </if>
+        <if test='castleVersionEntity.version != null and castleVersionEntity.version != ""'>
+            AND t.version like concat('%',#{castleVersionEntity.version},'%')
+        </if>
+        <if test='castleVersionEntity.title != null and castleVersionEntity.title != ""'>
+            AND t.title like concat('%',#{castleVersionEntity.title},'%')
+        </if>
+        <if test='castleVersionEntity.content != null and castleVersionEntity.content != ""'>
+            AND t.content like concat('%',#{castleVersionEntity.content},'%')
+        </if>
+        <if test='castleVersionEntity.appUrl != null and castleVersionEntity.appUrl != ""'>
+            AND t.app_url like concat('%',#{castleVersionEntity.appUrl},'%')
+        </if>
+        <if test='castleVersionEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleVersionEntity.createUser},'%')
+        </if>
+        <if test='castleVersionEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleVersionEntity.createTime},'%')
+        </if>
+        <if test='castleVersionEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleVersionEntity.updateUser},'%')
+        </if>
+        <if test='castleVersionEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleVersionEntity.updateTime},'%')
+        </if>
+        <if test='castleVersionEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleVersionEntity.isDeleted},'%')
+        </if>
+        <if test='castleVersionEntity.status != null'>
+            AND t.status like concat('%',#{castleVersionEntity.status},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_version t
+        WHERE
+            t.is_deleted = 2
+        <if test='castleVersionEntity.id != null'>
+            AND t.id like concat('%',#{castleVersionEntity.id},'%')
+        </if>
+        <if test='castleVersionEntity.version != null and castleVersionEntity.version != ""'>
+            AND t.version like concat('%',#{castleVersionEntity.version},'%')
+        </if>
+        <if test='castleVersionEntity.title != null and castleVersionEntity.title != ""'>
+            AND t.title like concat('%',#{castleVersionEntity.title},'%')
+        </if>
+        <if test='castleVersionEntity.content != null and castleVersionEntity.content != ""'>
+            AND t.content like concat('%',#{castleVersionEntity.content},'%')
+        </if>
+        <if test='castleVersionEntity.appUrl != null and castleVersionEntity.appUrl != ""'>
+            AND t.app_url like concat('%',#{castleVersionEntity.appUrl},'%')
+        </if>
+        <if test='castleVersionEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleVersionEntity.createUser},'%')
+        </if>
+        <if test='castleVersionEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleVersionEntity.createTime},'%')
+        </if>
+        <if test='castleVersionEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleVersionEntity.updateUser},'%')
+        </if>
+        <if test='castleVersionEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleVersionEntity.updateTime},'%')
+        </if>
+        <if test='castleVersionEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleVersionEntity.isDeleted},'%')
+        </if>
+        <if test='castleVersionEntity.status != null'>
+            AND t.status like concat('%',#{castleVersionEntity.status},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="castleVersionExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_version t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="selectDataList" resultType="com.castle.fortress.admin.system.entity.CastleVersionEntity">
+        SELECT
+            t.*
+        FROM
+            castle_version t
+        WHERE
+            t.is_deleted = 2
+              <if test="status != null and status != ''">
+                  and t.status = #{status}
+              </if>
+            order by create_time desc
+    </select>
+    <select id="selectNewVersion" resultType="com.castle.fortress.admin.system.entity.CastleVersionEntity">
+        SELECT
+            t.*
+        FROM
+            castle_version t
+        WHERE
+            t.is_deleted = 2 and t.status = 1
+        order by create_time desc limit 0,1
+    </select>
+
+</mapper>

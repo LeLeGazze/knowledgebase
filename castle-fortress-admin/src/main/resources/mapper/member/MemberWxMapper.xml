@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberWxMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberWxMap" type="com.castle.fortress.admin.member.entity.MemberWxEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="sex" property="sex"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="country" property="country"/>
+        <result column="head_img_url" property="headImgUrl"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="open_id" property="openId"/>
+        <result column="union_id" property="unionId"/>
+    </resultMap>
+    <resultMap id="memberWxExtendsMap" extends="memberWxMap" type="com.castle.fortress.admin.member.entity.MemberWxEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberWxExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_wx t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberWxEntity.id != null'>
+            AND t.id = #{memberWxEntity.id}
+        </if>
+        <if test='memberWxEntity.memberId != null'>
+            AND t.member_id = #{memberWxEntity.memberId}
+        </if>
+        <if test='memberWxEntity.nickName != null and memberWxEntity.nickName != ""'>
+            AND t.nick_name like concat('%',#{memberWxEntity.nickName},'%')
+        </if>
+        <if test='memberWxEntity.sex != null'>
+            AND t.sex = #{memberWxEntity.sex}
+        </if>
+        <if test='memberWxEntity.province != null and memberWxEntity.province != ""'>
+            AND t.province like concat('%',#{memberWxEntity.province},'%')
+        </if>
+        <if test='memberWxEntity.city != null and memberWxEntity.city != ""'>
+            AND t.city like concat('%',#{memberWxEntity.city},'%')
+        </if>
+        <if test='memberWxEntity.country != null and memberWxEntity.country != ""'>
+            AND t.country like concat('%',#{memberWxEntity.country},'%')
+        </if>
+        <if test='memberWxEntity.headImgUrl != null and memberWxEntity.headImgUrl != ""'>
+            AND t.head_img_url like concat('%',#{memberWxEntity.headImgUrl},'%')
+        </if>
+        <if test='memberWxEntity.status != null'>
+            AND t.status = #{memberWxEntity.status}
+        </if>
+        <if test='memberWxEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberWxEntity.createUser},'%')
+        </if>
+        <if test='memberWxEntity.createTime != null'>
+            AND t.create_time = #{memberWxEntity.createTime}
+        </if>
+        <if test='memberWxEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberWxEntity.updateUser},'%')
+        </if>
+        <if test='memberWxEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberWxEntity.updateTime},'%')
+        </if>
+        <if test='memberWxEntity.isDeleted != null'>
+            AND t.is_deleted = #{memberWxEntity.isDeleted}
+        </if>
+        <if test='memberWxEntity.openId != null and memberWxEntity.openId != ""'>
+            AND t.open_id = #{memberWxEntity.openId}
+        </if>
+        <if test='memberWxEntity.unionId != null and memberWxEntity.unionId != ""'>
+            AND t.union_id = #{memberWxEntity.unionId}
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_wx t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberWxEntity.id != null'>
+            AND t.id = #{memberWxEntity.id}
+        </if>
+        <if test='memberWxEntity.memberId != null'>
+            AND t.member_id = #{memberWxEntity.memberId}
+        </if>
+        <if test='memberWxEntity.nickName != null and memberWxEntity.nickName != ""'>
+            AND t.nick_name like concat('%',#{memberWxEntity.nickName},'%')
+        </if>
+        <if test='memberWxEntity.sex != null'>
+            AND t.sex = #{memberWxEntity.sex}
+        </if>
+        <if test='memberWxEntity.province != null and memberWxEntity.province != ""'>
+            AND t.province like concat('%',#{memberWxEntity.province},'%')
+        </if>
+        <if test='memberWxEntity.city != null and memberWxEntity.city != ""'>
+            AND t.city like concat('%',#{memberWxEntity.city},'%')
+        </if>
+        <if test='memberWxEntity.country != null and memberWxEntity.country != ""'>
+            AND t.country like concat('%',#{memberWxEntity.country},'%')
+        </if>
+        <if test='memberWxEntity.headImgUrl != null and memberWxEntity.headImgUrl != ""'>
+            AND t.head_img_url like concat('%',#{memberWxEntity.headImgUrl},'%')
+        </if>
+        <if test='memberWxEntity.status != null'>
+            AND t.status = #{memberWxEntity.status}
+        </if>
+        <if test='memberWxEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberWxEntity.createUser},'%')
+        </if>
+        <if test='memberWxEntity.createTime != null'>
+            AND t.create_time = #{memberWxEntity.createTime}
+        </if>
+        <if test='memberWxEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberWxEntity.updateUser},'%')
+        </if>
+        <if test='memberWxEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberWxEntity.updateTime},'%')
+        </if>
+        <if test='memberWxEntity.isDeleted != null'>
+            AND t.is_deleted = #{memberWxEntity.isDeleted}
+        </if>
+        <if test='memberWxEntity.openId != null and memberWxEntity.openId != ""'>
+            AND t.open_id = #{memberWxEntity.openId}
+        </if>
+        <if test='memberWxEntity.unionId != null and memberWxEntity.unionId != ""'>
+            AND t.union_id = #{memberWxEntity.unionId}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberWxExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_wx t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberLevelMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberLevelMap" type="com.castle.fortress.admin.member.entity.MemberLevelEntity">
+        <result column="id" property="id"/>
+        <result column="level" property="level"/>
+        <result column="name" property="name"/>
+        <result column="up_conditions" property="upConditions"/>
+        <result column="order_total" property="orderTotal"/>
+        <result column="order_count" property="orderCount"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="discount" property="discount"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="memberLevelExtendsMap" extends="memberLevelMap"
+               type="com.castle.fortress.admin.member.entity.MemberLevelEntity">
+        <result column="create_user_name" property="createUserName"/>
+        <result column="goods" property="createUserName"/>
+        <association property="goodsName" select="com.castle.fortress.admin.goods.mapper.GoodsMapper.getNameById"
+                     column="goods_id"></association>
+    </resultMap>
+    <select id="extendsList" resultMap="memberLevelExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_level t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberLevelEntity.id != null'>
+            AND t.id = #{memberLevelEntity.id}
+        </if>
+        <if test='memberLevelEntity.level != null'>
+            AND t.level = #{memberLevelEntity.level}
+        </if>
+        <if test='memberLevelEntity.name != null and memberLevelEntity.name != ""'>
+            AND t.name like concat('%',#{memberLevelEntity.name},'%')
+        </if>
+        <if test='memberLevelEntity.upConditions != null'>
+            AND t.up_conditions = #{memberLevelEntity.upConditions}
+        </if>
+        <if test='memberLevelEntity.orderTotal != null and memberLevelEntity.orderTotal != ""'>
+            AND t.order_total = #{memberLevelEntity.orderTotal}
+        </if>
+        <if test='memberLevelEntity.orderCount != null and memberLevelEntity.orderCount != ""'>
+            AND t.order_count = #{memberLevelEntity.orderCount}
+        </if>
+        <if test='memberLevelEntity.goodsId != null'>
+            AND t.goods_id = #{memberLevelEntity.goodsId}
+        </if>
+        <if test='memberLevelEntity.discount != null and memberLevelEntity.discount != ""'>
+            AND t.discount = #{memberLevelEntity.discount}
+        </if>
+        <if test='memberLevelEntity.createUser != null'>
+            AND t.create_user = #{memberLevelEntity.createUser}
+        </if>
+        <if test='memberLevelEntity.createTime != null'>
+            AND t.create_time = #{memberLevelEntity.createTime}
+        </if>
+        <if test='memberLevelEntity.updateUser != null'>
+            AND t.update_user = #{memberLevelEntity.updateUser}
+        </if>
+        <if test='memberLevelEntity.updateTime != null'>
+            AND t.update_time = #{memberLevelEntity.updateTime}
+        </if>
+        <if test='memberLevelEntity.status != null'>
+            AND t.status = #{memberLevelEntity.status}
+        </if>
+        <if test='memberLevelEntity.isDeleted != null'>
+            AND t.is_deleted = #{memberLevelEntity.isDeleted}
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        member_level t
+        WHERE
+        t.is_deleted = 2
+        <if test='memberLevelEntity.id != null'>
+            AND t.id = #{memberLevelEntity.id}
+        </if>
+        <if test='memberLevelEntity.level != null'>
+            AND t.level = #{memberLevelEntity.level}
+        </if>
+        <if test='memberLevelEntity.name != null and memberLevelEntity.name != ""'>
+            AND t.name like concat('%',#{memberLevelEntity.name},'%')
+        </if>
+        <if test='memberLevelEntity.upConditions != null'>
+            AND t.up_conditions = #{memberLevelEntity.upConditions}
+        </if>
+        <if test='memberLevelEntity.orderTotal != null and memberLevelEntity.orderTotal != ""'>
+            AND t.order_total = #{memberLevelEntity.orderTotal}
+        </if>
+        <if test='memberLevelEntity.orderCount != null and memberLevelEntity.orderCount != ""'>
+            AND t.order_count = #{memberLevelEntity.orderCount}
+        </if>
+        <if test='memberLevelEntity.goodsId != null'>
+            AND t.goods_id = #{memberLevelEntity.goodsId}
+        </if>
+        <if test='memberLevelEntity.discount != null and memberLevelEntity.discount != ""'>
+            AND t.discount = #{memberLevelEntity.discount}
+        </if>
+        <if test='memberLevelEntity.createUser != null'>
+            AND t.create_user = #{memberLevelEntity.createUser}
+        </if>
+        <if test='memberLevelEntity.createTime != null'>
+            AND t.create_time = #{memberLevelEntity.createTime}
+        </if>
+        <if test='memberLevelEntity.updateUser != null'>
+            AND t.update_user = #{memberLevelEntity.updateUser}
+        </if>
+        <if test='memberLevelEntity.updateTime != null'>
+            AND t.update_time = #{memberLevelEntity.updateTime}
+        </if>
+        <if test='memberLevelEntity.status != null'>
+            AND t.status = #{memberLevelEntity.status}
+        </if>
+        <if test='memberLevelEntity.isDeleted != null'>
+            AND t.is_deleted = #{memberLevelEntity.isDeleted}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberLevelExtendsMap">
+        SELECT t.*,
+               t1.real_name create_user_name
+        FROM member_level t
+                 LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE t.is_deleted = 2
+          AND t.id = #{id}
+    </select>
+
+</mapper>

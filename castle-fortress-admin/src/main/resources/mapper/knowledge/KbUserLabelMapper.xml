@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbUserLabelMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbUserLabelMap" type="com.castle.fortress.admin.knowledge.entity.KbUserLabelEntity">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="label_id" property="labelId"/>
+    </resultMap>
+	<select id="queryList" resultMap="kbUserLabelMap">
+		SELECT
+		t.*
+		FROM
+		kb_user_label t
+		WHERE
+		1 = 1
+		<if test='kbUserLabelEntity.id != null'>
+			AND t.id like concat('%',#{kbUserLabelEntity.id},'%')
+		</if>
+		<if test='kbUserLabelEntity.userId != null'>
+			AND t.user_id like concat('%',#{kbUserLabelEntity.userId},'%')
+		</if>
+		<if test='kbUserLabelEntity.labelId != null'>
+			AND t.label_id like concat('%',#{kbUserLabelEntity.labelId},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+    <select id="selectBasicByLabel" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select * from (
+		select distinct kb.id as id,kb.title as title ,kc.name as ctName ,csu.real_name as createUser,
+		kb.pub_time as pub_time,kc.sw_id as swId,ku.readCount
+		FROM kb_user_label kul
+		left join kb_basic_label kbl on kul.label_id = kbl.l_id
+		left join kb_basic kb on kbl.b_id = kb.id
+		left join castle_sys_user csu on kb.auth = csu.id
+		left join kb_category kc on kb.category_id = kc.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kb.is_deleted = 2
+			and kul.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth != #{kbBaseShowDto.createUser}
+			and kb.status = 1
+			<if test="kbBaseShowDto.labelIds != null and kbBaseShowDto.labelIds != ''">
+				and kul.label_id in (
+				<foreach collection="kbBaseShowDto.labelIds" item="labelId" separator=",">
+					#{labelId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="ids != null and ids != ''">
+				and kb.category_id in (
+				<foreach collection="ids" item="id" separator=",">
+					#{id}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kb.pub_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		union
+		select distinct kb.id as id,kb.title as title ,kc.name as ctName ,csu.real_name as createUser,
+		kb.pub_time as pub_time,kc.sw_id as swId,ku.readCount
+		FROM kb_user_label kul
+		left join kb_basic_label kbl on kul.label_id = kbl.l_id
+		left join kb_basic kb on kbl.b_id = kb.id
+		left join castle_sys_user csu on kb.auth = csu.id
+		left join kb_category kc on kb.category_id = kc.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kb.is_deleted = 2
+			and kb.status=1
+			and kul.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth = #{kbBaseShowDto.createUser}
+			<if test="kbBaseShowDto.labelIds != null and kbBaseShowDto.labelIds != ''">
+				and kul.label_id in (
+				<foreach collection="kbBaseShowDto.labelIds" item="labelId" separator=",">
+					#{labelId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="ids != null and ids != ''">
+				and kb.category_id in (
+				<foreach collection="ids" item="id" separator=",">
+					#{id}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kb.pub_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		)t2
+		ORDER BY t2.pub_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectBasicByLabelCount" resultType="java.lang.Integer">
+		select count(1)
+		from (select * from (
+		select distinct kb.id as id,kb.title as title ,kc.name as ctName ,csu.real_name as createUser,
+		kb.pub_time as pub_time,kc.sw_id as swId,ku.readCount
+		FROM kb_user_label kul
+		left join kb_basic_label kbl on kul.label_id = kbl.l_id
+		left join kb_basic kb on kbl.b_id = kb.id
+		left join castle_sys_user csu on kb.auth = csu.id
+		left join kb_category kc on kb.category_id = kc.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kb.is_deleted = 2
+			and kul.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth != #{kbBaseShowDto.createUser}
+			and kb.status = 1
+			<if test="kbBaseShowDto.labelIds != null and kbBaseShowDto.labelIds != ''">
+				and kul.label_id in (
+				<foreach collection="kbBaseShowDto.labelIds" item="labelId" separator=",">
+					#{labelId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="ids != null and ids != ''">
+				and kb.category_id in (
+				<foreach collection="ids" item="id" separator=",">
+					#{id}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kb.pub_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		union
+		select distinct kb.id as id,kb.title as title ,kc.name as ctName ,csu.real_name as createUser,
+		kb.pub_time as pub_time,kc.sw_id as swId,ku.readCount
+		FROM kb_user_label kul
+		left join kb_basic_label kbl on kul.label_id = kbl.l_id
+		left join kb_basic kb on kbl.b_id = kb.id
+		left join castle_sys_user csu on kb.auth = csu.id
+		left join kb_category kc on kb.category_id = kc.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kb.is_deleted = 2
+			and kb.status=1
+			and kul.user_id = #{kbBaseShowDto.createUser}
+			and kb.auth = #{kbBaseShowDto.createUser}
+			<if test="kbBaseShowDto.labelIds != null and kbBaseShowDto.labelIds != ''">
+				and kul.label_id in (
+				<foreach collection="kbBaseShowDto.labelIds" item="labelId" separator=",">
+					#{labelId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="ids != null and ids != ''">
+				and kb.category_id in (
+				<foreach collection="ids" item="id" separator=",">
+					#{id}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kb.pub_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		)t2) t1
+	</select>
+	<select id="findLabelByUser" resultType="com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity">
+		select kml.id as id ,kml.name as name
+		fROM kb_user_label kbu left join kb_model_label kml on kbu.label_id = kml.id
+		where kbu.user_id = #{userId} and kml.is_deleted = 2
+	</select>
+	<select id="findIds" resultType="java.lang.Long">
+		select id from kb_user_label where user_id = #{userId}
+	</select>
+	<select id="selectBasicByLabelAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select distinct kb.id as id,kb.title as title ,kc.name as ctName ,csu.real_name as createUser,
+		kb.pub_time as pub_time,kc.sw_id as swId,ku.readCount
+		FROM kb_user_label kul
+		left join kb_basic_label kbl on kul.label_id = kbl.l_id
+		left join kb_basic kb on kbl.b_id = kb.id
+		left join castle_sys_user csu on kb.auth = csu.id
+		left join kb_category kc on kb.category_id = kc.id
+		left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+		group by b_id) ku on kb.id = ku.b_id
+		<where>
+			kb.is_deleted = 2
+			and kb.status=1
+			and kul.user_id = #{kbBaseShowDto.createUser}
+			<if test="kbBaseShowDto.labelIds != null and kbBaseShowDto.labelIds != ''">
+				and kul.label_id in (
+				<foreach collection="kbBaseShowDto.labelIds" item="labelId" separator=",">
+					#{labelId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="ids != null and ids != ''">
+				and kb.category_id in (
+				<foreach collection="ids" item="id" separator=",">
+					#{id}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kb.pub_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		ORDER BY kb.pub_time desc
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectBasicByLabelaAdminCount" resultType="java.lang.Integer">
+		select count(1)
+		from (select distinct kb.id as id,kb.title as title ,kc.name as ctName,csu.real_name as createUser,kb.pub_time as pub_time
+		FROM kb_user_label kul
+		left join castle_sys_user csu on kul.user_id = csu.id
+		left join kb_basic_label kbl on kul.label_id = kbl.l_id
+		left join kb_basic kb on kbl.b_id = kb.id
+		left join kb_category kc on kb.category_id = kc.id
+		<where>
+			kb.is_deleted = 2
+			and kb.status=1
+			and kul.user_id = #{kbBaseShowDto.createUser}
+			<if test="kbBaseShowDto.labelIds != null and kbBaseShowDto.labelIds != ''">
+				and kul.label_id in (
+				<foreach collection="kbBaseShowDto.labelIds" item="labelId" separator=",">
+					#{labelId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
+				and kb.category_id in (
+				<foreach collection="kbBaseShowDto.categoryIds" item="kcId" separator=",">
+					#{kcId}
+				</foreach>
+				)
+			</if>
+			<if test="ids != null and ids != ''">
+				and kb.category_id in (
+				<foreach collection="ids" item="id" separator=",">
+					#{id}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+				and kc.sw_id in (
+				<foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+					#{swId}
+				</foreach>
+				)
+			</if>
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kb.pub_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+		</where>
+		) t1
+	</select>
+	<select id="findLabelByUserToBasicCountAdmin" resultType="java.lang.Integer"
+			parameterType="java.lang.Long">
+
+		select  count( distinct  t3.id)
+		from (select * from kb_user_label where user_id = #{userId}) t1
+				 join kb_basic_label t2 on t1.label_id = t2.l_id
+				 join kb_basic t3 on t2.b_id = t3.id
+		where t3.status = 1 and t3.is_deleted=2
+	</select>
+	<select id="findLabelByUserToBasicCount" resultType="java.lang.Integer">
+		select  count( distinct  t3.id)
+		from (select * from kb_user_label where user_id = #{userId}) t1
+				 join kb_basic_label t2 on t1.label_id = t2.l_id
+				 join kb_basic t3 on t2.b_id = t3.id
+		where t3.status = 1 and t3.is_deleted=2 and  t3.category_id in (
+		<foreach collection="categoryIds" item="categoryId" separator=",">#{categoryId}</foreach>)
+	</select>
+
+</mapper>

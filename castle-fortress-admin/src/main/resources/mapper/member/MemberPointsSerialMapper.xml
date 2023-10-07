@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberPointsSerialMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberPointsSerialMap" type="com.castle.fortress.admin.member.entity.MemberPointsSerialEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="member_points_id" property="memberPointsId"/>
+        <result column="points" property="points"/>
+        <result column="type" property="type"/>
+        <result column="memo" property="memo"/>
+        <result column="account_points" property="accountPoints"/>
+        <result column="order_id" property="orderId"/>
+        <result column="category" property="category"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    <resultMap id="memberPointsSerialExtendsMap" extends="memberPointsSerialMap" type="com.castle.fortress.admin.member.entity.MemberPointsSerialEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberPointsSerialExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_points_serial t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberPointsSerialEntity.id != null'>
+            AND t.id like concat('%',#{memberPointsSerialEntity.id},'%')
+        </if>
+        <if test='memberPointsSerialEntity.startTime != null'>
+            AND t.create_time &gt;= #{memberPointsSerialEntity.startTime}
+        </if>
+        <if test='memberPointsSerialEntity.endTime != null'>
+            AND t.create_time &lt;= #{memberPointsSerialEntity.endTime}
+        </if>
+        <if test='memberPointsSerialEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberPointsSerialEntity.memberId},'%')
+        </if>
+        <if test='memberPointsSerialEntity.memberPointsId != null'>
+            AND t.member_points_id like concat('%',#{memberPointsSerialEntity.memberPointsId},'%')
+        </if>
+        <if test='memberPointsSerialEntity.points != null and memberPointsSerialEntity.points != ""'>
+            AND t.points like concat('%',#{memberPointsSerialEntity.points},'%')
+        </if>
+        <if test='memberPointsSerialEntity.type != null'>
+            AND t.type like concat('%',#{memberPointsSerialEntity.type},'%')
+        </if>
+        <if test='memberPointsSerialEntity.category != null'>
+            AND t.category like concat('%',#{memberPointsSerialEntity.category},'%')
+        </if>
+        <if test='memberPointsSerialEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberPointsSerialEntity.createUser},'%')
+        </if>
+        <if test='memberPointsSerialEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberPointsSerialEntity.createTime},'%')
+        </if>
+        <if test='memberPointsSerialEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberPointsSerialEntity.updateUser},'%')
+        </if>
+        <if test='memberPointsSerialEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberPointsSerialEntity.updateTime},'%')
+        </if>
+        <if test='memberPointsSerialEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberPointsSerialEntity.isDeleted},'%')
+        </if>
+        <if test='memberPointsSerialEntity.status != null'>
+            AND t.status like concat('%',#{memberPointsSerialEntity.status},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_points_serial t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberPointsSerialEntity.id != null'>
+            AND t.id like concat('%',#{memberPointsSerialEntity.id},'%')
+        </if>
+        <if test='memberPointsSerialEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberPointsSerialEntity.memberId},'%')
+        </if>
+        <if test='memberPointsSerialEntity.memberPointsId != null'>
+            AND t.member_points_id like concat('%',#{memberPointsSerialEntity.memberPointsId},'%')
+        </if>
+        <if test='memberPointsSerialEntity.points != null and memberPointsSerialEntity.points != ""'>
+            AND t.points like concat('%',#{memberPointsSerialEntity.points},'%')
+        </if>
+        <if test='memberPointsSerialEntity.type != null'>
+            AND t.type like concat('%',#{memberPointsSerialEntity.type},'%')
+        </if>
+        <if test='memberPointsSerialEntity.category != null'>
+            AND t.category like concat('%',#{memberPointsSerialEntity.category},'%')
+        </if>
+        <if test='memberPointsSerialEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberPointsSerialEntity.createUser},'%')
+        </if>
+        <if test='memberPointsSerialEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberPointsSerialEntity.createTime},'%')
+        </if>
+        <if test='memberPointsSerialEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberPointsSerialEntity.updateUser},'%')
+        </if>
+        <if test='memberPointsSerialEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberPointsSerialEntity.updateTime},'%')
+        </if>
+        <if test='memberPointsSerialEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberPointsSerialEntity.isDeleted},'%')
+        </if>
+        <if test='memberPointsSerialEntity.status != null'>
+            AND t.status like concat('%',#{memberPointsSerialEntity.status},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberPointsSerialExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_points_serial t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

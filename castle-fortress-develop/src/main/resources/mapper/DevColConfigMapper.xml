@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.develop.mapper.DevColConfigMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysMenuMap" type="com.castle.fortress.develop.entity.DevColConfig">
+        <result column="id" property="id"/>
+        <result column="tb_id" property="tbId"/>
+        <result column="col_name" property="colName"/>
+        <result column="prop_name" property="propName"/>
+        <result column="col_type" property="colType"/>
+        <result column="prop_type" property="propType" />
+        <result column="prop_desc" property="propDesc"/>
+        <result column="is_list" property="isList"/>
+        <result column="is_query" property="isQuery"/>
+        <result column="query_type" property="queryType"/>
+        <result column="is_copy" property="isCopy"/>
+        <result column="is_form" property="isForm"/>
+        <result column="is_form_require" property="isFormRequire" />
+        <result column="validate_type" property="validateType" />
+        <result column="form_type" property="formType"/>
+        <result column="listdata_type" property="listdataType"/>
+        <result column="listdata_config" property="listdataConfig"/>
+    </resultMap>
+    <insert id="insertBatch">
+        insert into castle_dev_col_config(id,tb_id,col_name,prop_name,col_type,prop_type,prop_desc,is_list,is_query,query_type,is_copy,is_form,is_form_require,form_type)
+        values <foreach collection="list" item="col" separator=",">
+        (#{col.id},#{col.tbId},#{col.colName},#{col.propName},#{col.colType},#{col.propType},#{col.propDesc},#{col.isList},#{col.isQuery},#{col.queryType},#{col.isCopy},#{col.isForm},#{col.isFormRequire},#{col.formType})
+        </foreach>
+
+    </insert>
+    <update id="updateCols">
+        update castle_dev_col_config
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="col_type=case" suffix="end,">
+                <foreach collection="list" item="col" index="index" >
+                    when id = #{col.id} then #{col.colType}
+                </foreach>
+            </trim>
+            <trim prefix="prop_type=case" suffix="end,">
+                <foreach collection="list" item="col" index="index" >
+                    when id = #{col.id} then #{col.propType}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" item="col" index="index" separator="," open="(" close=")">
+           #{col.id}
+        </foreach>
+    </update>
+
+    <delete id="delByTbName">
+        delete from castle_dev_col_config
+        where tb_id in (
+        select id from castle_dev_tb_config where db_id =#{dbId} and tb_name=#{tbName}
+        )
+    </delete>
+    <delete id="delById">
+        delete from castle_dev_col_config where tb_id =#{tbId}
+    </delete>
+
+</mapper>

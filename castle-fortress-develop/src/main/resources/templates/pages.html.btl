@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${tbConfig.tbDesc}</title>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/static/cmd/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <script src="/static/cmd/jquery/jquery.min.js"></script>
+    <script src="/static/cmd/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/components.js"></script>
+</head>
+<body>
+<div id="scms-table"></div>
+
+<script src="/static/js/public.js"></script>
+
+<script src="/static/js/${tbConfig.moduleName}.<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>${entityKey}.js"></script>
+</body>
+</html>

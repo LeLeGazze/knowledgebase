@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbLabelCategoryMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbLabelCategoryMap" type="com.castle.fortress.admin.knowledge.entity.KbLabelCategoryEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+	<select id="queryList" resultMap="kbLabelCategoryMap">
+		SELECT
+		t.*
+		FROM
+		kb_label_category t
+		WHERE
+		1 = 1
+		<if test='kbLabelCategoryEntity.id != null'>
+			AND t.id like concat('%',#{kbLabelCategoryEntity.id},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.name != null and kbLabelCategoryEntity.name != ""'>
+			AND t.name like concat('%',#{kbLabelCategoryEntity.name},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.createTime != null'>
+			AND t.create_time like concat('%',#{kbLabelCategoryEntity.createTime},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.isDeleted != null'>
+			AND t.is_deleted like concat('%',#{kbLabelCategoryEntity.isDeleted},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.status != null'>
+			AND t.status like concat('%',#{kbLabelCategoryEntity.status},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.createUser != null'>
+			AND t.create_user like concat('%',#{kbLabelCategoryEntity.createUser},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.updateUser != null'>
+			AND t.update_user like concat('%',#{kbLabelCategoryEntity.updateUser},'%')
+		</if>
+		<if test='kbLabelCategoryEntity.updateTime != null'>
+			AND t.update_time like concat('%',#{kbLabelCategoryEntity.updateTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+    <select id="selectByNameOrLabelName"
+            resultType="com.castle.fortress.admin.knowledge.dto.KbLabelCategoryDto">
+		select t4.id,t4.name, t4.status ,t4.create_time from (select t1.*,t3.name as label_name
+		from kb_label_category t1
+				 left join kb_category_label t2 on t1.id = t2.ct_id
+				 left join kb_model_label t3 on t2.l_id = t3.id
+		where t1.is_deleted = 2
+		  and t3.is_deleted = 2
+		<if test='kbLabelCategoryDto.name != null'>
+			AND t1.name like concat('%',#{kbLabelCategoryDto.name},'%')
+		</if>
+		<if test='kbLabelCategoryDto.labelName != null'>
+			AND t3.name like concat('%',#{kbLabelCategoryDto.labelName},'%')
+		</if>
+		) t4 group by 1,2,3,4
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+
+	</select>
+	<select id="countByNameOrLabelName" resultType="java.lang.Integer">
+		select count(1)
+		from kb_label_category t1
+		left join kb_category_label t2 on t1.id = t2.ct_id
+		left join kb_model_label t3 on t2.l_id = t3.id
+		where t1.is_deleted = 2
+		and t3.is_deleted = 2
+		<if test='kbLabelCategoryDto.name != null'>
+			AND t1.name like concat('%',#{kbLabelCategoryDto.name},'%')
+		</if>
+		<if test='kbLabelCategoryDto.labelName != null'>
+			AND t3.name like concat('%',#{kbLabelCategoryDto.labelName},'%')
+		</if>
+	</select>
+
+</mapper>

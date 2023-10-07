@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberAddressMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberAddressMap" type="com.castle.fortress.admin.member.entity.MemberAddressEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="consignee" property="consignee"/>
+        <result column="phone" property="phone"/>
+        <result column="province" property="province"/>
+        <result column="province_code" property="provinceCode"/>
+        <result column="city" property="city"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="area" property="area"/>
+        <result column="area_code" property="areaCode"/>
+        <result column="address" property="address"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="memberAddressExtendsMap" extends="memberAddressMap" type="com.castle.fortress.admin.member.entity.MemberAddressEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberAddressExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_address t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberAddressEntity.id != null'>
+            AND t.id like concat('%',#{memberAddressEntity.id},'%')
+        </if>
+        <if test='memberAddressEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberAddressEntity.memberId},'%')
+        </if>
+        <if test='memberAddressEntity.consignee != null and memberAddressEntity.consignee != ""'>
+            AND t.consignee like concat('%',#{memberAddressEntity.consignee},'%')
+        </if>
+        <if test='memberAddressEntity.phone != null and memberAddressEntity.phone != ""'>
+            AND t.phone like concat('%',#{memberAddressEntity.phone},'%')
+        </if>
+        <if test='memberAddressEntity.province != null and memberAddressEntity.province != ""'>
+            AND t.province like concat('%',#{memberAddressEntity.province},'%')
+        </if>
+        <if test='memberAddressEntity.city != null and memberAddressEntity.city != ""'>
+            AND t.city like concat('%',#{memberAddressEntity.city},'%')
+        </if>
+        <if test='memberAddressEntity.area != null and memberAddressEntity.area != ""'>
+            AND t.area like concat('%',#{memberAddressEntity.area},'%')
+        </if>
+        <if test='memberAddressEntity.address != null and memberAddressEntity.address != ""'>
+            AND t.address like concat('%',#{memberAddressEntity.address},'%')
+        </if>
+        <if test='memberAddressEntity.isDefault != null'>
+            AND t.is_default like concat('%',#{memberAddressEntity.isDefault},'%')
+        </if>
+        <if test='memberAddressEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberAddressEntity.createUser},'%')
+        </if>
+        <if test='memberAddressEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberAddressEntity.createTime},'%')
+        </if>
+        <if test='memberAddressEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberAddressEntity.updateUser},'%')
+        </if>
+        <if test='memberAddressEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberAddressEntity.updateTime},'%')
+        </if>
+        <if test='memberAddressEntity.status != null'>
+            AND t.status like concat('%',#{memberAddressEntity.status},'%')
+        </if>
+        <if test='memberAddressEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberAddressEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_address t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberAddressEntity.id != null'>
+            AND t.id like concat('%',#{memberAddressEntity.id},'%')
+        </if>
+        <if test='memberAddressEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberAddressEntity.memberId},'%')
+        </if>
+        <if test='memberAddressEntity.consignee != null and memberAddressEntity.consignee != ""'>
+            AND t.consignee like concat('%',#{memberAddressEntity.consignee},'%')
+        </if>
+        <if test='memberAddressEntity.phone != null and memberAddressEntity.phone != ""'>
+            AND t.phone like concat('%',#{memberAddressEntity.phone},'%')
+        </if>
+        <if test='memberAddressEntity.province != null and memberAddressEntity.province != ""'>
+            AND t.province like concat('%',#{memberAddressEntity.province},'%')
+        </if>
+        <if test='memberAddressEntity.city != null and memberAddressEntity.city != ""'>
+            AND t.city like concat('%',#{memberAddressEntity.city},'%')
+        </if>
+        <if test='memberAddressEntity.area != null and memberAddressEntity.area != ""'>
+            AND t.area like concat('%',#{memberAddressEntity.area},'%')
+        </if>
+        <if test='memberAddressEntity.address != null and memberAddressEntity.address != ""'>
+            AND t.address like concat('%',#{memberAddressEntity.address},'%')
+        </if>
+        <if test='memberAddressEntity.isDefault != null'>
+            AND t.is_default like concat('%',#{memberAddressEntity.isDefault},'%')
+        </if>
+        <if test='memberAddressEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberAddressEntity.createUser},'%')
+        </if>
+        <if test='memberAddressEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberAddressEntity.createTime},'%')
+        </if>
+        <if test='memberAddressEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberAddressEntity.updateUser},'%')
+        </if>
+        <if test='memberAddressEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberAddressEntity.updateTime},'%')
+        </if>
+        <if test='memberAddressEntity.status != null'>
+            AND t.status like concat('%',#{memberAddressEntity.status},'%')
+        </if>
+        <if test='memberAddressEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberAddressEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberAddressExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_address t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

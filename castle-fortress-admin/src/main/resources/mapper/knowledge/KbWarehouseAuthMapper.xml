@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbWarehouseAuthMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbWarehouseAuthMap" type="com.castle.fortress.admin.knowledge.entity.KbWarehouseAuthEntity">
+        <result column="id" property="id"/>
+        <result column="wh_id" property="whId"/>
+        <result column="category" property="category"/>
+        <result column="user_id" property="userId"/>
+        <result column="wh_auth" property="whAuth"/>
+        <result column="kb_auth" property="kbAuth"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    <select id="queryList" resultMap="kbWarehouseAuthMap">
+        SELECT
+        t.*
+        FROM
+        kb_warehouse_auth t
+        WHERE
+        is_deleted = 2
+        <if test='kbWarehouseAuthEntity.id != null'>
+            AND t.id like concat('%',#{kbWarehouseAuthEntity.id},'%')
+        </if>
+        <if test='kbWarehouseAuthEntity.whId != null'>
+            AND t.wh_id = #{kbWarehouseAuthEntity.whId}
+        </if>
+        <if test='kbWarehouseAuthEntity.category != null and kbWarehouseAuthEntity.category != ""'>
+            AND t.category = #{kbWarehouseAuthEntity.category}
+        </if>
+        <if test='kbWarehouseAuthEntity.userId != null'>
+            AND t.user_id like concat('%',#{kbWarehouseAuthEntity.userId},'%')
+        </if>
+        <if test='kbWarehouseAuthEntity.whAuth != null'>
+            AND t.wh_auth = #{kbWarehouseAuthEntity.whAuth}
+        </if>
+        <if test='kbWarehouseAuthEntity.kbAuth != null'>
+            AND t.kb_auth = #{kbWarehouseAuthEntity.kbAuth}
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <update id="updateByWhId">
+        update kb_warehouse_auth
+        set is_deleted =1
+        where wh_id = #{wid}
+    </update>
+
+    <select id="findByWhId" resultType="com.castle.fortress.admin.knowledge.dto.KbWarehouseAuthDto">
+        select kb.id                    as id,
+               kb.wh_id                 as whId,
+               kb.category              as category,
+               kb.user_id               as userId,
+               kb.kb_auth               as kbAuth,
+               kb.wh_auth               as whAuth,
+               case
+                   when user.real_name is not null then user.real_name
+                   when dept.name is not null then dept.name
+                   else groupb.name end as userName,
+               kb.status                as status
+        from kb_warehouse_auth kb
+                 left join castle_sys_user user on user.id = kb.user_id
+            left join castle_sys_dept dept on dept.id = kb.user_id
+            left join kb_groups groupb on groupb.id = kb.user_id
+        where kb.is_deleted = 2
+          and wh_id = #{wid}
+    </select>
+    <delete id="deleteHyWhid">
+        delete
+        from kb_warehouse_auth
+        where wh_id = #{whId} and category in(00,02)
+    </delete>
+    <delete id="deleteWhid">
+        delete
+        from kb_warehouse_auth
+        where wh_id = #{whId} and category in(01)
+    </delete>
+    <select id="findByUid" resultMap="kbWarehouseAuthMap">
+        select distinct wh_id
+        from kb_warehouse_auth au
+        left join kb_groups_user groupb on groupb.group_id = au.user_id and status = 2
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%')) and au.status = 3
+        join castle_sys_user user on (user.dept_id = dept.id) or (au.user_id = user.id) or (groupb.user_id = user.id)
+        where au.is_deleted = 2
+        and user.id = #{uid}
+
+        <if test="cateGory != null and cateGory !='' ">
+            and category = #{cateGory}
+        </if>
+        <if test="swId != null and swId !='' ">
+            and wh_id = #{swId}
+        </if>
+    </select>
+    <select id="findByUidWarehouseAuth" resultMap="kbWarehouseAuthMap">
+        select au.*
+        from kb_category ct,
+        kb_warehouse_auth au,
+        kb_subject_warehouse sw
+        where sw.id = ct.sw_id
+        and au.wh_id =ct.id
+        and au.user_id=#{uid}
+
+        and sw.id=#{whId}
+        <if test="wcId != null and wcId !='' ">
+            and au.wh_id=#{wcId}
+        </if>
+    </select>
+    <select id="findByUidCategory" resultType="java.lang.Long">
+        select  distinct  ct.id
+        from kb_category ct
+        left join kb_warehouse_auth au on ((ct.id = au.wh_id and au.category = 01) or (ct.sw_id = au.wh_id and au.category = 02))
+        left join kb_groups_user groupb on groupb.group_id = au.user_id and au.status = 2
+        left join castle_sys_dept dept on(dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%')) and au.status = 3
+        left join castle_sys_user user on (user.dept_id = dept.id) or (au.user_id = user.id) or (groupb.user_id = user.id)
+        where ct.is_deleted = 2
+        and user.is_deleted = 2
+        and user.id=#{uid}
+        and kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+    </select>
+<!--            select distinct ct.id
+        from kb_warehouse_auth au
+        join kb_category ct on ((ct.id = au.wh_id and au.category = 01) or (ct.sw_id = au.wh_id and au.category = 02))
+        where user_id = #{uid}
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )-->
+    <select id="findBySwIdAuth" resultType="com.castle.fortress.admin.knowledge.dto.KbWarehouseAuthDto">
+        select kb.id                                                                                          as id,
+               kb.wh_id                                                                                       as whId,
+               kb.category                                                                                    as category,
+               kb.user_id                                                                                     as userId,
+               kb.kb_auth                                                                                     as kbAuth,
+               kb.wh_auth                                                                                     as whAuth,
+               case
+                   when user.real_name is not null then user.real_name
+                   when dept.name is not null then dept.name
+                   else gr.name end as userName,
+               kb.status,
+               kb.sort
+        from kb_warehouse_auth kb
+                 left  join (select * from castle_sys_user where is_deleted = 2) user on user.id = kb.user_id
+            left join (select * from castle_sys_dept where is_deleted = 2) dept on dept.id = kb.user_id
+            left join (select * from kb_groups where is_deleted = 2) gr on gr.id = kb.user_id
+        where kb.is_deleted = 2
+          and wh_id = #{swId}
+          and kb.category =#{category} having userName is not null
+        order by kb.sort
+    </select>
+    <select id="findByUidVideo" resultType="com.castle.fortress.admin.knowledge.entity.KbWarehouseAuthEntity">
+        select kb.*
+        from kb_warehouse_auth kb
+                 left join (select * from castle_sys_user where is_deleted = 2) user on user.id = kb.user_id
+                 left join (select dept.id, user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on user.dept_id = dept.id) dept on  (dept.id = kb.user_id or dept.parents like concat('%',kb.user_id,'%'))
+                 left join (select * from kb_groups_user) gr on gr.group_id = kb.user_id
+                 join kb_subject_warehouse sw on sw.id = kb.wh_id
+        where kb.is_deleted = 2
+          and sw.status=2
+          and sw.is_deleted=2
+          and kb.category = #{category}
+        and  (kb.user_id =#{uid} or gr.user_id=#{uid} or dept.uid=#{uid})
+        order by kb.sort
+    </select>
+    <!--   1.0  -->
+<!--    <select id="findBySwIdAuth" resultType="com.castle.fortress.admin.knowledge.dto.KbWarehouseAuthDto">-->
+<!--        select kb.id          as id,-->
+<!--               kb.wh_id       as whId,-->
+<!--               kb.category    as category,-->
+<!--               kb.user_id     as userId,-->
+<!--               kb.kb_auth     as kbAuth,-->
+<!--               kb.wh_auth     as whAuth,-->
+<!--               user.real_name as userName-->
+<!--        from kb_warehouse_auth kb,-->
+<!--             castle_sys_user user-->
+<!--        where kb.is_deleted = 2-->
+<!--          and user.is_deleted = 2-->
+<!--          and user.id = kb.user_id-->
+<!--          and wh_id = #{swId}-->
+<!--        and kb.category =#{category}-->
+<!--    </select>-->
+
+</mapper>

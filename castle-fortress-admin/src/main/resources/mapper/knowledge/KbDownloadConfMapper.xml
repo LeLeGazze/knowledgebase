@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbDownloadConfMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbDownloadConfMap" type="com.castle.fortress.admin.knowledge.entity.KbDownloadConfEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="type" property="type"/>
+    </resultMap>
+    <resultMap id="kbDownloadConfExtendsMap" extends="kbDownloadConfMap" type="com.castle.fortress.admin.knowledge.entity.KbDownloadConfEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="kbDownloadConfExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_download_conf t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbDownloadConfEntity.id != null'>
+            AND t.id like concat('%',#{kbDownloadConfEntity.id},'%')
+        </if>
+        <if test='kbDownloadConfEntity.name != null and kbDownloadConfEntity.name != ""'>
+            AND t.name like concat('%',#{kbDownloadConfEntity.name},'%')
+        </if>
+        <if test='kbDownloadConfEntity.status != null'>
+            AND t.status = #{kbDownloadConfEntity.status}
+        </if>
+        <if test='kbDownloadConfEntity.remark != null and kbDownloadConfEntity.remark != ""'>
+            AND t.remark like concat('%',#{kbDownloadConfEntity.remark},'%')
+        </if>
+        <if test='kbDownloadConfEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbDownloadConfEntity.createTime},'%')
+        </if>
+        <if test='kbDownloadConfEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbDownloadConfEntity.createUser},'%')
+        </if>
+        <if test='kbDownloadConfEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbDownloadConfEntity.updateTime},'%')
+        </if>
+        <if test='kbDownloadConfEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbDownloadConfEntity.updateUser},'%')
+        </if>
+        <if test='kbDownloadConfEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbDownloadConfEntity.isDeleted},'%')
+        </if>
+        <if test='kbDownloadConfEntity.type != null'>
+            AND t.type = #{kbDownloadConfEntity.type}
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        kb_download_conf t
+        WHERE
+            t.is_deleted = 2
+        <if test='kbDownloadConfEntity.id != null'>
+            AND t.id like concat('%',#{kbDownloadConfEntity.id},'%')
+        </if>
+        <if test='kbDownloadConfEntity.name != null and kbDownloadConfEntity.name != ""'>
+            AND t.name like concat('%',#{kbDownloadConfEntity.name},'%')
+        </if>
+        <if test='kbDownloadConfEntity.status != null'>
+            AND t.status = #{kbDownloadConfEntity.status}
+        </if>
+        <if test='kbDownloadConfEntity.remark != null and kbDownloadConfEntity.remark != ""'>
+            AND t.remark like concat('%',#{kbDownloadConfEntity.remark},'%')
+        </if>
+        <if test='kbDownloadConfEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbDownloadConfEntity.createTime},'%')
+        </if>
+        <if test='kbDownloadConfEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbDownloadConfEntity.createUser},'%')
+        </if>
+        <if test='kbDownloadConfEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbDownloadConfEntity.updateTime},'%')
+        </if>
+        <if test='kbDownloadConfEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbDownloadConfEntity.updateUser},'%')
+        </if>
+        <if test='kbDownloadConfEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbDownloadConfEntity.isDeleted},'%')
+        </if>
+        <if test='kbDownloadConfEntity.type != null'>
+            AND t.type = #{kbDownloadConfEntity.type}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbDownloadConfExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_download_conf t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

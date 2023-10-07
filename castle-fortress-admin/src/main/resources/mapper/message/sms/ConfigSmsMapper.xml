@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.message.sms.mapper.ConfigSmsMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="configSmsMap" type="com.castle.fortress.admin.message.sms.entity.ConfigSmsEntity">
+        <result column="id" property="id"/>
+        <result column="sms_code" property="smsCode"/>
+        <result column="platform" property="platform"/>
+        <result column="sms_config" property="smsConfig"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_dept" property="createDept"/>
+        <result column="create_post" property="createPost"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="configSmsExtendsMap" extends="configSmsMap" type="com.castle.fortress.admin.message.sms.entity.ConfigSmsEntity">
+        <result column="create_user_name" property="createUserName" />
+        <result column="create_dept_name" property="createDeptName" />
+        <result column="create_post_name" property="createPostName" />
+    </resultMap>
+    <select id="extendsList" resultMap="configSmsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name,
+        t2.name create_dept_name,
+        t3.name create_post_name
+        FROM
+        castle_config_sms t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        LEFT OUTER JOIN castle_sys_dept t2 ON t.create_dept  = t2.id
+        LEFT OUTER JOIN castle_sys_post t3 ON t.create_post = t3.id
+        WHERE
+        t.is_deleted = 2
+        <if test='configSmsEntity.id != null'>
+            AND t.id = #{configSmsEntity.id}
+        </if>
+        <if test='configSmsEntity.smsCode != null and configSmsEntity.smsCode != ""'>
+            AND t.sms_code = #{configSmsEntity.smsCode}
+        </if>
+        <if test='configSmsEntity.platform != null'>
+            AND t.platform = #{configSmsEntity.platform}
+        </if>
+        <if test='configSmsEntity.smsConfig != null and configSmsEntity.smsConfig != ""'>
+            AND t.sms_config = #{configSmsEntity.smsConfig}
+        </if>
+        <if test='configSmsEntity.remark != null and configSmsEntity.remark != ""'>
+            AND t.remark = #{configSmsEntity.remark}
+        </if>
+        <if test='configSmsEntity.status != null'>
+            AND t.status = #{configSmsEntity.status}
+        </if>
+        <if test='configSmsEntity.createUser != null'>
+            AND t.create_user = #{configSmsEntity.createUser}
+        </if>
+        <if test='configSmsEntity.createDept != null'>
+            AND t.create_dept = #{configSmsEntity.createDept}
+        </if>
+        <if test='configSmsEntity.createPost != null'>
+            AND t.create_post = #{configSmsEntity.createPost}
+        </if>
+        <if test='configSmsEntity.createTime != null'>
+            AND t.create_time = #{configSmsEntity.createTime}
+        </if>
+        <if test='configSmsEntity.updateUser != null'>
+            AND t.update_user = #{configSmsEntity.updateUser}
+        </if>
+        <if test='configSmsEntity.updateTime != null'>
+            AND t.update_time = #{configSmsEntity.updateTime}
+        </if>
+        <if test='configSmsEntity.isDeleted != null'>
+            AND t.is_deleted = #{configSmsEntity.isDeleted}
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        castle_config_sms t
+        WHERE
+        t.is_deleted = 2
+        <if test='configSmsEntity.id != null'>
+            AND t.id = #{configSmsEntity.id}
+        </if>
+        <if test='configSmsEntity.smsCode != null and configSmsEntity.smsCode != ""'>
+            AND t.sms_code = #{configSmsEntity.smsCode}
+        </if>
+        <if test='configSmsEntity.platform != null'>
+            AND t.platform = #{configSmsEntity.platform}
+        </if>
+        <if test='configSmsEntity.smsConfig != null and configSmsEntity.smsConfig != ""'>
+            AND t.sms_config = #{configSmsEntity.smsConfig}
+        </if>
+        <if test='configSmsEntity.remark != null and configSmsEntity.remark != ""'>
+            AND t.remark = #{configSmsEntity.remark}
+        </if>
+        <if test='configSmsEntity.status != null'>
+            AND t.status = #{configSmsEntity.status}
+        </if>
+        <if test='configSmsEntity.createUser != null'>
+            AND t.create_user = #{configSmsEntity.createUser}
+        </if>
+        <if test='configSmsEntity.createDept != null'>
+            AND t.create_dept = #{configSmsEntity.createDept}
+        </if>
+        <if test='configSmsEntity.createPost != null'>
+            AND t.create_post = #{configSmsEntity.createPost}
+        </if>
+        <if test='configSmsEntity.createTime != null'>
+            AND t.create_time = #{configSmsEntity.createTime}
+        </if>
+        <if test='configSmsEntity.updateUser != null'>
+            AND t.update_user = #{configSmsEntity.updateUser}
+        </if>
+        <if test='configSmsEntity.updateTime != null'>
+            AND t.update_time = #{configSmsEntity.updateTime}
+        </if>
+        <if test='configSmsEntity.isDeleted != null'>
+            AND t.is_deleted = #{configSmsEntity.isDeleted}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="configSmsExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_sms t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        LEFT OUTER JOIN castle_sys_dept t2 ON t.create_dept  = t2.id
+        LEFT OUTER JOIN castle_sys_post t3 ON t.create_post = t3.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+
+
+</mapper>

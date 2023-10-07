@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.message.mail.mapper.CastleMessageEmailRecordMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleMessageEmailRecordMap" type="com.castle.fortress.admin.message.mail.entity.CastleMessageEmailRecordEntity">
+        <result column="id" property="id"/>
+        <result column="sender" property="sender"/>
+        <result column="send_time" property="sendTime"/>
+        <result column="email_title" property="emailTitle"/>
+        <result column="email_body" property="emailBody"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_dept" property="createDept"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="to_user" property="toUser"/>
+        <result column="to_cuser" property="toCuser"/>
+    </resultMap>
+    <resultMap id="castleMessageEmailRecordExtendsMap" extends="castleMessageEmailRecordMap" type="com.castle.fortress.admin.message.mail.entity.CastleMessageEmailRecordEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="castleMessageEmailRecordExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_message_email_record t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='castleMessageEmailRecordEntity.id != null'>
+            AND t.id like concat('%',#{castleMessageEmailRecordEntity.id},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.sender != null and castleMessageEmailRecordEntity.sender != ""'>
+            AND t.sender like concat('%',#{castleMessageEmailRecordEntity.sender},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.sendTime != null'>
+            AND t.send_time like concat('%',#{castleMessageEmailRecordEntity.sendTime},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.emailTitle != null and castleMessageEmailRecordEntity.emailTitle != ""'>
+            AND t.email_title like concat('%',#{castleMessageEmailRecordEntity.emailTitle},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.emailBody != null and castleMessageEmailRecordEntity.emailBody != ""'>
+            AND t.email_body like concat('%',#{castleMessageEmailRecordEntity.emailBody},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleMessageEmailRecordEntity.createUser},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{castleMessageEmailRecordEntity.createDept},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleMessageEmailRecordEntity.createTime},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleMessageEmailRecordEntity.updateUser},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleMessageEmailRecordEntity.updateTime},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.status != null'>
+            AND t.status like concat('%',#{castleMessageEmailRecordEntity.status},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleMessageEmailRecordEntity.isDeleted},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.toUser != null and castleMessageEmailRecordEntity.toUser != ""'>
+            AND t.to_user like concat('%',#{castleMessageEmailRecordEntity.toUser},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.toCuser != null and castleMessageEmailRecordEntity.toCuser != ""'>
+            AND t.to_cuser like concat('%',#{castleMessageEmailRecordEntity.toCuser},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_message_email_record t
+        WHERE
+            t.is_deleted = 2
+        <if test='castleMessageEmailRecordEntity.id != null'>
+            AND t.id like concat('%',#{castleMessageEmailRecordEntity.id},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.sender != null and castleMessageEmailRecordEntity.sender != ""'>
+            AND t.sender like concat('%',#{castleMessageEmailRecordEntity.sender},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.sendTime != null'>
+            AND t.send_time like concat('%',#{castleMessageEmailRecordEntity.sendTime},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.emailTitle != null and castleMessageEmailRecordEntity.emailTitle != ""'>
+            AND t.email_title like concat('%',#{castleMessageEmailRecordEntity.emailTitle},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.emailBody != null and castleMessageEmailRecordEntity.emailBody != ""'>
+            AND t.email_body like concat('%',#{castleMessageEmailRecordEntity.emailBody},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleMessageEmailRecordEntity.createUser},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{castleMessageEmailRecordEntity.createDept},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleMessageEmailRecordEntity.createTime},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleMessageEmailRecordEntity.updateUser},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleMessageEmailRecordEntity.updateTime},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.status != null'>
+            AND t.status like concat('%',#{castleMessageEmailRecordEntity.status},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleMessageEmailRecordEntity.isDeleted},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.toUser != null and castleMessageEmailRecordEntity.toUser != ""'>
+            AND t.to_user like concat('%',#{castleMessageEmailRecordEntity.toUser},'%')
+        </if>
+        <if test='castleMessageEmailRecordEntity.toCuser != null and castleMessageEmailRecordEntity.toCuser != ""'>
+            AND t.to_cuser like concat('%',#{castleMessageEmailRecordEntity.toCuser},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="castleMessageEmailRecordExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_message_email_record t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

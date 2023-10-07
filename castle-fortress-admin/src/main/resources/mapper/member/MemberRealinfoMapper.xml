@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberRealinfoMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberRealinfoMap" type="com.castle.fortress.admin.member.entity.MemberRealinfoEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="real_name" property="realName"/>
+        <result column="card_num" property="cardNum"/>
+        <result column="img_front" property="imgFront"/>
+        <result column="img_back" property="imgBack"/>
+        <result column="birthday" property="birthday"/>
+        <result column="address" property="address"/>
+        <result column="validity_date" property="validityDate"/>
+        <result column="issuing_authority" property="issuingAuthority"/>
+        <result column="nation" property="nation"/>
+        <result column="gender" property="gender"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="card_type" property="cardType"/>
+        <result column="person" property="person"/>
+        <result column="capital" property="capital"/>
+        <result column="business" property="business"/>
+        <result column="enterprise_name" property="enterpriseName"/>
+        <result column="credit_code" property="creditCode"/>
+        <result column="reg_date" property="regDate"/>
+        <result column="business_term" property="businessTerm"/>
+        <result column="residence" property="residence"/>
+        <result column="reg_authority" property="regAuthority"/>
+        <result column="award_date" property="awardDate"/>
+    </resultMap>
+    <resultMap id="memberRealinfoExtendsMap" extends="memberRealinfoMap" type="com.castle.fortress.admin.member.entity.MemberRealinfoEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberRealinfoExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_realinfo t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberRealinfoEntity.id != null'>
+            AND t.id like concat('%',#{memberRealinfoEntity.id},'%')
+        </if>
+        <if test='memberRealinfoEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberRealinfoEntity.memberId},'%')
+        </if>
+        <if test='memberRealinfoEntity.realName != null and memberRealinfoEntity.realName != ""'>
+            AND t.real_name like concat('%',#{memberRealinfoEntity.realName},'%')
+        </if>
+        <if test='memberRealinfoEntity.cardNum != null and memberRealinfoEntity.cardNum != ""'>
+            AND t.card_num like concat('%',#{memberRealinfoEntity.cardNum},'%')
+        </if>
+        <if test='memberRealinfoEntity.imgFront != null and memberRealinfoEntity.imgFront != ""'>
+            AND t.img_front like concat('%',#{memberRealinfoEntity.imgFront},'%')
+        </if>
+        <if test='memberRealinfoEntity.imgBack != null and memberRealinfoEntity.imgBack != ""'>
+            AND t.img_back like concat('%',#{memberRealinfoEntity.imgBack},'%')
+        </if>
+        <if test='memberRealinfoEntity.birthday != null'>
+            AND t.birthday like concat('%',#{memberRealinfoEntity.birthday},'%')
+        </if>
+        <if test='memberRealinfoEntity.address != null and memberRealinfoEntity.address != ""'>
+            AND t.address like concat('%',#{memberRealinfoEntity.address},'%')
+        </if>
+        <if test='memberRealinfoEntity.validityDate != null and memberRealinfoEntity.validityDate != ""'>
+            AND t.validity_date like concat('%',#{memberRealinfoEntity.validityDate},'%')
+        </if>
+        <if test='memberRealinfoEntity.issuingAuthority != null and memberRealinfoEntity.issuingAuthority != ""'>
+            AND t.issuing_authority like concat('%',#{memberRealinfoEntity.issuingAuthority},'%')
+        </if>
+        <if test='memberRealinfoEntity.nation != null and memberRealinfoEntity.nation != ""'>
+            AND t.nation like concat('%',#{memberRealinfoEntity.nation},'%')
+        </if>
+        <if test='memberRealinfoEntity.gender != null and memberRealinfoEntity.gender != ""'>
+            AND t.gender like concat('%',#{memberRealinfoEntity.gender},'%')
+        </if>
+        <if test='memberRealinfoEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberRealinfoEntity.createUser},'%')
+        </if>
+        <if test='memberRealinfoEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberRealinfoEntity.createTime},'%')
+        </if>
+        <if test='memberRealinfoEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberRealinfoEntity.updateUser},'%')
+        </if>
+        <if test='memberRealinfoEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberRealinfoEntity.updateTime},'%')
+        </if>
+        <if test='memberRealinfoEntity.status != null'>
+            AND t.status like concat('%',#{memberRealinfoEntity.status},'%')
+        </if>
+        <if test='memberRealinfoEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberRealinfoEntity.isDeleted},'%')
+        </if>
+        <if test='memberRealinfoEntity.cardType != null and memberRealinfoEntity.cardType != ""'>
+            AND t.card_type like concat('%',#{memberRealinfoEntity.cardType},'%')
+        </if>
+        <if test='memberRealinfoEntity.person != null and memberRealinfoEntity.person != ""'>
+            AND t.person like concat('%',#{memberRealinfoEntity.person},'%')
+        </if>
+        <if test='memberRealinfoEntity.capital != null and memberRealinfoEntity.capital != ""'>
+            AND t.capital like concat('%',#{memberRealinfoEntity.capital},'%')
+        </if>
+        <if test='memberRealinfoEntity.business != null and memberRealinfoEntity.business != ""'>
+            AND t.business like concat('%',#{memberRealinfoEntity.business},'%')
+        </if>
+        <if test='memberRealinfoEntity.enterpriseName != null and memberRealinfoEntity.enterpriseName != ""'>
+            AND t.enterprise_name like concat('%',#{memberRealinfoEntity.enterpriseName},'%')
+        </if>
+        <if test='memberRealinfoEntity.creditCode != null and memberRealinfoEntity.creditCode != ""'>
+            AND t.credit_code like concat('%',#{memberRealinfoEntity.creditCode},'%')
+        </if>
+        <if test='memberRealinfoEntity.regDate != null'>
+            AND t.reg_date like concat('%',#{memberRealinfoEntity.regDate},'%')
+        </if>
+        <if test='memberRealinfoEntity.businessTerm != null and memberRealinfoEntity.businessTerm != ""'>
+            AND t.business_term like concat('%',#{memberRealinfoEntity.businessTerm},'%')
+        </if>
+        <if test='memberRealinfoEntity.residence != null and memberRealinfoEntity.residence != ""'>
+            AND t.residence like concat('%',#{memberRealinfoEntity.residence},'%')
+        </if>
+        <if test='memberRealinfoEntity.regAuthority != null and memberRealinfoEntity.regAuthority != ""'>
+            AND t.reg_authority like concat('%',#{memberRealinfoEntity.regAuthority},'%')
+        </if>
+        <if test='memberRealinfoEntity.awardDate != null'>
+            AND t.award_date like concat('%',#{memberRealinfoEntity.awardDate},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_realinfo t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberRealinfoEntity.id != null'>
+            AND t.id like concat('%',#{memberRealinfoEntity.id},'%')
+        </if>
+        <if test='memberRealinfoEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberRealinfoEntity.memberId},'%')
+        </if>
+        <if test='memberRealinfoEntity.realName != null and memberRealinfoEntity.realName != ""'>
+            AND t.real_name like concat('%',#{memberRealinfoEntity.realName},'%')
+        </if>
+        <if test='memberRealinfoEntity.cardNum != null and memberRealinfoEntity.cardNum != ""'>
+            AND t.card_num like concat('%',#{memberRealinfoEntity.cardNum},'%')
+        </if>
+        <if test='memberRealinfoEntity.imgFront != null and memberRealinfoEntity.imgFront != ""'>
+            AND t.img_front like concat('%',#{memberRealinfoEntity.imgFront},'%')
+        </if>
+        <if test='memberRealinfoEntity.imgBack != null and memberRealinfoEntity.imgBack != ""'>
+            AND t.img_back like concat('%',#{memberRealinfoEntity.imgBack},'%')
+        </if>
+        <if test='memberRealinfoEntity.birthday != null'>
+            AND t.birthday like concat('%',#{memberRealinfoEntity.birthday},'%')
+        </if>
+        <if test='memberRealinfoEntity.address != null and memberRealinfoEntity.address != ""'>
+            AND t.address like concat('%',#{memberRealinfoEntity.address},'%')
+        </if>
+        <if test='memberRealinfoEntity.validityDate != null and memberRealinfoEntity.validityDate != ""'>
+            AND t.validity_date like concat('%',#{memberRealinfoEntity.validityDate},'%')
+        </if>
+        <if test='memberRealinfoEntity.issuingAuthority != null and memberRealinfoEntity.issuingAuthority != ""'>
+            AND t.issuing_authority like concat('%',#{memberRealinfoEntity.issuingAuthority},'%')
+        </if>
+        <if test='memberRealinfoEntity.nation != null and memberRealinfoEntity.nation != ""'>
+            AND t.nation like concat('%',#{memberRealinfoEntity.nation},'%')
+        </if>
+        <if test='memberRealinfoEntity.gender != null and memberRealinfoEntity.gender != ""'>
+            AND t.gender like concat('%',#{memberRealinfoEntity.gender},'%')
+        </if>
+        <if test='memberRealinfoEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberRealinfoEntity.createUser},'%')
+        </if>
+        <if test='memberRealinfoEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberRealinfoEntity.createTime},'%')
+        </if>
+        <if test='memberRealinfoEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberRealinfoEntity.updateUser},'%')
+        </if>
+        <if test='memberRealinfoEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberRealinfoEntity.updateTime},'%')
+        </if>
+        <if test='memberRealinfoEntity.status != null'>
+            AND t.status like concat('%',#{memberRealinfoEntity.status},'%')
+        </if>
+        <if test='memberRealinfoEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberRealinfoEntity.isDeleted},'%')
+        </if>
+        <if test='memberRealinfoEntity.cardType != null and memberRealinfoEntity.cardType != ""'>
+            AND t.card_type like concat('%',#{memberRealinfoEntity.cardType},'%')
+        </if>
+        <if test='memberRealinfoEntity.person != null and memberRealinfoEntity.person != ""'>
+            AND t.person like concat('%',#{memberRealinfoEntity.person},'%')
+        </if>
+        <if test='memberRealinfoEntity.capital != null and memberRealinfoEntity.capital != ""'>
+            AND t.capital like concat('%',#{memberRealinfoEntity.capital},'%')
+        </if>
+        <if test='memberRealinfoEntity.business != null and memberRealinfoEntity.business != ""'>
+            AND t.business like concat('%',#{memberRealinfoEntity.business},'%')
+        </if>
+        <if test='memberRealinfoEntity.enterpriseName != null and memberRealinfoEntity.enterpriseName != ""'>
+            AND t.enterprise_name like concat('%',#{memberRealinfoEntity.enterpriseName},'%')
+        </if>
+        <if test='memberRealinfoEntity.creditCode != null and memberRealinfoEntity.creditCode != ""'>
+            AND t.credit_code like concat('%',#{memberRealinfoEntity.creditCode},'%')
+        </if>
+        <if test='memberRealinfoEntity.regDate != null'>
+            AND t.reg_date like concat('%',#{memberRealinfoEntity.regDate},'%')
+        </if>
+        <if test='memberRealinfoEntity.businessTerm != null and memberRealinfoEntity.businessTerm != ""'>
+            AND t.business_term like concat('%',#{memberRealinfoEntity.businessTerm},'%')
+        </if>
+        <if test='memberRealinfoEntity.residence != null and memberRealinfoEntity.residence != ""'>
+            AND t.residence like concat('%',#{memberRealinfoEntity.residence},'%')
+        </if>
+        <if test='memberRealinfoEntity.regAuthority != null and memberRealinfoEntity.regAuthority != ""'>
+            AND t.reg_authority like concat('%',#{memberRealinfoEntity.regAuthority},'%')
+        </if>
+        <if test='memberRealinfoEntity.awardDate != null'>
+            AND t.award_date like concat('%',#{memberRealinfoEntity.awardDate},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberRealinfoExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_realinfo t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="selectDataList" resultType="com.castle.fortress.admin.member.entity.MemberRealinfoEntity">
+        SELECT
+            t.*
+        FROM
+            member_realinfo t
+        WHERE
+            t.is_deleted = 2
+        <if test="memberId != null and memberId != ''">
+            and t.member_id = #{memberId}
+        </if>
+    </select>
+
+</mapper>

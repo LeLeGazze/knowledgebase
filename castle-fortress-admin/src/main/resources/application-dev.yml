@@ -1,0 +1,118 @@
+server:
+  port: 8081
+
+#系统个性化设置
+castle:
+  #图形验证码
+  imageCaptcha:
+    #是否开启图形验证码 true开启 false 关闭
+    isOpen: false
+    #图片类型 1:数字字母验证码 2 图形拖拽验证码
+    imageType: 2
+    #图型验证码路径(如果类型为2(拖拽)则该配置生效)
+    imagePath: D:\hcses\product\v2\admin\castle-fortress-admin\src\main\resources\image
+  # 邮件临时文件存储目录
+  mailFilePath:
+    mailFile: D:\temp\
+  #cms相关配置
+  cms:
+    #模板路径以文件分隔符结束 注 需要该文件夹的读写权限
+    templatePath: E:\code\castle-fortress-admin\src\main\resources\cmsTemplates\
+  #插件相关
+  addons:
+    #路径以文件分隔符结束 注 需要该文件夹的读写权限
+    path: D:\hcses\product\v2\addons\
+
+spring:
+  datasource:
+    # 使用阿里的Druid连接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    # 填写你数据库的url、登录名、密码和数据库名
+    url: jdbc:mysql://数据库地址:端口号/数据库名称?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+    username: 数据库账号
+    password: 数据库密码
+    druid:
+      # 连接池的配置信息
+      # 初始化大小，最小，最大
+      initial-size: 5
+      min-idle: 5
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: stat,wall,slf4j
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      # 配置DruidStatFilter
+      web-stat-filter:
+        enabled: true
+        url-pattern: "/*"
+        exclusions: "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"
+      # 配置DruidStatViewServlet
+      stat-view-servlet:
+        url-pattern: "/druid/*"
+    freemarker:
+      #指定HttpServletRequest的属性是否可以覆盖controller的model的同名项
+      allow-request-override: false
+      #req访问request
+      request-context-attribute: req
+      #后缀名freemarker默认后缀为.ftl，当然你也可以改成自己习惯的.html
+      suffix: .ftl
+      #设置响应的内容类型
+      content-type: text/html;charset=utf-8
+      #是否允许mvc使用freemarker
+#      enabled: true
+      #是否开启template caching
+#      cache: false
+      #设定模板的加载路径，多个以逗号分隔，默认: [“classpath:/templates/”]
+      template-loader-path: classpath:/templates/
+      #设定Template的编码
+      charset: UTF-8
+    resources:
+      static-locations: classpath:/static/
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 1
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis密码
+    username:
+    password:   # 密码（默认为空）
+    jedis:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 8
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池中的最小空闲连接
+        min-idle: 0
+      # 连接超时时间（毫秒）
+    timeout: 50000
+  #es
+  elasticsearch:
+    rest:
+      # 如果是集群，用逗号隔开
+      uris: 127.0.0.1:9400
+  main:
+    allow-circular-references: true
+
+pdf:
+  url: http://localhost:8302
+  html:
+    toll: D:\app\wkhtmltopdf\bin\wkhtmltopdf.exe

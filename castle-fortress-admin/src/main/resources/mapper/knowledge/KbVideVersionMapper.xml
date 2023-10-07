@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbVideVersionMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbVideVersionMap" type="com.castle.fortress.admin.knowledge.entity.KbVideVersionEntity">
+        <result column="id" property="id"/>
+        <result column="file_url" property="fileUrl"/>
+        <result column="file_name" property="fileName"/>
+        <result column="url" property="url"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="b_id" property="bId"/>
+        <result column="f_id" property="fId"/>
+        <result column="access_path" property="AccessPath"/>
+        <result column="download_url" property="downloadUrl"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="type" property="type"/>
+        <result column="ststus" property="status"/>
+    </resultMap>
+    <resultMap id="kbVideVersionExtendsMap" extends="kbVideVersionMap"
+               type="com.castle.fortress.admin.knowledge.entity.KbVideVersionEntity">
+        <result column="create_user_name" property="createUserName"/>
+    </resultMap>
+    <delete id="deleteByBid" parameterType="java.lang.Long">
+        delete
+        from kb_vide_version
+        where b_id=#{bId}
+    </delete>
+    <select id="extendsList" resultMap="kbVideVersionExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_vide_version t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbVideVersionEntity.id != null'>
+            AND t.id like concat('%',#{kbVideVersionEntity.id},'%')
+        </if>
+        <if test='kbVideVersionEntity.fileUrl != null and kbVideVersionEntity.fileUrl != ""'>
+            AND t.file_url like concat('%',#{kbVideVersionEntity.fileUrl},'%')
+        </if>
+        <if test='kbVideVersionEntity.fileName != null and kbVideVersionEntity.fileName != ""'>
+            AND t.file_name like concat('%',#{kbVideVersionEntity.fileName},'%')
+        </if>
+        <if test='kbVideVersionEntity.url != null and kbVideVersionEntity.url != ""'>
+            AND t.url like concat('%',#{kbVideVersionEntity.url},'%')
+        </if>
+        <if test='kbVideVersionEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbVideVersionEntity.createTime},'%')
+        </if>
+        <if test='kbVideVersionEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbVideVersionEntity.createUser},'%')
+        </if>
+        <if test='kbVideVersionEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbVideVersionEntity.updateUser},'%')
+        </if>
+        <if test='kbVideVersionEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbVideVersionEntity.updateTime},'%')
+        </if>
+        <if test='kbVideVersionEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbVideVersionEntity.isDeleted},'%')
+        </if>
+        <if test='kbVideVersionEntity.bId != null'>
+            AND t.b_id like concat('%',#{kbVideVersionEntity.bId},'%')
+        </if>
+        <if test='kbVideVersionEntity.fId != null and kbVideVersionEntity.fId != ""'>
+            AND t.f_id like concat('%',#{kbVideVersionEntity.fId},'%')
+        </if>
+        <if test='kbVideVersionEntity.fileSize != null and kbVideVersionEntity.fileSize != ""'>
+            AND t.file_size like concat('%',#{kbVideVersionEntity.fileSize},'%')
+        </if>
+        <if test='kbVideVersionEntity.type != null and kbVideVersionEntity.type != ""'>
+            AND t.type like concat('%',#{kbVideVersionEntity.type},'%')
+        </if>
+        <if test='kbVideVersionEntity.ststus != null'>
+            AND t.ststus like concat('%',#{kbVideVersionEntity.ststus},'%')
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        kb_vide_version t
+        WHERE
+        t.is_deleted = 2
+        <if test='kbVideVersionEntity.id != null'>
+            AND t.id like concat('%',#{kbVideVersionEntity.id},'%')
+        </if>
+        <if test='kbVideVersionEntity.fileUrl != null and kbVideVersionEntity.fileUrl != ""'>
+            AND t.file_url like concat('%',#{kbVideVersionEntity.fileUrl},'%')
+        </if>
+        <if test='kbVideVersionEntity.fileName != null and kbVideVersionEntity.fileName != ""'>
+            AND t.file_name like concat('%',#{kbVideVersionEntity.fileName},'%')
+        </if>
+        <if test='kbVideVersionEntity.url != null and kbVideVersionEntity.url != ""'>
+            AND t.url like concat('%',#{kbVideVersionEntity.url},'%')
+        </if>
+        <if test='kbVideVersionEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbVideVersionEntity.createTime},'%')
+        </if>
+        <if test='kbVideVersionEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbVideVersionEntity.createUser},'%')
+        </if>
+        <if test='kbVideVersionEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbVideVersionEntity.updateUser},'%')
+        </if>
+        <if test='kbVideVersionEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbVideVersionEntity.updateTime},'%')
+        </if>
+        <if test='kbVideVersionEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbVideVersionEntity.isDeleted},'%')
+        </if>
+        <if test='kbVideVersionEntity.bId != null'>
+            AND t.b_id like concat('%',#{kbVideVersionEntity.bId},'%')
+        </if>
+        <if test='kbVideVersionEntity.fId != null and kbVideVersionEntity.fId != ""'>
+            AND t.f_id like concat('%',#{kbVideVersionEntity.fId},'%')
+        </if>
+        <if test='kbVideVersionEntity.fileSize != null and kbVideVersionEntity.fileSize != ""'>
+            AND t.file_size like concat('%',#{kbVideVersionEntity.fileSize},'%')
+        </if>
+        <if test='kbVideVersionEntity.type != null and kbVideVersionEntity.type != ""'>
+            AND t.type like concat('%',#{kbVideVersionEntity.type},'%')
+        </if>
+        <if test='kbVideVersionEntity.ststus != null'>
+            AND t.ststus like concat('%',#{kbVideVersionEntity.ststus},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbVideVersionExtendsMap">
+        SELECT t.*,
+               t1.real_name create_user_name
+        FROM kb_vide_version t
+                 LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE t.is_deleted = 2
+          AND t.id = #{id}
+    </select>
+    <select id="findByUid" resultType="com.castle.fortress.admin.knowledge.dto.KbVideVersionDto"
+            parameterType="java.lang.Long">
+        select ve.*,ba.b_id as baId
+        from kb_vide_version ve
+                 left join kb_basic_history ba on ve.b_id = ba.id
+        where ve.b_id = #{uid}
+
+    </select>
+
+</mapper>

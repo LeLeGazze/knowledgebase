@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbModelMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbModelMap" type="com.castle.fortress.admin.knowledge.entity.KbModelEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="kbModelExtendsMap" extends="kbModelMap" type="com.castle.fortress.admin.knowledge.entity.KbModelEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="kbModelExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_model t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbModelEntity.id != null'>
+            AND t.id like concat('%',#{kbModelEntity.id},'%')
+        </if>
+        <if test='kbModelEntity.name != null and kbModelEntity.name != ""'>
+            AND t.name like concat('%',#{kbModelEntity.name},'%')
+        </if>
+        <if test='kbModelEntity.code != null and kbModelEntity.code != ""'>
+            AND t.code like concat('%',#{kbModelEntity.code},'%')
+        </if>
+        <if test='kbModelEntity.status != null'>
+            AND t.status like concat('%',#{kbModelEntity.status},'%')
+        </if>
+        <if test='kbModelEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbModelEntity.createUser},'%')
+        </if>
+        <if test='kbModelEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbModelEntity.createTime},'%')
+        </if>
+        <if test='kbModelEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbModelEntity.updateUser},'%')
+        </if>
+        <if test='kbModelEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbModelEntity.updateTime},'%')
+        </if>
+        <if test='kbModelEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbModelEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        kb_model t
+        WHERE
+            t.is_deleted = 2
+        <if test='kbModelEntity.id != null'>
+            AND t.id like concat('%',#{kbModelEntity.id},'%')
+        </if>
+        <if test='kbModelEntity.name != null and kbModelEntity.name != ""'>
+            AND t.name like concat('%',#{kbModelEntity.name},'%')
+        </if>
+        <if test='kbModelEntity.code != null and kbModelEntity.code != ""'>
+            AND t.code like concat('%',#{kbModelEntity.code},'%')
+        </if>
+        <if test='kbModelEntity.status != null'>
+            AND t.status like concat('%',#{kbModelEntity.status},'%')
+        </if>
+        <if test='kbModelEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbModelEntity.createUser},'%')
+        </if>
+        <if test='kbModelEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbModelEntity.createTime},'%')
+        </if>
+        <if test='kbModelEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbModelEntity.updateUser},'%')
+        </if>
+        <if test='kbModelEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbModelEntity.updateTime},'%')
+        </if>
+        <if test='kbModelEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbModelEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbModelExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_model t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="getByArticleId" resultMap="kbModelExtendsMap">
+        select t.*
+        from kb_model t join kb_channel t1
+        on t.id =t1.model
+        join cms_article t2
+        on t1.id = t2.channel_id
+        where t2.id = #{id}
+    </select>
+    <select id="getByCode" resultMap="kbModelMap">
+        select t.*
+        from kb_model t
+        where t.code = #{code}
+    </select>
+    <select id="findswId" resultType="java.lang.Long">
+        select ksw.id as id from kb_subject_warehouse ksw
+        left join kb_model km on ksw.model_id = km.id
+        where ksw.model_id = #{modelId}
+    </select>
+
+
+</mapper>

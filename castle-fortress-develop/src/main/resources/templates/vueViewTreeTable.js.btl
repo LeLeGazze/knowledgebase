@@ -1,0 +1,41 @@
+import request from "@/common/request"
+
+//${classDdsc}左树数据展示
+export const leftTreeList = (queryForm) => {
+    return request("get", "${treeUrl}", queryForm);
+}
+
+//${classDdsc}分页展示
+export const ${lowerEntitykey}Page = (queryForm) => {
+    return request("get", "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/page", queryForm);
+}
+//${classDdsc}列表展示
+export const ${lowerEntitykey}List = (queryForm) => {
+    return request("get", "/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/list", queryForm);
+}
+//${classDdsc}详情
+export const ${lowerEntitykey}Info = (id) => {
+    return request('get', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/info', {
+        id: id
+    })
+}
+//${classDdsc}信息保存
+export const ${lowerEntitykey}Save = (data) => {
+    return request('post', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/save', data)
+}
+//${classDdsc}信息修改
+export const ${lowerEntitykey}Edit = (data) => {
+    return request('post', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/edit', data)
+}
+//${classDdsc}信息删除
+export const ${lowerEntitykey}Del = (id) => {
+    return request('post', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/delete?id=' + id)
+}
+//${classDdsc}批量删除
+export const ${lowerEntitykey}DelBatch = (ids) => {
+    return request('post', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/deleteBatch', ids)
+}
+//${classDdsc}动态表头导出
+export const ${lowerEntitykey}DynamicExport = (data) => {
+    return request("eptpost", '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/exportDynamic', data)
+}

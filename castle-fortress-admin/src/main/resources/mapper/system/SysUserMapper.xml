@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.SysUserMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysUserMap" type="com.castle.fortress.admin.system.entity.SysUser">
+        <result column="id" property="id"/>
+        <result column="login_name" property="loginName"/>
+        <result column="nickname" property="nickname"/>
+        <result column="real_name" property="realName"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="gender" property="gender"/>
+        <result column="birthday" property="birthday"/>
+        <result column="avatar" property="avatar"/>
+        <result column="idcard_type" property="idcardType"/>
+        <result column="idcard" property="idcard"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="post_id" property="postId"/>
+        <result column="remark" property="remark"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_dept" property="createDept"/>
+        <result column="create_post" property="createPost"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="office_phone" property="officePhone"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="data_auth_type" property="postDataAuth"/>
+        <result column="union_id" property="unionId"/>
+        <result column="openid" property="openid"/>
+        <result column="wx_bind_time" property="wxBindTime"/>
+        <result column="wx_avatar" property="wxAvatar"/>
+        <result column="wx_name" property="wxName"/>
+        <result column="qq_openid" property="qqOpenid"/>
+        <result column="qq_bind_time" property="qqBindTime"/>
+        <result column="qq_avatar" property="qqAvatar"/>
+        <result column="qq_name" property="qqName"/>
+        <result column="address" property="address"/>
+    </resultMap>
+
+    <resultMap id="sysUserMapExtend" type="com.castle.fortress.admin.system.entity.SysUser" extends="sysUserMap">
+        <result column="dept_parents" property="deptParents"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="post_name" property="postName"/>
+        <result column="create_dept_name" property="createDeptName"/>
+        <result column="create_post_name" property="createPostName"/>
+    </resultMap>
+    <update id="updateBatch">
+        update castle_sys_user set status = 2
+       where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+    <update id="updateBatchTrue">
+        update castle_sys_user set status = 1
+        where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+    <select id="queryByLoginName" resultMap="sysUserMap">
+        select t.*,t1.data_auth_type,t2.parents dept_parents,t2.name as dept_name
+        from castle_sys_user t left outer join castle_sys_post t1
+        on t.post_id = t1.id
+        left outer join castle_sys_dept t2
+        on t.dept_id = t2.id
+        where t.is_deleted = 2
+        and (t.login_name =#{loginName} or t.phone = #{loginName} or t.email = #{loginName})
+    </select>
+    <select id="extendsList" resultMap="sysUserMapExtend">
+        SELECT
+        distinct t.*,
+        t1.name dept_name,
+        t1.parents dept_parents,
+        t2.name post_name
+        FROM
+        castle_sys_user t
+        left outer join castle_sys_dept t1 on t.dept_id  = t1.id
+        LEFT OUTER JOIN castle_sys_post t2 ON t.post_id = t2.id
+        WHERE
+        t.is_deleted = 2
+        <if test='sysUserDto.loginName !=null and sysUserDto.loginName != ""' >
+            and t.login_name = #{sysUserDto.loginName}
+        </if>
+        <if test='sysUserDto.realName !=null and sysUserDto.realName != ""' >
+            and t.real_name like concat('%',#{sysUserDto.realName},'%')
+        </if>
+        <if test='sysUserDto.phone !=null and sysUserDto.phone != ""' >
+            and t.phone = #{sysUserDto.phone}
+        </if>
+        <if test='sysUserDto.deptId !=null and sysUserDto.deptId != ""' >
+            and t.dept_id = #{sysUserDto.deptId}
+        </if>
+        <if test='deptIdList !=null and deptIdList.size()>0'>
+            and (t.dept_id in
+            <foreach collection="deptIdList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test='createUserLimit !=null ' >
+                or t.id = #{createUserLimit}
+            </if>
+            <if test='subPostList !=null and subPostList.size()>0'>
+                or t.post_id in
+                <foreach collection="subPostList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test='(deptIdList == null or deptIdList.size() == 0) and subPostList !=null and subPostList.size()>0'>
+            and (t.post_id in
+            <foreach collection="subPostList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test='createUserLimit !=null '>
+                or t.id = #{createUserLimit}
+            </if>
+            )
+        </if>
+        <if test='(deptIdList == null or deptIdList.size() == 0 ) and (subPostList == null or subPostList.size() == 0) and createUserLimit !=null ' >
+            and t.id = #{createUserLimit}
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(distinct t.id)
+        FROM
+        castle_sys_user t
+        WHERE
+        t.is_deleted = 2
+        <if test='sysUserDto.loginName !=null and sysUserDto.loginName != ""' >
+            and t.login_name = #{sysUserDto.loginName}
+        </if>
+        <if test='sysUserDto.realName !=null and sysUserDto.realName != ""' >
+            and t.real_name like concat('%',#{sysUserDto.realName},'%')
+        </if>
+        <if test='sysUserDto.phone !=null and sysUserDto.phone != ""' >
+            and t.phone = #{sysUserDto.phone}
+        </if>
+        <if test='sysUserDto.deptId !=null and sysUserDto.deptId != ""' >
+            and t.dept_id = #{sysUserDto.deptId}
+        </if>
+        <if test='deptIdList !=null and deptIdList.size()>0'>
+            and (t.dept_id in
+            <foreach collection="deptIdList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test='createUserLimit !=null ' >
+                or t.id = #{createUserLimit}
+            </if>
+            <if test='subPostList !=null and subPostList.size()>0'>
+                or t.post_id in
+                <foreach collection="subPostList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test='(deptIdList == null or deptIdList.size() == 0) and subPostList !=null and subPostList.size()>0'>
+            and (t.post_id in
+            <foreach collection="subPostList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test='createUserLimit !=null '>
+                or t.id = #{createUserLimit}
+            </if>
+            )
+        </if>
+        <if test='(deptIdList == null or deptIdList.size() == 0 ) and (subPostList == null or subPostList.size() == 0) and createUserLimit !=null ' >
+            and t.id = #{createUserLimit}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="sysUserMapExtend">
+        SELECT
+            t.*,
+            t1.name create_dept_name,
+        t2.name create_post_name ,
+            t1.name dept_name
+        FROM
+            castle_sys_user t
+            left outer join castle_sys_dept t1 on t.dept_id  = t1.id
+            LEFT OUTER JOIN castle_sys_post t2 ON t.post_id = t2.id
+        WHERE
+            t.is_deleted = 2
+            and t.id = #{id}
+    </select>
+    <select id="listSysUser" resultType="com.castle.fortress.admin.system.entity.SysUser">
+        SELECT
+        t.*
+        FROM
+        castle_sys_user t
+        WHERE
+        t.is_deleted = 2
+        and t.id in
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        <if test='deptIdList !=null and deptIdList.size()>0'>
+            and (t.dept_id in
+            <foreach collection="deptIdList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test='createUserLimit !=null ' >
+                or t.id = #{createUserLimit}
+            </if>
+            <if test='subPostList !=null and subPostList.size()>0'>
+                or t.post_id in
+                <foreach collection="subPostList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            )
+        </if>
+        <if test='(deptIdList == null or deptIdList.size() == 0) and subPostList !=null and subPostList.size()>0'>
+            and (t.post_id in
+            <foreach collection="subPostList" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test='createUserLimit !=null '>
+                or t.id = #{createUserLimit}
+            </if>
+            )
+        </if>
+        <if test='(deptIdList == null or deptIdList.size() == 0 ) and (subPostList == null or subPostList.size() == 0) and createUserLimit !=null ' >
+            and t.id = #{createUserLimit}
+        </if>
+    </select>
+    <select id="noPunched" resultType="com.castle.fortress.admin.system.entity.SysUser">
+
+        SELECT t.*
+        FROM castle_sys_user t
+                 left OUTER JOIN oa_attendance_record t1
+                                 ON t.id = t1.user_id and t1.type = #{type} and t1.is_deleted = 2 and
+                                    t1.create_time &gt;= #{begin} and t1.create_time &lt;= #{end}
+        WHERE t1.id is null and t.login_name!='admin'
+
+    </select>
+    <select id="getByWeComUserId" resultType="com.castle.fortress.admin.system.entity.SysUser">
+        SELECT t1.* FROM castle_sys_user t1
+             LEFT JOIN castle_sys_user_we_com t2 ON t1.id = t2.user_id
+        WHERE t2.we_com_userid = #{userId}
+    </select>
+    <select id="getByDingUnionid" resultType="com.castle.fortress.admin.system.entity.SysUser">
+        SELECT t1.* FROM castle_sys_user t1
+                             LEFT JOIN castle_sys_user_ding t2 ON t1.id = t2.user_id
+        WHERE t2.ding_unionid = #{unionId}
+    </select>
+    <select id="findByIds" resultType="com.castle.fortress.admin.system.entity.SysUser">
+        select * from castle_sys_user where id in
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </select>
+    <select id="findAll" resultType="com.castle.fortress.admin.system.entity.SysUser">
+        select * from castle_sys_user
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            <if test="name != null">
+                AND real_name like concat('%',#{name},'%')
+            </if>
+            AND is_deleted=2
+        </trim>
+
+    </select>
+    <select id="selectUserInfo" resultType="com.castle.fortress.admin.system.dto.SysUserDto">
+        SELECT csu.real_name as realName,csd.name as deptName,csp.name as postName,csu.remark,csu.avatar as avatar,
+               csu.id as id,csu.login_name as loginName FROM castle_sys_user csu
+        LEFT join castle_sys_dept csd on csu.dept_id = csd.id
+        LEFT JOIN castle_sys_post csp on csu.post_id = csp.id
+        where csu.id = #{id}
+    </select>
+    <select id="findUserByIds" resultType="com.castle.fortress.admin.system.dto.SysUserDto">
+        select csu.id as id,csu.real_name as realName,csu.login_name as loginName,csp.name as postName,csu.phone as phone,csu.email as email
+        from castle_sys_user csu left join castle_sys_dept csd on csu.dept_id = csd.id
+        left join castle_sys_post csp on csd.id = csp.dept_id
+        where
+              csu.id in (
+            <foreach collection="ids" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="findUserByidsCount" resultType="java.lang.Integer">
+        select count(1)
+        from (
+        select *
+        from castle_sys_user
+        where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        ) t1
+    </select>
+    <select id="authorityAllUserName" resultType="com.castle.fortress.admin.system.dto.SysUserDto">
+        <if test="roleIds!=null and roleIds.size > 0">
+            select  user.*
+            from (
+            select t1.*,
+            #                 t1.parent_id,
+            if(find_in_set(parent_id, @parentId) > 0 or find_in_set(id, @parentId) > 0 , @parentId := concat(@parentId, ',', id), 0) as ischild
+            from (
+            select  *
+            from castle_sys_dept t
+            where is_deleted=2
+            ) t1,
+            (select @parentId := (SELECT  group_concat(distinct t1.dept_id ) FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )) t2
+            ) t3  join castle_sys_user user on user.dept_id=t3.id
+            where ischild != 0
+            <if test="realName!=null and realName !='' ">
+                and user.real_name like concat('%',#{realName},'%')
+            </if>
+            <if test="map != null">
+                limit #{map.offset},#{map.rows}
+            </if>
+        </if>
+        <if test="roleIds==null ">
+            select user.*
+            from castle_sys_dept t join castle_sys_user user on user.dept_id=t.id
+            where t.is_deleted = 2
+            <if test="realName!=null and realName !='' ">
+                and user.real_name like concat('%',#{realName},'%')
+            </if>
+            <if test="map != null">
+                limit #{map.offset},#{map.rows}
+            </if>
+        </if>
+    </select>
+    <select id="authorityAllUserNameCount" resultType="java.lang.Integer">
+        <if test="roleIds!=null and roleIds.size > 0">
+            select count(1)
+            from (
+            select t1.*,
+            #                 t1.parent_id,
+            if(find_in_set(parent_id, @parentId) > 0 or find_in_set(id, @parentId) > 0 , @parentId := concat(@parentId, ',', id), 0) as ischild
+            from (
+            select  *
+            from castle_sys_dept t
+            where is_deleted=2
+            ) t1,
+            (select @parentId := (SELECT  group_concat(distinct t1.dept_id ) FROM castle_sys_role_data_auth t1 WHERE t1.role_id IN
+            <foreach collection="roleIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )) t2
+            ) t3  join castle_sys_user user on user.dept_id=t3.id
+            where ischild != 0
+            <if test="realName!=null and realName !='' ">
+                and user.real_name like concat('%',#{realName},'%')
+            </if>
+
+        </if>
+        <if test="roleIds==null ">
+            select count(1)
+            from castle_sys_dept t join castle_sys_user user on user.dept_id=t.id
+            where t.is_deleted = 2
+            <if test="realName!=null and realName !='' ">
+                and user.real_name like concat('%',#{realName},'%')
+            </if>
+        </if>
+    </select>
+</mapper>

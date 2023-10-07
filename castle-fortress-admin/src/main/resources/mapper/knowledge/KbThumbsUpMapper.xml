@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbThumbsUpMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbThumbsUpMap" type="com.castle.fortress.admin.knowledge.entity.KbThumbsUpEntity">
+        <result column="id" property="id"/>
+        <result column="comment_id" property="commentId"/>
+        <result column="status" property="status"/>
+        <result column="basic_id" property="basicId"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    <delete id="removeUp">
+		delete from kb_thumbs_up where comment_id =#{commentId} and basic_id = #{basicId} and user_id = #{userId}
+	</delete>
+
+    <select id="queryList" resultMap="kbThumbsUpMap">
+		SELECT
+		t.*
+		FROM
+		kb_thumbs_up t
+		WHERE
+		1 = 1
+		<if test='kbThumbsUpEntity.id != null'>
+			AND t.id like concat('%',#{kbThumbsUpEntity.id},'%')
+		</if>
+		<if test='kbThumbsUpEntity.commentId != null'>
+			AND t.comment_id like concat('%',#{kbThumbsUpEntity.commentId},'%')
+		</if>
+		<if test='kbThumbsUpEntity.status != null'>
+			AND t.status like concat('%',#{kbThumbsUpEntity.status},'%')
+		</if>
+		<if test='kbThumbsUpEntity.basicId != null'>
+			AND t.basic_id like concat('%',#{kbThumbsUpEntity.basicId},'%')
+		</if>
+		<if test='kbThumbsUpEntity.userId != null'>
+			AND t.user_id like concat('%',#{kbThumbsUpEntity.userId},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+    <select id="checkExites" resultType="com.castle.fortress.admin.knowledge.entity.KbThumbsUpEntity">
+		select * from kb_thumbs_up where comment_id =#{commentId} and basic_id = #{basicId} and user_id = #{userId}
+	</select>
+
+</mapper>

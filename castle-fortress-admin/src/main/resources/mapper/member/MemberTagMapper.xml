@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberTagMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberTagMap" type="com.castle.fortress.admin.member.entity.MemberTagEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+    <resultMap id="memberTagExtendsMap" extends="memberTagMap" type="com.castle.fortress.admin.member.entity.MemberTagEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberTagExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_tag t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberTagEntity.id != null'>
+            AND t.id = #{memberTagEntity.id}
+        </if>
+        <if test='memberTagEntity.name != null and memberTagEntity.name != ""'>
+            AND t.name like concat('%',#{memberTagEntity.name},'%')
+        </if>
+        <if test='memberTagEntity.status != null'>
+            AND t.status = #{memberTagEntity.status}
+        </if>
+        <if test='memberTagEntity.createUser != null'>
+            AND t.create_user = #{memberTagEntity.createUser}
+        </if>
+        <if test='memberTagEntity.createTime != null'>
+            AND t.create_time = #{memberTagEntity.createTime}
+        </if>
+        <if test='memberTagEntity.updateUser != null'>
+            AND t.update_user = #{memberTagEntity.updateUser}
+        </if>
+        <if test='memberTagEntity.updateTime != null'>
+            AND t.update_time = #{memberTagEntity.updateTime}
+        </if>
+        <if test='memberTagEntity.isDeleted != null'>
+            AND t.is_deleted = #{memberTagEntity.isDeleted}
+        </if>
+        <if test='memberTagEntity.sort != null'>
+            AND t.sort = #{memberTagEntity.sort}
+        </if>
+            order by sort desc,create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_tag t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberTagEntity.id != null'>
+            AND t.id = #{memberTagEntity.id}
+        </if>
+        <if test='memberTagEntity.name != null and memberTagEntity.name != ""'>
+            AND t.name like concat('%',#{memberTagEntity.name},'%')
+        </if>
+        <if test='memberTagEntity.status != null'>
+            AND t.status = #{memberTagEntity.status}
+        </if>
+        <if test='memberTagEntity.createUser != null'>
+            AND t.create_user = #{memberTagEntity.createUser}
+        </if>
+        <if test='memberTagEntity.createTime != null'>
+            AND t.create_time = #{memberTagEntity.createTime}
+        </if>
+        <if test='memberTagEntity.updateUser != null'>
+            AND t.update_user = #{memberTagEntity.updateUser}
+        </if>
+        <if test='memberTagEntity.updateTime != null'>
+            AND t.update_time = #{memberTagEntity.updateTime}
+        </if>
+        <if test='memberTagEntity.isDeleted != null'>
+            AND t.is_deleted = #{memberTagEntity.isDeleted}
+        </if>
+        <if test='memberTagEntity.sort != null'>
+            AND t.sort = #{memberTagEntity.sort}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberTagExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_tag t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

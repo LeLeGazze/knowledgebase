@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.SysRoleDataAuthMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysRoleDataAuthMap" type="com.castle.fortress.admin.system.entity.SysRoleDataAuthEntity">
+        <result column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="dept_id" property="deptId"/>
+    </resultMap>
+    <delete id="delByRoleId">
+        delete from castle_sys_role_data_auth where role_id=#{roleId}
+    </delete>
+    <select id="getAuthDeptByUserId" resultType="java.lang.Long">
+        select distinct dept_id
+        from castle_sys_role_data_auth
+        where  role_id in (
+            select role_id from castle_sys_user_role where user_id = #{userId}
+        )
+    </select>
+
+</mapper>

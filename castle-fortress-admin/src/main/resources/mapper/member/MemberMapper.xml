@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberMap" type="com.castle.fortress.admin.member.entity.MemberEntity">
+        <result column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="phone" property="phone"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="openid" property="openid"/>
+        <result column="unionid" property="unionid"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="birthday" property="birthday"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="tags" property="tags"/>
+        <result column="level_id" property="levelId"/>
+        <result column="province_name" property="provinceName"/>
+        <result column="province_code" property="provinceCode"/>
+        <result column="city_name" property="cityName"/>
+        <result column="city_code" property="cityCode"/>
+        <result column="area_name" property="areaName"/>
+        <result column="area_code" property="areaCode"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="memberExtendsMap" extends="memberMap" type="com.castle.fortress.admin.member.entity.MemberEntity">
+        <result column="create_user_name" property="createUserName"/>
+    </resultMap>
+    <select id="extendsList" resultMap="memberExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberEntity.id != null'>
+            AND t.id like concat('%',#{memberEntity.id},'%')
+        </if>
+        <if test='memberEntity.userName != null and memberEntity.userName != ""'>
+            AND t.user_name like concat('%',#{memberEntity.userName},'%')
+        </if>
+        <if test='memberEntity.password != null and memberEntity.password != ""'>
+            AND t.password like concat('%',#{memberEntity.password},'%')
+        </if>
+        <if test='memberEntity.phone != null and memberEntity.phone != ""'>
+            AND t.phone like concat('%',#{memberEntity.phone},'%')
+        </if>
+        <if test='memberEntity.nickName != null and memberEntity.nickName != ""'>
+            AND t.nick_name like concat('%',#{memberEntity.nickName},'%')
+        </if>
+        <if test='memberEntity.openid != null and memberEntity.openid != ""'>
+            AND t.openid like concat('%',#{memberEntity.openid},'%')
+        </if>
+        <if test='memberEntity.unionid != null and memberEntity.unionid != ""'>
+            AND t.unionid like concat('%',#{memberEntity.unionid},'%')
+        </if>
+        <if test='memberEntity.avatar != null and memberEntity.avatar != ""'>
+            AND t.avatar like concat('%',#{memberEntity.avatar},'%')
+        </if>
+        <if test='memberEntity.gender != null'>
+            AND t.gender like concat('%',#{memberEntity.gender},'%')
+        </if>
+        <if test='memberEntity.birthday != null'>
+            AND t.birthday like concat('%',#{memberEntity.birthday},'%')
+        </if>
+        <if test='memberEntity.status != null'>
+            AND t.status like concat('%',#{memberEntity.status},'%')
+        </if>
+        <if test='memberEntity.remark != null and memberEntity.remark != ""'>
+            AND t.remark like concat('%',#{memberEntity.remark},'%')
+        </if>
+        <if test='memberEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberEntity.createUser},'%')
+        </if>
+        <if test='memberEntity.startTime != null'>
+            AND t.create_time &gt;= #{memberEntity.startTime}
+        </if>
+        <if test='memberEntity.endTime != null'>
+            AND t.create_time &lt;= #{memberEntity.endTime}
+        </if>
+        <if test='memberEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberEntity.createTime},'%')
+        </if>
+        <if test='memberEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberEntity.updateUser},'%')
+        </if>
+        <if test='memberEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberEntity.updateTime},'%')
+        </if>
+        <if test='memberEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberEntity.isDeleted},'%')
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        member t
+        WHERE
+        t.is_deleted = 2
+        <if test='memberEntity.id != null'>
+            AND t.id like concat('%',#{memberEntity.id},'%')
+        </if>
+        <if test='memberEntity.userName != null and memberEntity.userName != ""'>
+            AND t.user_name like concat('%',#{memberEntity.userName},'%')
+        </if>
+        <if test='memberEntity.password != null and memberEntity.password != ""'>
+            AND t.password like concat('%',#{memberEntity.password},'%')
+        </if>
+        <if test='memberEntity.phone != null and memberEntity.phone != ""'>
+            AND t.phone like concat('%',#{memberEntity.phone},'%')
+        </if>
+        <if test='memberEntity.nickName != null and memberEntity.nickName != ""'>
+            AND t.nick_name like concat('%',#{memberEntity.nickName},'%')
+        </if>
+        <if test='memberEntity.openid != null and memberEntity.openid != ""'>
+            AND t.openid like concat('%',#{memberEntity.openid},'%')
+        </if>
+        <if test='memberEntity.unionid != null and memberEntity.unionid != ""'>
+            AND t.unionid like concat('%',#{memberEntity.unionid},'%')
+        </if>
+        <if test='memberEntity.avatar != null and memberEntity.avatar != ""'>
+            AND t.avatar like concat('%',#{memberEntity.avatar},'%')
+        </if>
+        <if test='memberEntity.gender != null'>
+            AND t.gender like concat('%',#{memberEntity.gender},'%')
+        </if>
+        <if test='memberEntity.birthday != null'>
+            AND t.birthday like concat('%',#{memberEntity.birthday},'%')
+        </if>
+        <if test='memberEntity.status != null'>
+            AND t.status like concat('%',#{memberEntity.status},'%')
+        </if>
+        <if test='memberEntity.remark != null and memberEntity.remark != ""'>
+            AND t.remark like concat('%',#{memberEntity.remark},'%')
+        </if>
+        <if test='memberEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberEntity.createUser},'%')
+        </if>
+        <if test='memberEntity.startTime != null'>
+            AND t.create_time &gt;= #{memberEntity.startTime}
+        </if>
+        <if test='memberEntity.endTime != null'>
+            AND t.create_time &lt;= #{memberEntity.endTime}
+        </if>
+        <if test='memberEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberEntity.createTime},'%')
+        </if>
+        <if test='memberEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberEntity.updateUser},'%')
+        </if>
+        <if test='memberEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberEntity.updateTime},'%')
+        </if>
+        <if test='memberEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberExtendsMap">
+        SELECT t.*,
+               t1.real_name create_user_name
+        FROM member t
+                 LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE t.is_deleted = 2
+          AND t.id = #{id}
+    </select>
+
+</mapper>

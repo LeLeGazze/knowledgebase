@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbModelDomainMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbModelDomainMap" type="com.castle.fortress.admin.knowledge.entity.KbModelDomainEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="url" property="url"/>
+        <result column="key" property="key"/>
+        <result column="remark" property="remark"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <resultMap id="kbModelDomainExtendsMap" extends="kbModelDomainMap" type="com.castle.fortress.admin.knowledge.entity.KbModelDomainEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="kbModelDomainExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_model_domain t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbModelDomainEntity.id != null'>
+            AND t.id like concat('%',#{kbModelDomainEntity.id},'%')
+        </if>
+        <if test='kbModelDomainEntity.name != null and kbModelDomainEntity.name != ""'>
+            AND t.name like concat('%',#{kbModelDomainEntity.name},'%')
+        </if>
+        <if test='kbModelDomainEntity.pid != null'>
+            AND t.pid like concat('%',#{kbModelDomainEntity.pid},'%')
+        </if>
+        <if test='kbModelDomainEntity.url != null and kbModelDomainEntity.url != ""'>
+            AND t.url like concat('%',#{kbModelDomainEntity.url},'%')
+        </if>
+        <if test='kbModelDomainEntity.key != null'>
+            AND t.key like concat('%',#{kbModelDomainEntity.key},'%')
+        </if>
+        <if test='kbModelDomainEntity.remark != null and kbModelDomainEntity.remark != ""'>
+            AND t.remark like concat('%',#{kbModelDomainEntity.remark},'%')
+        </if>
+        <if test='kbModelDomainEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbModelDomainEntity.updateTime},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        kb_model_domain t
+        WHERE
+            t.is_deleted = 2
+        <if test='kbModelDomainEntity.id != null'>
+            AND t.id like concat('%',#{kbModelDomainEntity.id},'%')
+        </if>
+        <if test='kbModelDomainEntity.name != null and kbModelDomainEntity.name != ""'>
+            AND t.name like concat('%',#{kbModelDomainEntity.name},'%')
+        </if>
+        <if test='kbModelDomainEntity.pid != null'>
+            AND t.pid like concat('%',#{kbModelDomainEntity.pid},'%')
+        </if>
+        <if test='kbModelDomainEntity.url != null and kbModelDomainEntity.url != ""'>
+            AND t.url like concat('%',#{kbModelDomainEntity.url},'%')
+        </if>
+        <if test='kbModelDomainEntity.key != null'>
+            AND t.key like concat('%',#{kbModelDomainEntity.key},'%')
+        </if>
+        <if test='kbModelDomainEntity.remark != null and kbModelDomainEntity.remark != ""'>
+            AND t.remark like concat('%',#{kbModelDomainEntity.remark},'%')
+        </if>
+        <if test='kbModelDomainEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbModelDomainEntity.updateTime},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbModelDomainExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_model_domain t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="findAll" resultType="com.castle.fortress.admin.knowledge.entity.KbModelDomainEntity">
+        select * from kb_model_domain
+    </select>
+
+</mapper>

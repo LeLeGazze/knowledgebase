@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.log.mapper.LogJobMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="logJobMap" type="com.castle.fortress.admin.log.entity.LogJobEntity">
+        <result column="id" property="id"/>
+        <result column="task_name" property="taskName"/>
+        <result column="task_id" property="taskId"/>
+        <result column="invoke_params" property="invokeParams"/>
+        <result column="invoke_status" property="invokeStatus"/>
+        <result column="invoke_time" property="invokeTime"/>
+        <result column="elapsed_time" property="elapsedTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberGoodsCartMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberGoodsCartMap" type="com.castle.fortress.admin.member.entity.MemberGoodsCartEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="option_id" property="optionId"/>
+        <result column="total" property="total"/>
+        <result column="price" property="price"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="memberGoodsCartExtendsMap" extends="memberGoodsCartMap" type="com.castle.fortress.admin.member.entity.MemberGoodsCartEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberGoodsCartExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_goods_cart t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberGoodsCartEntity.id != null'>
+            AND t.id like concat('%',#{memberGoodsCartEntity.id},'%')
+        </if>
+        <if test='memberGoodsCartEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberGoodsCartEntity.memberId},'%')
+        </if>
+        <if test='memberGoodsCartEntity.goodsId != null and memberGoodsCartEntity.goodsId != ""'>
+            AND t.goods_id like concat('%',#{memberGoodsCartEntity.goodsId},'%')
+        </if>
+        <if test='memberGoodsCartEntity.optionId != null and memberGoodsCartEntity.optionId != ""'>
+            AND t.option_id like concat('%',#{memberGoodsCartEntity.optionId},'%')
+        </if>
+        <if test='memberGoodsCartEntity.total != null and memberGoodsCartEntity.total != ""'>
+            AND t.total like concat('%',#{memberGoodsCartEntity.total},'%')
+        </if>
+        <if test='memberGoodsCartEntity.price != null and memberGoodsCartEntity.price != ""'>
+            AND t.price like concat('%',#{memberGoodsCartEntity.price},'%')
+        </if>
+        <if test='memberGoodsCartEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberGoodsCartEntity.createUser},'%')
+        </if>
+        <if test='memberGoodsCartEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberGoodsCartEntity.createTime},'%')
+        </if>
+        <if test='memberGoodsCartEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberGoodsCartEntity.updateUser},'%')
+        </if>
+        <if test='memberGoodsCartEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberGoodsCartEntity.updateTime},'%')
+        </if>
+        <if test='memberGoodsCartEntity.status != null'>
+            AND t.status like concat('%',#{memberGoodsCartEntity.status},'%')
+        </if>
+        <if test='memberGoodsCartEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberGoodsCartEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_goods_cart t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberGoodsCartEntity.id != null'>
+            AND t.id like concat('%',#{memberGoodsCartEntity.id},'%')
+        </if>
+        <if test='memberGoodsCartEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberGoodsCartEntity.memberId},'%')
+        </if>
+        <if test='memberGoodsCartEntity.goodsId != null and memberGoodsCartEntity.goodsId != ""'>
+            AND t.goods_id like concat('%',#{memberGoodsCartEntity.goodsId},'%')
+        </if>
+        <if test='memberGoodsCartEntity.optionId != null and memberGoodsCartEntity.optionId != ""'>
+            AND t.option_id like concat('%',#{memberGoodsCartEntity.optionId},'%')
+        </if>
+        <if test='memberGoodsCartEntity.total != null and memberGoodsCartEntity.total != ""'>
+            AND t.total like concat('%',#{memberGoodsCartEntity.total},'%')
+        </if>
+        <if test='memberGoodsCartEntity.price != null and memberGoodsCartEntity.price != ""'>
+            AND t.price like concat('%',#{memberGoodsCartEntity.price},'%')
+        </if>
+        <if test='memberGoodsCartEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberGoodsCartEntity.createUser},'%')
+        </if>
+        <if test='memberGoodsCartEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberGoodsCartEntity.createTime},'%')
+        </if>
+        <if test='memberGoodsCartEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberGoodsCartEntity.updateUser},'%')
+        </if>
+        <if test='memberGoodsCartEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberGoodsCartEntity.updateTime},'%')
+        </if>
+        <if test='memberGoodsCartEntity.status != null'>
+            AND t.status like concat('%',#{memberGoodsCartEntity.status},'%')
+        </if>
+        <if test='memberGoodsCartEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberGoodsCartEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberGoodsCartExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_goods_cart t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

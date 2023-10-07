@@ -1,0 +1,45 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>mapper;
+
+<% for(pkg in imports){%>
+import ${pkg};
+<% } %>
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity;
+import java.util.Map;
+import java.util.List;
+/**
+ * ${classDdsc}Mapper 接口
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+public interface ${className}Mapper extends BaseMapper<${className}Entity> {
+
+    <%if(hasSuperEntity){%>
+    /**
+    * 扩展信息列表
+    * @param pageMap
+    * @param ${entityKey}Entity
+    * @return
+    */
+    List<${className}Entity> extendsList(@Param("map")Map<String, Long> pageMap, @Param("${entityKey}Entity") ${className}Entity ${entityKey}Entity);
+
+    /**
+    * 扩展信息记录总数
+    * @param ${entityKey}Entity
+    * @return
+    */
+    Long extendsCount(@Param("${entityKey}Entity") ${className}Entity ${entityKey}Entity);
+
+    /**
+    * ${classDdsc}扩展详情
+    * @param id ${classDdsc}id
+    * @return
+    */
+    ${className}Entity getByIdExtends(@Param("id")Long id);
+    <%}else{%>
+	List<${className}Entity> queryList(@Param("map")Map<String, Long> pageMap, @Param("${entityKey}Entity") ${className}Entity ${entityKey}Entity);
+	<%}%>
+
+
+
+}

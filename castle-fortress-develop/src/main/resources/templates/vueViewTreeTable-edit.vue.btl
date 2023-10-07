@@ -1,0 +1,446 @@
+<template>
+    <el-dialog :title="form.id ? '编辑' : '新增'" :visible.sync="visible" :close-on-click-modal="false">
+        <el-form ref="form" :model="form" :rules="rules">
+            <%
+            for(field in colList){
+            if(field.isForm == 1 && field.propName != "id"){%>
+                <%
+                //左树字段
+                if(field.propName == tableCol){%>
+            <el-form-item label="${field.propDesc}" :label-width="formLabelWidth" v-if="form.id">
+             <el-select v-model="form.${field.propName}" clearable placeholder="请选择" v-if="form.id">
+                <el-option :label="selLeftTree.${treeLabel}" :value="selLeftTree.${treeValue}">
+                  <el-tree
+                      :data="leftTreeData"
+                      :props="{
+                          children: 'children',
+                          label: '${treeLabel}',
+                          }"
+                      accordion
+                      highlight-current
+                      @node-click="handleSelectionChange"
+                  ></el-tree>
+                </el-option>
+              </el-select>
+            </el-form-item>
+                <%//复选框
+                }else if(field.formType == 6  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+            <el-form-item label="${field.propDesc}" :label-width="formLabelWidth" prop="${field.propName}CheckedList">
+                <el-checkbox-group v-model="form.${field.propName}CheckedList">
+                <el-checkbox
+                        v-for="item in ${field.dataListName}"
+                        :label="item.code"
+                        :key="item.code"
+                >{{ item.name }}</el-checkbox>
+                </el-checkbox-group>
+            </el-form-item>
+                <%}else{%>
+            <el-form-item label="${field.propDesc}" :label-width="formLabelWidth" prop="${field.propName}">
+                    <%//多行文本
+                    if(field.formType == 2 ){%>
+                <el-input
+                        type="textarea"
+                        :rows="2"
+                        placeholder="请输入${field.propDesc}"
+                        v-model="form.${field.propName}"
+                >
+                </el-input>
+                    <%//富文本
+                    }else if(field.formType == 3){%>
+                <fortress-editor v-model="form.${field.propName}"></fortress-editor>
+                    <%//下拉框 且 字典不为空
+                    }else if(field.formType == 4 && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                <fortress-select
+                        v-model="form.${field.propName}"
+                        :dictList="${field.dataListName}"
+                        placeholder="请选择${field.propDesc}"
+                        clearable
+                ></fortress-select>
+                    <%//单选框
+                    }else if(field.formType == 5  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                <fortress-radio-group
+                        v-model="form.${field.propName}"
+                        :dictList="${field.dataListName}"
+                >
+                </fortress-radio-group>
+                    <%//日期
+                    }else if(field.formType == 7){%>
+                <el-date-picker
+                        v-model="form.${field.propName}"
+                        type="date"
+                        placeholder="选择日期"
+                        value-format="yyyy-MM-dd"
+                >
+                </el-date-picker>
+                    <%//日期时间
+                    }else if(field.formType == 8){%>
+                <el-date-picker
+                        v-model="form.${field.propName}"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                >
+                </el-date-picker>
+                    <%//图片上传组件
+                    }else if(field.formType == 9 || field.formType == 10 || field.formType == 11){%>
+                <fortress-upload
+                        <%if(field.formType == 9){%>
+                  type="image"
+                        <%}else if(field.formType == 10){%>
+                  type="file"
+                        <%}else if(field.formType == 11){%>
+                  type="video"
+                        <%}%>
+                  name="${field.propName}"
+                  :formData="form"
+                ></fortress-upload>
+                  <%//开关
+                  }else if(field.formType == 12){%>
+                <el-switch
+                      v-model="form.${field.propName}"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      <%if(field.propType == "Boolean"){%>
+                      :active-value="true"
+                      :inactive-value="false"
+                      <%}else{%>
+                      :active-value="1"
+                      :inactive-value="2"
+                      <%}%>
+                ></el-switch>
+              <%//计数器
+              }else if(field.formType == 13){%>
+              <el-input-number
+                  v-model="form.${field.propName}"
+              ></el-input-number>
+                    <%}else{%>
+                <el-input
+                        v-model="form.${field.propName}"
+                        autocomplete="off"
+                        placeholder="请输入${field.propDesc}"
+                ></el-input>
+                    <%}%>
+            </el-form-item>
+                <%}%>
+            <%}
+            }
+            %>
+        </el-form>
+        <div slot="footer" class="dialog-footer" >
+            <el-button @click="visible = false" size="medium" type="danger">取 消</el-button>
+            <el-button type="primary" size="medium" @click="submitForm('form')">确 定</el-button>
+        </div>
+    </el-dialog>
+</template>
+<script>
+    import { ${lowerEntitykey}Info, ${lowerEntitykey}Save, ${lowerEntitykey}Edit } from "@/api/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${lowerEntitykey}.js";
+    <%if(hasDataList){%>import { <%if(hasDictName){%>dictList,<%}%><%if(hasEnumName){%>enumList,<%}%><%if(hasUrlName){%>urlList,<%}%> } from "@/api/public.api.js";<%}%>
+    <%if(hasValidator){%>import * as ftVal from "@/common/fortressValidator.js";<%}%>
+    export default {
+        props: ["leftTreeData"],
+        data() {
+            return {
+                visible: false,
+                selLeftTree:{},
+                form: {
+                <%for(field in colList){
+                    if(field.isForm == 1 ){%>
+                        <%if(field.formType == 6  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                    ${field.propName}CheckedList:[],
+                        <%}%>
+                    <%else if(field.formType == 12  ){%>
+                  <%if(field.propType == "Boolean"){%>
+                    ${field.propName}:false,
+                  <%}else{%>
+                    ${field.propName}:"2",
+                  <%}%>
+                            <%}else{%>
+                    ${field.propName}:"",
+                    <%}}
+                }%>
+                    ${tableCol}Name:"",
+                },
+                formLabelWidth: "120px",
+             <%if(hasUEditor){%>
+                myconfig: window.$conf.commonConf.ueConfig,
+            <%}%>
+                rules: {
+                <%for(field in colList){
+                    if(field.isFormRequire == 1 || !isEmpty(field.validateTypeName) ){%>
+                        <%if(field.formType == 6  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                    ${field.propName}CheckedList:[
+                        <%if(field.isFormRequire == 1){%>
+                          { required: true, message: "请输入${field.propDesc}", trigger: "blur" },
+                        <%}%>
+                        <%if(!isEmpty(field.validateTypeName)){%>
+                          { validator: ftVal.${field.validateTypeName},trigger: "blur"},
+                        <%}%>
+                        ],
+                        <% }else{%>
+                    ${field.propName}:[
+                          <%if(field.isFormRequire == 1){%>
+                          { required: true, message: "请输入${field.propDesc}", trigger: "blur" },
+                          <%}%>
+                      <%if(!isEmpty(field.validateTypeName)){%>
+                          { validator: ftVal.${field.validateTypeName},trigger: "blur"},
+                          <%}%>
+                      ],
+                        <%}%>
+                    <%}
+                }%>
+                },
+            <%for(dictName in dictNameSet){%>
+                ${dictName}List:[],
+            <%}%>
+            <%for(enumObj in enumNameList){ %>
+                ${enumObj.dataListName}:[],
+            <%}%>
+            <%for(urlObj in urlNameList){%>
+                ${urlObj.dataListName}:[],
+            <%}%>
+            <%for(jsonObj in jsonNameList){%>
+                ${jsonObj.dataListName}:[],
+            <%}%>
+            };
+        },
+        created() {
+        },
+        methods: {
+          <%if(hasDictName){%>
+            queryDictList(){
+              <%for(dictName in dictNameSet){%>
+                this.${dictName}List = [];
+                dictList("${dictName}").then((resp) => {
+                  if (resp.code == 0) {
+                    this.${dictName}List = resp.data;
+                  }
+                });
+                <%}%>
+            },
+            <%}%>
+        <%if(hasEnumName){%>
+            queryEnumList(){
+              <%for(enumObj in enumNameList){ %>
+                this.${enumObj.dataListName} = [];
+                enumList("${enumObj.enumName}","${enumObj.moduleName}").then((resp) => {
+                  if (resp.code == 0) {
+                    this.${enumObj.dataListName} = resp.data;
+                  }
+                });
+                <%}%>
+            },
+            <%}%>
+        <%if(hasUrlName){%>
+            queryUrlList(){
+              <%for(urlObj in urlNameList){%>
+                this.${urlObj.dataListName} = [];
+                urlList("${urlObj.urlName}").then((resp) => {
+                  if (resp.code == 0) {
+                    if (resp.data) {
+                      resp.data.forEach((item) => {
+                        this.${urlObj.dataListName}.push({ code: item.${urlObj.code}, name: item.${urlObj.name} });
+                      });
+                    }
+                  }
+                });
+                <%}%>
+            },
+            <%}%>
+        <%if(hasJsonName){%>
+            queryJsonList(){
+                <%for(jsonObj in jsonNameList){%>
+                this.${jsonObj.dataListName} = [];
+                let ${jsonObj.dataListName}Data = '${jsonObj.data}';
+                this.${jsonObj.dataListName} = JSON.parse(${jsonObj.dataListName}Data);
+                <%}%>
+            },
+        <%}%>
+            init(id,treeId,treeName) {
+                this.resetForm();
+            <%if(hasDictName){%>
+                this.queryDictList();
+              <%}%>
+            <%if(hasEnumName){%>
+                this.queryEnumList();
+              <%}%>
+            <%if(hasUrlName){%>
+                this.queryUrlList();
+              <%}%>
+            <%if(hasJsonName){%>
+                this.queryJsonList();
+              <%}%>
+                //修改
+                if (id) {
+                    ${lowerEntitykey}Info(id).then((resp) => {
+                        if (resp.code == 0) {
+                            this.$nextTick(() => {
+                                this.form = {
+                                    ...this.form,
+                                    ...resp.data,
+                                };
+                                <%for(field in colList){
+                                    if(field.isForm == 1 && field.formType == 10){%>
+                                if (resp.data.${field.propName}) {
+                                    this.form.${field.propName} = [];
+                                    let ${field.propName}Array = JSON.parse(resp.data.${field.propName});
+                                    ${field.propName}Array.forEach((item) => {
+                                      this.form.${field.propName}.push({ name: item.name, url: item.url });
+                                    });
+                                }
+                                    <%}
+                                    if(field.isForm == 1 && field.formType == 6  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                                if(resp.data.${field.propName}){
+                                    this.form.${field.propName}CheckedList = resp.data.${field.propName}.split(';');
+                                }
+                                    <%}%>
+                                <%}%>
+                              this.selLeftTree = {
+                                  ${treeValue}:resp.data.${tableCol},
+                                  ${treeLabel}:resp.data.${tableCol}Name
+                              }
+                            });
+                        } else {
+                            this.$msg({
+                                message: resp.msg,
+                                type: "error",
+                            });
+                        }
+                    });
+                }else{
+                  this.form.${tableCol}=treeId;
+                  this.selLeftTree={
+                      ${treeValue}:treeId,
+                      ${treeLabel}:treeName
+                  }
+                }
+                this.visible = true;
+            },
+            //提交表单数据
+            submitForm() {
+                this.$refs["form"].validate((valid) => {
+                if (valid) {
+                <%for(field in colList){
+                    if(field.isForm == 1 && field.formType == 10){%>
+                    if (this.form.${field.propName}) {
+                        let ${field.propName}Json = [];
+                        this.form.${field.propName}.forEach((item) => {
+                            ${field.propName}Json.push({ name: item.name, url: item.url });
+                        });
+                        this.form.${field.propName} = JSON.stringify(${field.propName}Json);
+                    }
+                    <%}
+                    if(field.isForm == 1 && field.formType == 6  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                    if(this.form.${field.propName}CheckedList){
+                        this.form.${field.propName} = this.form.${field.propName}CheckedList.join(";");
+                    }
+                    <%}
+                }%>
+                    //修改
+                    if (this.form.id) {
+                        ${lowerEntitykey}Edit(this.form).then((resp) => {
+                            if (resp.code == 0) {
+                                this.$message({
+                                    type: "success",
+                                    message: "操作成功!",
+                                });
+                            this.$emit("refreshData");
+                            this.visible = false;
+                            } else {
+                                this.$msg({
+                                    message: resp.msg,
+                                    type: "error",
+                                });
+                            }
+                        });
+                    //新增
+                    } else {
+                        ${lowerEntitykey}Save(this.form).then((resp) => {
+                            if (resp.code == 0) {
+                                this.$message({
+                                    type: "success",
+                                    message: "操作成功!",
+                                });
+                                this.$emit("refreshData");
+                                this.visible = false;
+                            } else {
+                                this.$msg({
+                                    message: resp.msg,
+                                    type: "error",
+                                });
+                            }
+                        });
+                    }
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+                });
+            },
+            resetForm() {
+                this.form = {
+                <%for(field in colList){
+                    if(field.isForm == 1 ){%>
+                        <%if(field.formType == 6  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                    ${field.propName}CheckedList:[],
+                        <%}%>
+                        <%else if(field.formType == 12  ){%>
+                            <%if(field.propType == "Boolean"){%>
+                    ${field.propName}:false,
+                            <%}else{%>
+                    ${field.propName}:"2",
+                            <%}%>
+                        <%}else{%>
+                    ${field.propName}:"",
+                        <%}
+                    }
+                }%>
+                    ${tableCol}Name:"",
+                };
+                this.$nextTick(() => {
+                    if (this.$refs["form"]) {
+                        this.$refs["form"].resetFields();
+                    }
+                });
+            },
+            //切换树数据选中状态
+            handleSelectionChange(data) {
+              this.selLeftTree.${treeValue} = data.${treeValue}
+              this.selLeftTree.${treeLabel} = data.${treeLabel}
+              this.form.${tableCol} = data.${treeValue}
+            },
+        },
+    };
+</script>
+<style scoped>
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409eff;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+    .el-scrollbar .el-scrollbar__view .el-select-dropdown__item {
+        height: auto;
+        max-height: 274px;
+        padding: 7px;
+        overflow: hidden;
+        overflow-y: auto;
+        font-weight: normal;
+    }
+</style>

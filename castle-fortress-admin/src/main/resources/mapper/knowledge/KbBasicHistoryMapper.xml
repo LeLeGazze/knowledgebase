@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbBasicHistoryMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbBasicHistoryMap" type="com.castle.fortress.admin.knowledge.entity.KbBasicHistoryEntity">
+        <result column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="b_id" property="bId"/>
+        <result column="wh_id" property="whId"/>
+        <result column="title" property="title"/>
+        <result column="auth" property="auth"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="pub_time" property="pubTime"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="model_id" property="modelId"/>
+        <result column="exp_time" property="expTime"/>
+        <result column="attachment" property="attachment"/>
+        <result column="label" property="label"/>
+        <result column="model_code" property="modelCode"/>
+        <result column="remark" property="remark"/>
+        <result column="sort" property="sort"/>
+        <result column="word_cloud" property="wordCloud"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <resultMap id="kbBasicHistoryExtendsMap" extends="kbBasicHistoryMap" type="com.castle.fortress.admin.knowledge.entity.KbBasicHistoryEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <delete id="deleteByBId" parameterType="java.lang.Long">
+        delete from kb_basic_history where b_id = #{bid}
+    </delete>
+    <select id="extendsList" resultType="com.castle.fortress.admin.knowledge.dto.KbBasicHistoryDto">
+        SELECT t.title,t.create_time, ifnull(t.update_time, t.create_time) as update_time,t.create_user,t.id,t.b_id,
+        t1.real_name create_user_name,
+        t2.sw_id
+        FROM kb_basic_history t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        LEFT OUTER JOIN kb_category t2 ON t.category_id = t2.id
+        WHERE t.is_deleted = 2
+        <if test='kbBasicHistoryEntity.bId != null'>
+            and t.b_id =#{kbBasicHistoryEntity.bId}
+        </if>
+        <if test='kbBasicHistoryEntity.createTime != null'>
+            and t.create_time &lt;= #{kbBasicHistoryEntity.createTime}
+        </if>
+        <if test='kbBasicHistoryEntity.createTime == null and kbBasicHistoryEntity.bId != null '>
+            union all
+            SELECT t.title,t.create_time, ifnull(t.update_time, t.create_time) as update_time,t.create_user,t.id, t.id as b_id,
+            t1.real_name create_user_name,
+            t2.sw_id
+            FROM kb_basic t
+            LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+            LEFT OUTER JOIN kb_category t2 ON t.category_id = t2.id
+            WHERE t.is_deleted = 2
+            and t.id =#{kbBasicHistoryEntity.bId}
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+       select count(1) from ( SELECT t.title,t.create_time,t.create_user,t.id,
+        t1.real_name create_user_name,
+        t2.sw_id
+        FROM kb_basic_history t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        LEFT OUTER JOIN kb_category t2 ON t.category_id = t2.id
+        WHERE t.is_deleted = 2
+        <if test='kbBasicHistoryEntity.bId != null'>
+            and t.b_id =#{kbBasicHistoryEntity.bId}
+        </if>
+        <if test='kbBasicHistoryEntity.createTime != null'>
+            and t.create_time &lt;= #{kbBasicHistoryEntity.createTime}
+        </if>
+        <if test='kbBasicHistoryEntity.createTime == null and kbBasicHistoryEntity.bId != null '>
+            union all
+            SELECT t.title,t.create_time,t.create_user,t.id,
+            t1.real_name create_user_name,
+            t2.sw_id
+            FROM kb_basic t
+            LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+            LEFT OUTER JOIN kb_category t2 ON t.category_id = t2.id
+            WHERE t.is_deleted = 2
+            and t.id =#{kbBasicHistoryEntity.bId}
+        </if>) t
+    </select>
+    <select id="getByIdExtends" resultMap="kbBasicHistoryExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_basic_history t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="findAllByBasic" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto"
+            parameterType="java.lang.Long">
+        select base.id          as id,
+               ct.id            as ctId,
+               base.title       as title,
+               dept.name        as deptName,
+               base.pub_time    as pubTime,
+               base.exp_time    as expTime,
+               model.code       as modelCode,
+               base.model_id    as modelId,
+               model.name       as modelName,
+               base.remark      as remark,
+               base.sort        as sort,
+               base.create_user as createUser,
+               user.real_name   as createName,
+               base.is_deleted  as is_deleted,
+               base.status      as status,
+               base.attachment  as attachmentTmp,
+               null                cols,
+               null             as propCols,
+               base.auth        as createUserId,
+               base.dept_id     as deptId,
+               ksw.name          as swName,
+               ksw.id           as swId,
+               base.word_cloud      as wordCloud,
+               base.read_count as readCount,
+               base.comments_count as commentsCount,
+               base.download_count as downloadCount,
+               base.label
+        from kb_basic_history base
+                 left join kb_model model on model.id = base.model_id
+                 left join castle_sys_user user on user.id = base.auth
+            left join castle_sys_dept dept on dept.id = base.dept_id
+            left join kb_category ct on ct.id = base.category_id
+            left join kb_subject_warehouse ksw on ct.sw_id = ksw.id
+        where
+            base.id = #{id};
+    </select>
+
+</mapper>

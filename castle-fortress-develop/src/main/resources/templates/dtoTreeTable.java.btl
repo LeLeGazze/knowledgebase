@@ -1,0 +1,52 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}%><%if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+<% for(pkg in imports){%>
+import ${pkg};
+<% }
+if(swagger2){%>
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+<%}%>
+/**
+ * ${classDdsc} 实体类
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+<% if (swagger2){ %>
+@ApiModel(value = "${entityKey}对象", description = "${tbConfig.tbDesc}")
+<% } %>
+public class ${className}Dto implements Serializable {
+	private static final long serialVersionUID = 1L;
+<% for(field in colList){
+	if(isNotEmpty(field.propDesc)){%>
+	<%}
+	if(field.propType == "Long"){%>
+	@JsonSerialize(using = ToStringSerializer.class)
+	<%}else if(field.propType == "Date" && field.colType =="datetime"){%>
+	@DateTimeFormat(
+		pattern = "yyyy-MM-dd HH:mm:ss"
+	)
+	@JsonFormat(
+		pattern = "yyyy-MM-dd HH:mm:ss"
+	)
+	<%}else if(field.propType == "Date" && field.colType =="date"){%>
+	@DateTimeFormat(
+			pattern = "yyyy-MM-dd"
+	)
+	@JsonFormat(
+			pattern = "yyyy-MM-dd"
+	)
+	<%}
+	if(swagger2){%>
+	@ApiModelProperty(value = "${field.propDesc}")
+	<%}%>
+	@JsonProperty("${field.propName}")
+	private ${field.propType} ${field.propName};
+<%}%>
+	@JsonProperty("${tableCol}Name")
+	private String ${tableCol}Name;
+
+}

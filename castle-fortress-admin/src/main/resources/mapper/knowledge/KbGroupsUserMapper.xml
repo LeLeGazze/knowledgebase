@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbGroupsUserMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbGroupsUserMap" type="com.castle.fortress.admin.knowledge.entity.KbGroupsUserEntity">
+        <result column="id" property="id"/>
+        <result column="group_id" property="groupId"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    <select id="queryList" resultMap="kbGroupsUserMap">
+        SELECT
+        t.*
+        FROM
+        kb_groups_user t
+        WHERE
+        1 = 1
+        <if test='kbGroupsUserEntity.id != null'>
+            AND t.id like concat('%',#{kbGroupsUserEntity.id},'%')
+        </if>
+        <if test='kbGroupsUserEntity.groupId != null'>
+            AND t.group_id like concat('%',#{kbGroupsUserEntity.groupId},'%')
+        </if>
+        <if test='kbGroupsUserEntity.userId != null'>
+            AND t.user_id like concat('%',#{kbGroupsUserEntity.userId},'%')
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="findById" resultType="com.castle.fortress.admin.knowledge.entity.KbGroupsUserEntity">
+        select *
+        from kb_groups_user
+        where group_id = #{groupId}
+    </select>
+    <select id="listFindUser" resultType="com.castle.fortress.admin.system.dto.SysUserDto">
+        select csu.id         as id,
+        csu.real_name  as realName,
+        csu.login_name as loginName,
+        csp.name       as postName,
+        csu.phone      as
+        phone,
+        csu.email      as email,
+        kg.name        as groupName,
+        kg.id          as groupId,
+        dept.name as deptName
+        from kb_groups_user kgu
+        left join castle_sys_user csu on kgu.user_id = csu.id
+        left join castle_sys_post csp on csu.post_id = csp.id
+        left join kb_groups kg on kgu.group_id = kg.id
+        left join castle_sys_dept dept  on dept.id =csu.dept_id
+        <where>
+            <if test="id != null and id != ''">
+                kgu.group_id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and csu.real_name like concat('%',#{name},'%')
+            </if>
+        </where>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+
+    </select>
+    <select id="listFindUserCount" resultType="java.lang.Integer">
+        select count(1)
+        from (
+        select csu.id as id,csu.real_name as realName,csu.login_name as loginName,csp.name as postName,csu.phone as
+        phone,csu.email as email,kg.name as groupName
+        from kb_groups_user kgu
+        left join castle_sys_user csu on kgu.user_id = csu.id
+        left join castle_sys_post csp on csu.post_id = csp.id
+        left join kb_groups kg on kgu.group_id = kg.id
+        left join castle_sys_dept dept  on dept.id =csu.dept_id
+        <where>
+            <if test="id != null and id != ''">
+                kgu.group_id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and csu.real_name like concat('%',#{name},'%')
+            </if>
+        </where>
+        ) t1
+    </select>
+
+
+</mapper>

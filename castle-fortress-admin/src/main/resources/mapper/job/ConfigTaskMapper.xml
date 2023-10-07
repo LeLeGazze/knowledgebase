@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.job.mapper.ConfigTaskMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="configTaskMap" type="com.castle.fortress.admin.job.entity.ConfigTaskEntity">
+        <result column="id" property="id"/>
+        <result column="task_name" property="taskName"/>
+        <result column="params" property="params"/>
+        <result column="cron_expression" property="cronExpression"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="configTaskExtendsMap" extends="configTaskMap" type="com.castle.fortress.admin.job.entity.ConfigTaskEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="configTaskExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_task t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='configTaskEntity.id != null'>
+            AND t.id = #{configTaskEntity.id}
+        </if>
+        <if test='configTaskEntity.taskName != null and configTaskEntity.taskName != ""'>
+            AND t.task_name like concat('%',#{configTaskEntity.taskName},'%')
+        </if>
+        <if test='configTaskEntity.params != null and configTaskEntity.params != ""'>
+            AND t.params like concat('%',#{configTaskEntity.params},'%')
+        </if>
+        <if test='configTaskEntity.cronExpression != null and configTaskEntity.cronExpression != ""'>
+            AND t.cron_expression = #{configTaskEntity.cronExpression}
+        </if>
+        <if test='configTaskEntity.status != null'>
+            AND t.status = #{configTaskEntity.status}
+        </if>
+        <if test='configTaskEntity.createUser != null'>
+            AND t.create_user = #{configTaskEntity.createUser}
+        </if>
+        <if test='configTaskEntity.createTime != null'>
+            AND t.create_time = #{configTaskEntity.createTime}
+        </if>
+        <if test='configTaskEntity.updateUser != null'>
+            AND t.update_user = #{configTaskEntity.updateUser}
+        </if>
+        <if test='configTaskEntity.updateTime != null'>
+            AND t.update_time = #{configTaskEntity.updateTime}
+        </if>
+        <if test='configTaskEntity.isDeleted != null'>
+            AND t.is_deleted = #{configTaskEntity.isDeleted}
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_config_task t
+        WHERE
+            t.is_deleted = 2
+        <if test='configTaskEntity.id != null'>
+            AND t.id = #{configTaskEntity.id}
+        </if>
+        <if test='configTaskEntity.taskName != null and configTaskEntity.taskName != ""'>
+            AND t.task_name like concat('%',#{configTaskEntity.taskName},'%')
+        </if>
+        <if test='configTaskEntity.params != null and configTaskEntity.params != ""'>
+            AND t.params like concat('%',#{configTaskEntity.params},'%')
+        </if>
+        <if test='configTaskEntity.cronExpression != null and configTaskEntity.cronExpression != ""'>
+            AND t.cron_expression = #{configTaskEntity.cronExpression}
+        </if>
+        <if test='configTaskEntity.status != null'>
+            AND t.status = #{configTaskEntity.status}
+        </if>
+        <if test='configTaskEntity.createUser != null'>
+            AND t.create_user = #{configTaskEntity.createUser}
+        </if>
+        <if test='configTaskEntity.createTime != null'>
+            AND t.create_time = #{configTaskEntity.createTime}
+        </if>
+        <if test='configTaskEntity.updateUser != null'>
+            AND t.update_user = #{configTaskEntity.updateUser}
+        </if>
+        <if test='configTaskEntity.updateTime != null'>
+            AND t.update_time = #{configTaskEntity.updateTime}
+        </if>
+        <if test='configTaskEntity.isDeleted != null'>
+            AND t.is_deleted = #{configTaskEntity.isDeleted}
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="configTaskExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_task t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

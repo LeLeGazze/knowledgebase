@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.SysDictMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysDictMap" type="com.castle.fortress.admin.system.entity.SysDictEntity">
+        <result column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="code" property="code"/>
+        <result column="dict_key" property="dictKey"/>
+        <result column="dict_value" property="dictValue"/>
+        <result column="sort" property="sort"/>
+        <result column="remark" property="remark"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <update id="updateSubCode">
+        update castle_sys_dict
+        set code = #{sysDictParent.code}
+        where parent_id = #{sysDictParent.id}
+    </update>
+    <delete id="deleteDict">
+        update castle_sys_dict
+        set is_deleted = 1
+        where id = #{id} or parent_id = #{id}
+    </delete>
+
+
+</mapper>

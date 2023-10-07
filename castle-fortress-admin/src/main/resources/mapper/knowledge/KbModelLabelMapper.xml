@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbModelLabelMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbModelLabelMap" type="com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="status" property="status"/>
+        <result column="sort" property="sort"/>
+        <result column="hot_word" property="hotWord"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <update id="updateBatch">
+        update kb_model_label set is_deleted = #{labels[0].isDeleted}
+        where id in (
+        <foreach collection="labels" item="entity" separator=",">
+            #{entity.id}
+        </foreach>
+            )
+    </update>
+    <update id="updateLabel">
+        update kb_model_label set is_deleted = #{kbModelLabelEntity.isDeleted} where id = #{kbModelLabelEntity.id}
+    </update>
+
+    <update id="removeLabels">
+        update kb_model_label set is_deleted = 3
+            <where>
+                <if test="ids != null and ids != ''">
+                    id in
+                    <foreach collection="ids" item="id" separator="," open="(" close=")">
+                        #{id}
+                    </foreach>
+                </if>
+            </where>
+    </update>
+    <update id="updateByLabel" parameterType="java.lang.Long">
+        update kb_model_label  set is_deleted = 3 where id=#{id}
+    </update>
+    <select id="queryList" resultMap="kbModelLabelMap">
+        SELECT
+        t.*
+        FROM
+        kb_model_label t
+        WHERE
+        1 = 1
+        <if test='kbModelLabelEntity.id != null'>
+            AND t.id like concat('%',#{kbModelLabelEntity.id},'%')
+        </if>
+        <if test='kbModelLabelEntity.name != null and kbModelLabelEntity.name != ""'>
+            AND t.name like concat('%',#{kbModelLabelEntity.name},'%')
+        </if>
+        <if test='kbModelLabelEntity.browsingTimes != null and kbModelLabelEntity.browsingTimes != ""'>
+            AND t.browsing_times like concat('%',#{kbModelLabelEntity.browsingTimes},'%')
+        </if>
+        <if test='kbModelLabelEntity.status != null'>
+            AND t.status like concat('%',#{kbModelLabelEntity.status},'%')
+        </if>
+        <if test='kbModelLabelEntity.sort != null'>
+            AND t.sort like concat('%',#{kbModelLabelEntity.sort},'%')
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="findIsExistName" resultType="com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity">
+        select id,name,is_deleted
+        from kb_model_label
+        where status=2
+        <if test="names!=null  and names.size > 0">
+          and name in
+            <foreach collection="names" item="name" separator="," open="(" close=")">
+                #{name}
+            </foreach>
+        </if>
+    </select>
+    <select id="listHotWord" resultType="com.castle.fortress.admin.knowledge.dto.KbModelLabelDto">
+        select kml.*, count(l_id) as alls
+        FROM kb_model_label kml
+                 LEFT JOIN kb_basic_label kbl ON kml.id = kbl.l_id
+        WHERE kml.hot_word = 1 and kml.is_deleted = 2
+        GROUP BY kml.id
+        ORDER BY sort desc, alls desc, create_time desc LIMIT 10
+    </select>
+    <select id="findIsExistNames" resultMap="kbModelLabelMap">
+        select *
+        from kb_model_label
+        where is_deleted = 2
+          and name in (
+        <foreach collection="labels" item="label" separator=",">
+            #{label}
+        </foreach>
+        )
+
+    </select>
+    <select id="findLabelByBid" resultType="java.lang.String" parameterType="java.lang.Long">
+        select label.name
+        from kb_model_label label
+                 join kb_basic_label bi on bi.l_id = label.id
+        where label.is_deleted = 2
+          and b_id =#{bid}
+    </select>
+    <select id="selectPageLabel" resultType="com.castle.fortress.admin.knowledge.dto.KbModelLabelDto">
+        select label.*, case when lb.count is null then 0 else lb.count end as count
+        from kb_model_label label
+            left join (select l_id, count(1) as count from kb_basic_label group by l_id) lb
+        on lb.l_id = label.id
+        <where>
+            <if test="kbModelLabelDto.status == null and kbModelLabelDto.isDeleted == null">
+                label.is_deleted = 2
+            </if>
+            <if test="kbModelLabelDto.status!=null and kbModelLabelDto.status != ''">
+                and label.status = #{kbModelLabelDto.status}
+                and label.is_deleted = 2
+            </if>
+            <if test="kbModelLabelDto.isDeleted!=null and kbModelLabelDto.isDeleted != ''">
+                and label.is_deleted = 1
+            </if>
+            <if test="kbModelLabelDto.name != null and kbModelLabelDto.name != ''">
+                and label.name like concat('%',#{kbModelLabelDto.name},'%')
+            </if>
+        </where>
+        order by lb.count desc,label.create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="selectPageLabelCount" resultType="java.lang.Integer">
+        select count(1)
+        from(
+        select label.*, case when lb.count is null then 0 else lb.count end as count
+        from kb_model_label label
+        left join (select l_id, count(1) as count from kb_basic_label group by l_id) lb
+        on lb.l_id = label.id
+        <where>
+            <if test="kbModelLabelDto.status == null and kbModelLabelDto.isDeleted == null">
+                label.is_deleted = 2
+            </if>
+            <if test="kbModelLabelDto.status!=null and kbModelLabelDto.status != ''">
+                and label.status = #{kbModelLabelDto.status}
+                and label.is_deleted = 2
+            </if>
+            <if test="kbModelLabelDto.isDeleted!=null and kbModelLabelDto.isDeleted != ''">
+                and label.is_deleted = 1
+            </if>
+            <if test="kbModelLabelDto.name != null and kbModelLabelDto.name != ''">
+                and label.name like concat('%',#{kbModelLabelDto.name},'%')
+            </if>
+        </where>
+        ) t1
+    </select>
+    <select id="findLabelByDeleted" resultType="com.castle.fortress.admin.knowledge.dto.KbModelLabelDto">
+        select *
+        from kb_model_label
+        where is_deleted = 1
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="findLabelByDeletedCount" resultType="java.lang.Integer">
+        select count(1)
+        from kb_model_label
+        where is_deleted = 1
+    </select>
+
+
+</mapper>

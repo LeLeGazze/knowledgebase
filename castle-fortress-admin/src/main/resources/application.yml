@@ -1,0 +1,88 @@
+#是否启动swagger
+swagger:
+  enable: true
+
+#系统个性化设置
+castle:
+  #数据库日志沉淀
+  logs:
+    #登录日志
+    login: true
+    #会员登录日志
+    memberLogin: true
+    #操作日志
+    opt: false
+    #错误日志
+    errorOpt: false
+    #job日志
+    job: false
+    #对外开放接口调用日志
+    openApi: false
+  #验证码
+  captcha:
+    #有效时长
+    seconds: 60
+    #短信验证码模板code
+    smsCode: 1001
+    #表单验证码code
+    formCode: 1001
+  #cms相关配置
+  cms:
+    isOpen: true
+
+server:
+  servlet:
+    context-path: /
+  ##100k
+  max-http-header-size: 102400
+
+spring:
+  profiles:
+    active: dev #指定生效的profile
+  messages:
+    encoding: UTF-8
+    basename: i18n/messages
+# WebMvcConfigurer配置后该配置无效
+#  jackson:
+#    time-zone: GMT+8 #@JsonFormat 8小时时间差
+  servlet:
+    multipart:
+      max-file-size: 50MB #文件上传大小限制
+      max-request-size: 1000MB # 最大支持请求大小
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+#模板
+beetl:
+  templatesPath: templates
+  suffix: html
+beetlsql:
+  enabled: false
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*Mapper.xml,/mapper/**/**/*Mapper.xml,/mapper/**/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.castle.fortress.*.*.entity,com.castle.fortress.*.*.*.entity
+  global-config:
+    #数据库相关配置
+    db-config:
+      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID", ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
+      id-type: ID_WORKER
+    banner: false
+  #原生配置
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+    #逻辑删除配置
+    logic-delete-value: 1
+    logic-not-delete-value: 2
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+#工作流
+flowable:
+  async-executor-activate: false #关闭定时任务JOB
+  #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
+  database-schema-update: false

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.CastleSysUserDingMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleSysUserDingMap" type="com.castle.fortress.admin.system.entity.CastleSysUserDingEntity">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="ding_unionid" property="dingUnionid"/>
+        <result column="ding_userid" property="dingUserid"/>
+        <result column="name" property="name"/>
+        <result column="dept_id_list" property="deptIdList"/>
+        <result column="role_list" property="roleList"/>
+        <result column="mobile" property="mobile"/>
+        <result column="email" property="email"/>
+        <result column="org_email" property="orgEmail"/>
+        <result column="avatar" property="avatar"/>
+    </resultMap>
+	<select id="queryList" resultMap="castleSysUserDingMap">
+		SELECT
+		t.*
+		FROM
+		castle_sys_user_ding t
+		WHERE
+		1 = 1
+		<if test='castleSysUserDingEntity.id != null'>
+			AND t.id like concat('%',#{castleSysUserDingEntity.id},'%')
+		</if>
+		<if test='castleSysUserDingEntity.userId != null'>
+			AND t.user_id like concat('%',#{castleSysUserDingEntity.userId},'%')
+		</if>
+		<if test='castleSysUserDingEntity.dingUnionid != null and castleSysUserDingEntity.dingUnionid != ""'>
+			AND t.ding_unionid like concat('%',#{castleSysUserDingEntity.dingUnionid},'%')
+		</if>
+		<if test='castleSysUserDingEntity.dingUserid != null and castleSysUserDingEntity.dingUserid != ""'>
+			AND t.ding_userid like concat('%',#{castleSysUserDingEntity.dingUserid},'%')
+		</if>
+		<if test='castleSysUserDingEntity.name != null and castleSysUserDingEntity.name != ""'>
+			AND t.name like concat('%',#{castleSysUserDingEntity.name},'%')
+		</if>
+		<if test='castleSysUserDingEntity.deptIdList != null and castleSysUserDingEntity.deptIdList != ""'>
+			AND t.dept_id_list like concat('%',#{castleSysUserDingEntity.deptIdList},'%')
+		</if>
+		<if test='castleSysUserDingEntity.roleList != null and castleSysUserDingEntity.roleList != ""'>
+			AND t.role_list like concat('%',#{castleSysUserDingEntity.roleList},'%')
+		</if>
+		<if test='castleSysUserDingEntity.mobile != null and castleSysUserDingEntity.mobile != ""'>
+			AND t.mobile like concat('%',#{castleSysUserDingEntity.mobile},'%')
+		</if>
+		<if test='castleSysUserDingEntity.email != null and castleSysUserDingEntity.email != ""'>
+			AND t.email like concat('%',#{castleSysUserDingEntity.email},'%')
+		</if>
+		<if test='castleSysUserDingEntity.orgEmail != null and castleSysUserDingEntity.orgEmail != ""'>
+			AND t.org_email like concat('%',#{castleSysUserDingEntity.orgEmail},'%')
+		</if>
+		<if test='castleSysUserDingEntity.avatar != null and castleSysUserDingEntity.avatar != ""'>
+			AND t.avatar like concat('%',#{castleSysUserDingEntity.avatar},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>		
+
+</mapper>

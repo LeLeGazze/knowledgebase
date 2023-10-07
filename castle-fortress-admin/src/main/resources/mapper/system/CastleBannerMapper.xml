@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.CastleBannerMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleBannerMap" type="com.castle.fortress.admin.system.entity.CastleBannerEntity">
+        <result column="id" property="id"/>
+        <result column="banner_url" property="bannerUrl"/>
+        <result column="link" property="link"/>
+        <result column="sort" property="sort"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="castleBannerExtendsMap" extends="castleBannerMap" type="com.castle.fortress.admin.system.entity.CastleBannerEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="castleBannerExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_banner t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='castleBannerEntity.id != null'>
+            AND t.id like concat('%',#{castleBannerEntity.id},'%')
+        </if>
+        <if test='castleBannerEntity.bannerUrl != null and castleBannerEntity.bannerUrl != ""'>
+            AND t.banner_url like concat('%',#{castleBannerEntity.bannerUrl},'%')
+        </if>
+        <if test='castleBannerEntity.sort != null'>
+            AND t.sort like concat('%',#{castleBannerEntity.sort},'%')
+        </if>
+        <if test='castleBannerEntity.remark != null and castleBannerEntity.remark != ""'>
+            AND t.remark like concat('%',#{castleBannerEntity.remark},'%')
+        </if>
+        <if test='castleBannerEntity.status != null'>
+            AND t.status like concat('%',#{castleBannerEntity.status},'%')
+        </if>
+        <if test='castleBannerEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleBannerEntity.createUser},'%')
+        </if>
+        <if test='castleBannerEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleBannerEntity.createTime},'%')
+        </if>
+        <if test='castleBannerEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleBannerEntity.updateUser},'%')
+        </if>
+        <if test='castleBannerEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleBannerEntity.updateTime},'%')
+        </if>
+        <if test='castleBannerEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleBannerEntity.isDeleted},'%')
+        </if>
+            order by sort desc,create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_banner t
+        WHERE
+            t.is_deleted = 2
+        <if test='castleBannerEntity.id != null'>
+            AND t.id like concat('%',#{castleBannerEntity.id},'%')
+        </if>
+        <if test='castleBannerEntity.bannerUrl != null and castleBannerEntity.bannerUrl != ""'>
+            AND t.banner_url like concat('%',#{castleBannerEntity.bannerUrl},'%')
+        </if>
+        <if test='castleBannerEntity.sort != null'>
+            AND t.sort like concat('%',#{castleBannerEntity.sort},'%')
+        </if>
+        <if test='castleBannerEntity.remark != null and castleBannerEntity.remark != ""'>
+            AND t.remark like concat('%',#{castleBannerEntity.remark},'%')
+        </if>
+        <if test='castleBannerEntity.status != null'>
+            AND t.status like concat('%',#{castleBannerEntity.status},'%')
+        </if>
+        <if test='castleBannerEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleBannerEntity.createUser},'%')
+        </if>
+        <if test='castleBannerEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleBannerEntity.createTime},'%')
+        </if>
+        <if test='castleBannerEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleBannerEntity.updateUser},'%')
+        </if>
+        <if test='castleBannerEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleBannerEntity.updateTime},'%')
+        </if>
+        <if test='castleBannerEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleBannerEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="castleBannerExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_banner t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="selectDataList" resultType="com.castle.fortress.admin.system.entity.CastleBannerEntity">
+        SELECT
+            t.*
+        FROM
+            castle_banner t
+        WHERE
+            t.is_deleted = 2
+        <if test="status != null and status != ''">
+            and status = #{status}
+        </if>
+        order by sort desc
+    </select>
+
+</mapper>

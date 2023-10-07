@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.CastleSysIndustryMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleSysIndustryMap" type="com.castle.fortress.admin.system.entity.CastleSysIndustryEntity">
+        <result column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="name" property="name"/>
+        <result column="tree_level" property="treeLevel"/>
+        <result column="leaf" property="leaf"/>
+        <result column="shortpinyin" property="shortpinyin"/>
+        <result column="sort" property="sort"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <resultMap id="castleSysIndustryExtendsMap" extends="castleSysIndustryMap" type="com.castle.fortress.admin.system.entity.CastleSysIndustryEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="castleSysIndustryExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_sys_industry t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='castleSysIndustryEntity.id != null'>
+            AND t.id like concat('%',#{castleSysIndustryEntity.id},'%')
+        </if>
+        <if test='castleSysIndustryEntity.parentId != null'>
+            AND t.parent_id like concat('%',#{castleSysIndustryEntity.parentId},'%')
+        </if>
+        <if test='castleSysIndustryEntity.name != null and castleSysIndustryEntity.name != ""'>
+            AND t.name like concat('%',#{castleSysIndustryEntity.name},'%')
+        </if>
+        <if test='castleSysIndustryEntity.treeLevel != null'>
+            AND t.tree_level like concat('%',#{castleSysIndustryEntity.treeLevel},'%')
+        </if>
+        <if test='castleSysIndustryEntity.leaf != null'>
+            AND t.leaf like concat('%',#{castleSysIndustryEntity.leaf},'%')
+        </if>
+        <if test='castleSysIndustryEntity.shortpinyin != null and castleSysIndustryEntity.shortpinyin != ""'>
+            AND t.shortpinyin like concat('%',#{castleSysIndustryEntity.shortpinyin},'%')
+        </if>
+        <if test='castleSysIndustryEntity.sort != null'>
+            AND t.sort like concat('%',#{castleSysIndustryEntity.sort},'%')
+        </if>
+        <if test='castleSysIndustryEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleSysIndustryEntity.createUser},'%')
+        </if>
+        <if test='castleSysIndustryEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleSysIndustryEntity.createTime},'%')
+        </if>
+        <if test='castleSysIndustryEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleSysIndustryEntity.updateUser},'%')
+        </if>
+        <if test='castleSysIndustryEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleSysIndustryEntity.updateTime},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_sys_industry t
+        WHERE
+            t.is_deleted = 2
+        <if test='castleSysIndustryEntity.id != null'>
+            AND t.id like concat('%',#{castleSysIndustryEntity.id},'%')
+        </if>
+        <if test='castleSysIndustryEntity.parentId != null'>
+            AND t.parent_id like concat('%',#{castleSysIndustryEntity.parentId},'%')
+        </if>
+        <if test='castleSysIndustryEntity.name != null and castleSysIndustryEntity.name != ""'>
+            AND t.name like concat('%',#{castleSysIndustryEntity.name},'%')
+        </if>
+        <if test='castleSysIndustryEntity.treeLevel != null'>
+            AND t.tree_level like concat('%',#{castleSysIndustryEntity.treeLevel},'%')
+        </if>
+        <if test='castleSysIndustryEntity.leaf != null'>
+            AND t.leaf like concat('%',#{castleSysIndustryEntity.leaf},'%')
+        </if>
+        <if test='castleSysIndustryEntity.shortpinyin != null and castleSysIndustryEntity.shortpinyin != ""'>
+            AND t.shortpinyin like concat('%',#{castleSysIndustryEntity.shortpinyin},'%')
+        </if>
+        <if test='castleSysIndustryEntity.sort != null'>
+            AND t.sort like concat('%',#{castleSysIndustryEntity.sort},'%')
+        </if>
+        <if test='castleSysIndustryEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleSysIndustryEntity.createUser},'%')
+        </if>
+        <if test='castleSysIndustryEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleSysIndustryEntity.createTime},'%')
+        </if>
+        <if test='castleSysIndustryEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleSysIndustryEntity.updateUser},'%')
+        </if>
+        <if test='castleSysIndustryEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleSysIndustryEntity.updateTime},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="castleSysIndustryExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_sys_industry t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

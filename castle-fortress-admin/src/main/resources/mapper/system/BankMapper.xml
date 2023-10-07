@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.BankMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="bankMap" type="com.castle.fortress.admin.system.entity.BankEntity">
+        <result column="id" property="id"/>
+        <result column="bank_name" property="bankName"/>
+        <result column="bank_code" property="bankCode"/>
+        <result column="bank_logo" property="bankLogo"/>
+    </resultMap>
+	<select id="queryList" resultMap="bankMap">
+		SELECT
+		t.*
+		FROM
+		castle_bank t
+		WHERE
+		1 = 1
+		<if test='bankEntity.id != null'>
+			AND t.id like concat('%',#{bankEntity.id},'%')
+		</if>
+		<if test='bankEntity.bankName != null and bankEntity.bankName != ""'>
+			AND t.bank_name like concat('%',#{bankEntity.bankName},'%')
+		</if>
+		<if test='bankEntity.bankCode != null and bankEntity.bankCode != ""'>
+			AND t.bank_code like concat('%',#{bankEntity.bankCode},'%')
+		</if>
+		<if test='bankEntity.bankLogo != null and bankEntity.bankLogo != ""'>
+			AND t.bank_logo like concat('%',#{bankEntity.bankLogo},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>		
+
+</mapper>

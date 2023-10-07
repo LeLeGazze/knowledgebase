@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbCommentMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbCommentMap" type="com.castle.fortress.admin.knowledge.entity.KbCommentEntity">
+        <result column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="basic_id" property="basicId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="user_id" property="userId"/>
+        <result column="one_id" property="oneId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="is_reply" property="isReply"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    <delete id="deleteByBid" parameterType="java.lang.Long">
+        delete
+        from kb_comment
+        where basic_id = #{bId}
+    </delete>
+    <select id="queryList" resultMap="kbCommentMap">
+        SELECT
+        t.*
+        FROM
+        kb_comment t
+        WHERE
+        1 = 1
+        <if test='kbCommentEntity.id != null'>
+            AND t.id like concat('%',#{kbCommentEntity.id},'%')
+        </if>
+        <if test='kbCommentEntity.content != null and kbCommentEntity.content != ""'>
+            AND t.content like concat('%',#{kbCommentEntity.content},'%')
+        </if>
+        <if test='kbCommentEntity.bId != null'>
+            AND t.basic_id like concat('%',#{kbCommentEntity.bId},'%')
+        </if>
+        <if test='kbCommentEntity.pId != null'>
+            AND t.parent_id like concat('%',#{kbCommentEntity.pId},'%')
+        </if>
+        <if test='kbCommentEntity.uId != null'>
+            AND t.user_id like concat('%',#{kbCommentEntity.uId},'%')
+        </if>
+        <if test='kbCommentEntity.creatTime != null'>
+            AND t.create_time &gt; #{kbCommentEntity.createTime}
+        </if>
+        <if test='kbCommentEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbCommentEntity.isDeleted},'%')
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="getComments" resultType="com.castle.fortress.admin.knowledge.dto.KbCommentDto">
+        SELECT a.id,
+               a.basic_id,
+               a.parent_id,
+               a.user_id,
+               b.nickname,
+               b.avatar,
+               a.content,
+               a.create_time
+        FROM kb_comment a
+                 left join castle_sys_user b on a.user_id = b.id
+        WHERE a.basic_id = #{newsId}
+    </select>
+
+    <select id="selectComment" resultType="com.castle.fortress.admin.knowledge.dto.KbCommentDto">
+        SELECT a.id,
+               a.basic_id,
+               a.parent_id,
+               a.user_id,
+               b.real_name                                         as nickname,
+               b.avatar,
+               a.content,
+               a.create_time,
+               a.is_reply,
+               case when ktu.nums is null then 0 else ktu.nums end as nums,
+               case when ktut.upStatus is null then 0 else ktut.upStatus end as upStatus
+        FROM kb_comment a
+                 left join castle_sys_user b on a.user_id = b.id
+                 left join (SELECT count(1) as nums, comment_id FROM kb_thumbs_up GROUP BY comment_id) ktu
+                           on a.id = ktu.comment_id
+                 left join (SELECT count(1) as upStatus,comment_id,user_id FROM kb_thumbs_up GROUP BY comment_id,user_id having user_id = #{userId}) ktut
+                           on a.id = ktut.comment_id
+
+        WHERE a.basic_id = #{basicId}
+          and a.parent_id is null
+            and a.is_deleted = 2
+        order by a.create_time desc
+            limit #{pageIndex}, #{pageSize};
+    </select>
+    <select id="selectDownComment" resultType="com.castle.fortress.admin.knowledge.dto.KbCommentDto">
+        SELECT a.id,
+               a.basic_id,
+               a.parent_id,
+               a.user_id,
+               b.real_name     as nickname,
+               b.avatar        as avatar,
+               a.content,
+               a.create_time,
+               a.is_reply,
+        FROM kb_comment a
+                 left join castle_sys_user b on a.user_id = b.id
+        WHERE basic_id = #{basicId}
+          and parent_id = #{parentId}
+        order by a.create_time desc;
+    </select>
+    <select id="selectSon" resultType="com.castle.fortress.admin.knowledge.dto.KbCommentDto">
+        SELECT a.id,
+               a.basic_id,
+               a.parent_id,
+               a.user_id,
+               b.real_name           as nickname,
+               b.avatar              as avatar,
+               a.content,
+               a.create_time,
+               a.is_reply,
+               case when ktu.nums is null then 0 else ktu.nums end as nums,
+               case when ktut.upStatus is null then 0 else ktut.upStatus end as upStatus,
+               u.real_name as parentName,
+               u.avatar    as parentAvatar
+        FROM kb_comment a
+                 left join castle_sys_user b on a.user_id = b.id
+                 left join kb_comment kc on a.parent_id = kc.id
+                 left join castle_sys_user u on kc.user_id = u.id
+                 left join (SELECT count(1) as nums, comment_id FROM kb_thumbs_up GROUP BY comment_id) ktu on a.id = ktu.comment_id
+                 left join (SELECT count(1) as upStatus,comment_id,user_id FROM kb_thumbs_up GROUP BY comment_id,user_id having user_id = #{userId}) ktut
+                           on a.id = ktut.comment_id
+        WHERE a.one_id = #{oneId}
+                and a.is_deleted = 2
+        order by a.create_time
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="selectSonId" resultType="java.lang.Long">
+        select id
+        from kb_comment
+        where one_id = #{oneId}
+    </select>
+    <select id="findByBid" resultType="java.lang.Integer" parameterType="java.lang.Long">
+        select count(1)
+        from kb_comment
+        where basic_id = #{bId} and is_deleted=2
+    </select>
+    <select id="getCount" resultType="java.lang.Integer">
+        select COUNT(*)
+        FROM kb_comment
+        where user_id = #{userId}
+    </select>
+    <select id="recentComments" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+        select distinct t2.* from (
+        select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,
+               kbu.create_time as pubTime,kc.sw_id as swId,ku.readCount,kb.status as status
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_basic kb on kbu.basic_id = kb.id
+        LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+        left join kb_category kc on kb.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kb.auth != #{kbBaseShowDto.createUser}
+        and kb.status = 1
+        and kbu.status = 1
+        and kbu.is_deleted = 2
+        and kb.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kb.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+        union
+        select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,
+               kbu.create_time as pubTime,kc.sw_id as swId,ku.readCount,kb.status as status
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_basic kb on kbu.basic_id = kb.id
+        LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+        left join kb_category kc on kb.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kb.auth = #{kbBaseShowDto.createUser}
+        and kbu.status = 1
+        and kbu.is_deleted = 2
+        and kb.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kb.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+        ) t2 order by t2.pubTime desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="recentCountComments" resultType="java.lang.Integer">
+        select count(1) from (
+        select distinct t2.* from (
+        select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kbu.create_time as pubTime,kc.sw_id as swId,ku.readCount
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_basic kb on kbu.basic_id = kb.id
+        LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+        left join kb_category kc on kb.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kb.auth != #{kbBaseShowDto.createUser}
+        and kb.status = 1
+        and kbu.status = 1
+        and kbu.is_deleted = 2
+        and kb.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kb.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+        union
+        select kb.id as id,kb.title as title, kc.name as ctName,csu.real_name as createName,kbu.create_time as pubTime,kc.sw_id as swId,ku.readCount
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_basic kb on kbu.basic_id = kb.id
+        LEFT JOIN castle_sys_user csu on kb.auth = csu.id
+        left join kb_category kc on kb.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kb.auth = #{kbBaseShowDto.createUser}
+        and kbu.status = 1
+        and kbu.is_deleted = 2
+        and kb.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kb.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+        ) t2 ) t3
+    </select>
+    <select id="recentCommentsVideo" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+        select distinct t2.* from (
+        select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kv.pub_time as pubTime,
+               kc.sw_id as swId,ku.readCount,kv.status as status
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_video kv on kbu.basic_id = kv.id
+        LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+        left join kb_category kc on kv.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 and status =2 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kv.auth != #{kbBaseShowDto.createUser}
+        and kv.status = 1
+        and kbu.status=2
+        and kbu.is_deleted = 2
+        and kv.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kv.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+        union
+        select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kv.pub_time as pubTime,
+               kc.sw_id as swId,ku.readCount,kv.status as status
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_video kv on kbu.basic_id = kv.id
+        LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+        left join kb_category kc on kv.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 and status =2 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kv.auth = #{kbBaseShowDto.createUser}
+        and kbu.status=2
+        and kbu.is_deleted = 2
+        and kv.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kv.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+
+        ) t2 order by t2.pubTime desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="recentCountCommentsVideo" resultType="java.lang.Integer">
+        select count(1) from (
+        select distinct t2.* from (
+        select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kv.pub_time as pubTime,
+               kc.sw_id as swId,ku.readCount,kv.status as status
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_video kv on kbu.basic_id = kv.id
+        LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+        left join kb_category kc on kv.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 and status =2 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kv.auth != #{kbBaseShowDto.createUser}
+        and kv.status = 1
+        and kbu.status=2
+        and kbu.is_deleted = 2
+        and kv.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kv.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+        union
+        select kv.id as id,kv.title as title, kc.name as ctName,csu.real_name as createName,kv.pub_time as pubTime,
+               kc.sw_id as swId,ku.readCount,kv.status as status
+        from (select max(create_time) create_time, user_id, basic_id,status,is_deleted from kb_comment group by
+        user_id,basic_id,status,is_deleted) kbu
+        LEFT JOIN kb_video kv on kbu.basic_id = kv.id
+        LEFT JOIN castle_sys_user csu on kv.auth = csu.id
+        left join kb_category kc on kv.category_id = kc.id
+        left join kb_subject_warehouse ksw on kc.sw_id = ksw.id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type =1 and status =2 GROUP BY b_id) ku on kbu.basic_id = ku.b_id
+        where
+        kbu.user_id = #{kbBaseShowDto.createUser}
+        and kv.auth = #{kbBaseShowDto.createUser}
+        and kbu.status=2
+        and kbu.is_deleted = 2
+        and kv.is_deleted =2
+        <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''  and kbBaseShowDto.categoryIds.size() > 0 ">
+            and kv.category_id in (
+            <foreach collection="kbBaseShowDto.categoryIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.swIds != null and kbBaseShowDto.swIds != ''">
+            and kc.sw_id in (
+            <foreach collection="kbBaseShowDto.swIds" item="swId" separator=",">
+                #{swId}
+            </foreach>
+            )
+        </if>
+        <if test="kbBaseShowDto.title!=null and kbBaseShowDto.title!=''">
+            and kv.title like concat('%',#{kbBaseShowDto.title},'%')
+        </if>
+        <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime!=''">
+            and kbu.create_time like concat('%',#{kbBaseShowDto.fromTime},'%')
+        </if>
+
+        ) t2 ) t3
+    </select>
+    <select id="findByUidToUserName" resultType="com.castle.fortress.admin.system.entity.SysUser">
+        SELECT us.real_name,us.avatar
+        FROM `castle_sys_user` us
+                 JOIN kb_comment cm
+                      on us.id = cm.user_id
+        where cm.is_deleted = 2
+          and us.is_deleted = 2
+          and cm.id = #{parentId}
+
+    </select>
+    <select id="getCommentOne" resultType="com.castle.fortress.admin.knowledge.dto.KbCommentDto">
+        select  * from kb_comment where one_id = #{oneId} and is_deleted = 2 limit 1
+    </select>
+    <select id="selectSonCount" resultType="java.lang.Integer">
+        SELECT count(a.id)
+        FROM kb_comment a
+                 left join castle_sys_user b on a.user_id = b.id
+                 left join kb_comment kc on a.parent_id = kc.id
+                 left join castle_sys_user u on kc.user_id = u.id
+                 left join (SELECT count(1) as nums, comment_id FROM kb_thumbs_up GROUP BY comment_id) ktu on a.id = ktu.comment_id
+                 left join (SELECT count(1) as upStatus,comment_id,user_id FROM kb_thumbs_up GROUP BY comment_id,user_id having user_id = #{userId}) ktut
+                           on a.id = ktut.comment_id
+        WHERE a.one_id = #{oneId}
+          and a.is_deleted = 2
+        order by a.create_time ;
+    </select>
+
+</mapper>

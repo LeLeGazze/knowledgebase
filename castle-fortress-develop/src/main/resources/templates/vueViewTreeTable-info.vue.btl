@@ -1,0 +1,268 @@
+<template>
+    <div>
+        <el-drawer title="" :visible.sync="drawer" :direction="direction" :before-close="handleClose" custom-class="drawer-info">
+            <div class="info-item">
+                <h5 class="from-title">基本信息</h5>
+                <%for(field in colList){
+                    if((field.isForm == 1 || field.isList == 1) && field.propName != "id"){
+              if(field.propName == tableCol){%>
+              <div class="form-item">
+                <label class="form-item-label">${field.propDesc}:</label>
+                <div class="form-item-content">{{ objInfo.${tableCol}Name }}</div>
+              </div>
+              <%}else if(field.propName == "createUser"){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content">{{ objInfo.createUserName }}</div>
+                </div>
+                        <%}else if(field.propName == "createDept"){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content">{{ objInfo.createDeptName }}</div>
+                </div>
+                        <%}else if(field.propName == "createPost"){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content">{{ objInfo.createPostName }}</div>
+                </div>
+                <%}else if((field.formType == 4||field.formType == 5||field.formType == 6) && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content">{{ objInfo.${field.propName}Name }}</div>
+                </div>
+                <%}else if((field.formType == 3)){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content" v-html="objInfo.${field.propName}"></div>
+                </div>
+                <%}else if((field.formType == 12)){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                  <%if(field.propType == "Boolean"){%>
+                    <div class="form-item-content" v-if="objInfo.${field.propName}">启用</div>
+                  <%}else{%>
+                    <div class="form-item-content" v-if="objInfo.${field.propName} == 1">启用</div>
+                  <%}%>
+                    <div class="form-item-content" v-else>禁用</div>
+                </div>
+                <%}else if((field.formType == 9)){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content" ><img v-if="objInfo.${field.propName}" :src="objInfo.${field.propName}" style="width: 100px; height: 100px" /></div>
+                </div>
+                <%}else if((field.formType == 10)){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content" >
+                      <template v-for="(item, indexs) in objInfo.${field.propName}">
+                        <a :key="indexs" :href="item.url" target="_blank">{{
+                          item.name
+                          }}</a>
+                        <br />
+                      </template>
+                    </div>
+                </div>
+                <%}else if((field.formType == 11)){%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content" >
+                      <fortress-upload
+                          v-if="objInfo.${field.propName}"
+                          type="videoShow"
+                          name="${field.propName}"
+                          :formData="objInfo"
+                          :videoSrc="objInfo.${field.propName}"
+                      ></fortress-upload>
+                    </div>
+                </div>
+                        <%}else{%>
+                <div class="form-item">
+                    <label class="form-item-label">${field.propDesc}:</label>
+                    <div class="form-item-content">{{ objInfo.${field.propName} }}
+                    <%if(field.isCopy == 1){%>
+                      <fortress-copy :copyData="objInfo.${field.propName}"></fortress-copy>
+                    <%}%>
+                    </div>
+                </div>
+                        <%}
+                    }
+                }%>
+            </div>
+        </el-drawer>
+    </div>
+</template>
+<script>
+    import { ${lowerEntitykey}Info } from "@/api/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${lowerEntitykey}.js";
+    <%if(hasDataList){%>import { <%if(hasDictName){%>dictList,<%}%><%if(hasEnumName){%>enumList,<%}%><%if(hasUrlName){%>urlList,<%}%> } from "@/api/public.api.js";<%}%>
+    export default {
+        data() {
+            return {
+                drawer: true,
+                direction: "rtl",
+                objInfo: {},
+          <%for(dictName in dictNameSet){%>
+                ${dictName}List:[],
+                <%}%>
+          <%for(enumObj in enumNameList){ %>
+                ${enumObj.dataListName}:[],
+                <%}%>
+          <%for(urlObj in urlNameList){%>
+                ${urlObj.dataListName}:[],
+                <%}%>
+          <%for(jsonObj in jsonNameList){%>
+                ${jsonObj.dataListName}:[],
+                <%}%>
+            }
+        },
+        created() {
+        },
+        methods: {
+        <%if(hasDictName){%>
+          queryDictList(){
+            <%for(dictName in dictNameSet){%>
+              this.${dictName}List = [];
+              dictList("${dictName}").then((resp) => {
+                if (resp.code == 0) {
+                  this.${dictName}List = resp.data;
+                }
+              });
+              <%}%>
+          },
+          <%}%>
+        <%if(hasEnumName){%>
+          queryEnumList(){
+            <%for(enumObj in enumNameList){ %>
+              this.${enumObj.dataListName} = [];
+              enumList("${enumObj.enumName}","${enumObj.moduleName}").then((resp) => {
+                if (resp.code == 0) {
+                  this.${enumObj.dataListName} = resp.data;
+                }
+              });
+              <%}%>
+          },
+          <%}%>
+        <%if(hasUrlName){%>
+          queryUrlList(){
+            <%for(urlObj in urlNameList){%>
+              this.${urlObj.dataListName} = [];
+              urlList("${urlObj.urlName}").then((resp) => {
+                if (resp.code == 0) {
+                  if (resp.data) {
+                    resp.data.forEach((item) => {
+                      this.${urlObj.dataListName}.push({ code: item.${urlObj.code}, name: item.${urlObj.name} });
+                    });
+                  }
+                }
+              });
+              <%}%>
+          },
+          <%}%>
+        <%if(hasJsonName){%>
+          queryJsonList(){
+            <%for(jsonObj in jsonNameList){%>
+              this.${jsonObj.dataListName} = [];
+              let ${jsonObj.dataListName}Data = '${jsonObj.data}';
+              this.${jsonObj.dataListName} = JSON.parse(${jsonObj.dataListName}Data);
+              <%}%>
+          },
+          <%}%>
+        <%if(hasFormVideo){%>
+        <%//视频展示组件
+          for(field in colList){
+            if((field.isForm == 1 || field.isList == 1) && field.formType == 11){%>
+              get${field.propName}Desc(data) {
+                var ${field.propName} = {
+                  ${field.propName}: {
+                    type: "gallery",
+                    default: data.${field.propName},
+                    attrs: {
+                      type: "video",
+                      size: 100,
+                    },
+                  },
+                };
+                return ${field.propName};
+              },
+              <%}
+          }%>
+
+        <%}%>
+            init(id) {
+              <%if(hasDictName){%>
+                this.queryDictList();
+                <%}%>
+            <%if(hasEnumName){%>
+                this.queryEnumList();
+                <%}%>
+            <%if(hasUrlName){%>
+                this.queryUrlList();
+                <%}%>
+            <%if(hasJsonName){%>
+                this.queryJsonList();
+                <%}%>
+                if (id) {
+                   ${lowerEntitykey}Info(id).then(res => {
+                        this.objInfo = res.data
+                        <%for(field in colList){
+                            if((field.isForm == 1 || field.isList == 1) && field.formType == 10){%>
+                              this.objInfo.${field.propName} = JSON.parse(res.data.${field.propName});
+                            <%}
+                            //下拉单选
+                            if((field.isForm == 1 || field.isList == 1) && (field.formType == 4||field.formType == 5) && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                              let ${field.propName}Obj = this.${field.dataListName}.find((item) => {
+                                return item.code == this.objInfo.${field.propName};
+                              });
+                              this.objInfo.${field.propName}Name = ${field.propName}Obj ? ${field.propName}Obj.name : "";
+                            <%//复选框
+                            }else if((field.isForm == 1 || field.isList == 1) && (field.formType == 6) && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+                            this.objInfo.${field.propName}Name = "";
+                            if (this.objInfo.${field.propName}) {
+                                let ${field.propName}Array = this.objInfo.${field.propName}.split(";");
+                                this.${field.dataListName}.forEach(item =>{
+                                        ${field.propName}Array.forEach((o) => {
+                                        if (o == item.code) {
+                                            this.objInfo.${field.propName}Name += item.name + " ";
+                                        }
+                                    });
+                                })
+                            }
+                            <%}
+                       }%>
+                   })
+
+                }
+                this.drawer = true
+            },
+            // 关闭抽屉
+            handleClose(done) {
+                done()
+            },
+        },
+    }
+</script>
+<style scoped>
+    .from-title {
+        margin-bottom: 20px;
+        padding: 0 20px 20px 20px;
+        font-size: 16px;
+        color: #17233d;
+        border-bottom: 1px solid #eee;
+    }
+    .info-item {
+        margin-bottom: 40px;
+    }
+
+    .form-item {
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    .form-item-label {
+        text-align: right;
+        float: left;
+        width: 25%;
+    }
+    .form-item-content {
+        margin-left: 30%;
+        width: 70%;
+    }
+</style>

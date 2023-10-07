@@ -1,0 +1,771 @@
+<template>
+    <div >
+      <el-row :gutter="20">
+        <el-col :lg="8" :xl="8" style="margin-bottom: 17px">
+          <div class="padding10 tree" :style="{ height: leftTreeHeight + 'px' }">
+            <el-input
+                placeholder="输入关键字进行过滤"
+                v-model="leftTreeFilterText"
+                clearable
+                style="margin-bottom: 10px"
+            ></el-input>
+            <el-tree
+                class="filter-tree"
+                :data="leftTreeData"
+                :props="defaultProps"
+                default-expand-all
+                :filter-node-method="leftTreeFilterNode"
+                highlight-current
+                ref="tree"
+                @node-click="chooseLeftTree"
+            ></el-tree>
+          </div>
+        </el-col>
+        <el-col :lg="16" :xl="16">
+          <div class="padding10">
+            <el-form :inline="true" :model="queryForm" @submit.native.prevent @keyup.enter.native="queryList">
+                <%
+                var queryCount = 0;
+                for(field in colList){
+                    if(field.isQuery == 1 && (field.formType == 4||field.formType == 5||field.formType == 6) && !isEmpty(field.listdataConfig) && field.listdataType != null){
+                        queryCount+=1;%>
+                <el-form-item  <%if(queryCount > 2){%>v-show="collapse.flag" <%}%>>
+                    <fortress-select
+                      v-model="queryForm.${field.propName}"
+                      :dictList="${field.dataListName}"
+                      placeholder="请选择${field.propDesc}"
+                      clearable
+                      filterable
+                    ></fortress-select>
+                </el-form-item>
+                <%}else if(field.isQuery == 1 && field.formType == 7){
+                queryCount+=1;%>
+                <el-form-item  <%if(queryCount > 2){%>v-show="collapse.flag" <%}%>>
+                <el-date-picker
+                        v-model="queryForm.${field.propName}"
+                        type="date"
+                        placeholder="请选择${field.propDesc}"
+                        value-format="yyyy-MM-dd"
+                        clearable
+                >
+                </el-date-picker>
+                </el-form-item>
+                <%}else if(field.isQuery == 1 && field.formType == 8){
+                queryCount+=1;%>
+                <el-form-item  <%if(queryCount > 2){%>v-show="collapse.flag" <%}%>>
+                <el-date-picker
+                        v-model="queryForm.${field.propName}"
+                        type="datetime"
+                        placeholder="请选择${field.propDesc}"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        clearable
+                >
+                </el-date-picker>
+                </el-form-item>
+                <%}else if(field.isQuery == 1 && field.formType == 12){
+                queryCount+=1;%>
+                <el-form-item  <%if(queryCount > 2){%>v-show="collapse.flag" <%}%>>
+                  <el-select
+                      v-model="queryForm.${field.propName}"
+                      placeholder="请选择${field.propDesc}"
+                      clearable
+                  >
+                    <%if(field.propType == "Boolean"){%>
+                    <el-option label="启用" :value="true"></el-option>
+                    <el-option label="禁用" :value="false"></el-option>
+                    <%}else{%>
+                    <el-option label="启用" value="1"></el-option>
+                    <el-option label="禁用" value="2"></el-option>
+                    <%}%>
+                  </el-select>
+                </el-form-item>
+                <%}else if(field.isQuery == 1){
+                queryCount+=1;%>
+                <el-form-item  <%if(queryCount > 2){%>v-show="collapse.flag" <%}%>>
+                    <el-input prefix-icon="el-icon-search" v-model="queryForm.${field.propName}" autocomplete="off" placeholder="请输入${field.propDesc}" clearable></el-input>
+                </el-form-item>
+
+                    <%}
+                }
+                %>
+                <el-form-item>
+                    <el-button type="primary" size="medium" icon="el-icon-search" @click="queryList({current:1})">查询</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" size="medium" icon="el-icon-refresh-left" @click="resetQueryForm">重置</el-button>
+                </el-form-item>
+                <%if(queryCount>2){%>
+                <el-form-item>
+                    <el-button type="text" @click="handleCollapseState"
+                    >{{ collapse.label }}<i :class="collapse.icon"></i
+                    ></el-button>
+                </el-form-item>
+                <%}%>
+            </el-form>
+            <el-button
+                    style="margin: 10px 0 17px"
+                    type="primary"
+                    size="medium"
+                    icon="el-icon-plus"
+                    v-if="$tools.hasPermission('${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:save')"
+                    @click="handleEdit()"
+            >添加</el-button
+            >
+            <el-button
+                    v-if="$tools.hasPermission('${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:deleteBatch')"
+                    size="medium"
+                    type="danger"
+                    icon="el-icon-delete"
+                    @click="handleDeleteBatch()"
+            >删除</el-button
+            >
+            <div style="float: right; padding-right: 17px">
+                <i
+                  class="el-icon-download"
+                  style="margin-right: 10px; cursor: pointer"
+                  @click="handleExport"
+                ></i>
+                <i
+                        class="el-icon-refresh"
+                        style="margin-right: 10px; cursor: pointer"
+                        @click="refresh"
+                ></i>
+
+                <el-popover placement="bottom" width="180" trigger="click" title="列展示" popper-class="columnShows">
+                    <el-checkbox-group v-model="tableShowList">
+                        <el-checkbox
+                                v-for="item in tableList"
+                                :label="item.propName"
+                                :key="item.propName"
+                                :value="item.propName"
+                        >{{ item.propDesc }}</el-checkbox
+                        >
+                    </el-checkbox-group>
+                    <i
+                            slot="reference"
+                            class="el-icon-s-operation"
+                            style="cursor: pointer"
+                    ></i>
+                </el-popover>
+            </div>
+            <!-- loading -->
+            <loading :show="parentShow">
+        <el-table
+                ref="multipleTable"
+                :data="tableData"
+                style="width: 100%; margin-bottom: 20px"
+                row-key="id"
+                border
+        >
+            <el-table-column type="selection" width="55" show-overflow-tooltip></el-table-column>
+
+            <%
+            for(field in colList){
+                if(field.isList == 1){%>
+                    <%if(field.propName == tableCol){%>
+            <el-table-column
+                  v-if="$tools.isShow('${tableCol}', tableShowList)"
+                  prop="${tableCol}Name"
+                  label="${field.propDesc}"
+                  :show-overflow-tooltip="true"
+              >
+            </el-table-column>
+                    <%}else if(field.propName == "createUser"){%>
+            <el-table-column
+                    v-if="$tools.isShow('createUser', tableShowList)"
+                    prop="createUserName"
+                    label="${field.propDesc}"
+                    :show-overflow-tooltip="true"
+            >
+            </el-table-column>
+                    <%}else if(field.propName == "createDept"){%>
+            <el-table-column
+                    v-if="$tools.isShow('createDept', tableShowList)"
+                    prop="createDeptName"
+                    label="${field.propDesc}"
+                    :show-overflow-tooltip="true"
+            >
+            </el-table-column>
+                    <%}else if(field.propName == "createPost"){%>
+            <el-table-column
+                    v-if="$tools.isShow('createPost', tableShowList)"
+                    prop="createPostName"
+                    label="${field.propDesc}"
+                    :show-overflow-tooltip="true"
+            >
+            </el-table-column>
+                    <%}else if((field.formType == 4||field.formType == 5||field.formType == 6)  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+            <el-table-column
+                    v-if="$tools.isShow('${field.propName}', tableShowList)"
+                    prop="${field.propName}"
+                    label="${field.propDesc}"
+                    :show-overflow-tooltip="true"
+                    :formatter="${field.propName}Fmt"
+            >
+            </el-table-column>
+                    <%}else if(field.formType == 12){%>
+            <el-table-column
+                  v-if="$tools.isShow('${field.propName}', tableShowList)"
+                  prop="${field.propName}"
+                  label="${field.propDesc}"
+                  :show-overflow-tooltip="true"
+                  :formatter="${field.propName}Fmt"
+            >
+            </el-table-column>
+                    <%}else if(field.formType == 3){%>
+            <el-table-column
+                 v-if="$tools.isShow('${field.propName}', tableShowList)"
+                 prop="${field.propName}"
+                 label="${field.propDesc}"
+                 :show-overflow-tooltip="true"
+            >
+              <template slot-scope="scope">
+                <p v-html="scope.row.${field.propName}"></p>
+              </template>
+            </el-table-column>
+          <%}else if(field.formType == 9){%>
+          <el-table-column
+              v-if="$tools.isShow('${field.propName}', tableShowList)"
+              prop="${field.propName}"
+              label="${field.propDesc}"
+              :show-overflow-tooltip="true"
+          >
+            <template slot-scope="scope">
+              <el-image
+                  v-if="scope.row.${field.propName}"
+                  :src="scope.row.${field.propName}"
+                  style="width: 100px; height: 100px"
+                  :preview-src-list="[scope.row.${field.propName}]"
+              />
+            </template>
+          </el-table-column>
+          <%}else if(field.formType == 10){%>
+          <el-table-column
+              v-if="$tools.isShow('${field.propName}', tableShowList)"
+              prop="${field.propName}"
+              label="${field.propDesc}"
+              :show-overflow-tooltip="true"
+              :formatter="${field.propName}Fmt"
+          >
+          </el-table-column>
+          <%}else if(field.formType == 11){%>
+          <el-table-column
+              v-if="$tools.isShow('${field.propName}', tableShowList)"
+              prop="${field.propName}"
+              label="${field.propDesc}"
+              :show-overflow-tooltip="true"
+          >
+            <template slot-scope="scope">
+              <fortress-upload
+                  style="width: 100px; height: 100px"
+                  v-if="scope.row.${field.propName}"
+                  type="videoShow"
+                  name="${field.propName}"
+                  :formData="tableData[scope.$index]"
+                  :videoSrc="scope.row.${field.propName}"
+              ></fortress-upload>
+            </template>
+          </el-table-column>
+                    <%}else{%>
+            <el-table-column
+              v-if="$tools.isShow('${field.propName}', tableShowList)"
+              prop="${field.propName}"
+              label="${field.propDesc}"
+              :show-overflow-tooltip="true"
+            >
+            </el-table-column>
+                    <%}%>
+                <%}
+            }
+            %>
+            <el-table-column label="操作" fixed="right" min-width="180">
+                <template slot-scope="scope">
+                    <el-button
+                            v-if="$tools.hasPermission('${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:info')"
+                            size="mini"
+                            plain
+                            @click="handleInfo(scope.row.id)"
+                    >详情</el-button
+                    >
+                    <el-button
+                            v-if="$tools.hasPermission('${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:edit')"
+                            size="mini"
+                            plain
+                            @click="handleEdit(scope.row)"
+                    >编辑</el-button
+                    >
+                    <el-button
+                            v-if="$tools.hasPermission('${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:delete')"
+                            size="mini"
+                            plain
+                            type="danger"
+                            @click="handleDelete(scope.row)"
+                    >删除</el-button
+                    >
+                </template>
+            </el-table-column>
+        </el-table>
+            </loading>
+        <pagination :total="page.total" :current-page="page.current" :page-size="page.size" @refreshData="queryList"></pagination>
+        <!-- 新增、编辑 -->
+        <form-edit
+                v-if="formEditVisible"
+                ref="formEdit"
+                :leftTreeData="leftTreesimple"
+                @refreshData="queryList"
+        ></form-edit>
+        <!-- 详情 -->
+        <form-info v-if="formInfoVisible" ref="formInfo"></form-info>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+</template>
+<script>
+    import { ${lowerEntitykey}Page, ${lowerEntitykey}Del, ${lowerEntitykey}DelBatch, ${lowerEntitykey}DynamicExport,leftTreeList, } from "@/api/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${lowerEntitykey}.js";
+    import { viewTableList } from "@/api/public.api.js";
+    import FormEdit from "./${lowerEntitykey}-edit";
+    import FormInfo from "./${lowerEntitykey}-info";
+    import FortressPagination from "@/components/fortress-pagination.vue";
+    <%if(hasDataList){%>import { <%if(hasDictName){%>dictList,<%}%><%if(hasEnumName){%>enumList,<%}%><%if(hasUrlName){%>urlList,<%}%> } from "@/api/public.api.js";<%}%>
+    export default {
+        data() {
+            return {
+                leftTreeHeight: 0,
+                leftTreeFilterText:"",
+                parentShow: false,
+                tableData: [],
+                leftTreeData: [],
+                leftTreesimple: [],
+                defaultProps: {
+                  children: "children",
+                  label: "${treeLabel}",
+                },
+                sleLeftTreeId:"",
+                sleLeftTreeName:"",
+                formEditVisible: false,
+                formInfoVisible: false,
+                queryForm: {
+                <%for(field in colList){
+                    if(field.isQuery == 1){%>
+                        ${field.propName}:"",
+                    <%}
+                }%>
+                },
+                page: {
+                    current: 1,
+                    size: 10,
+                    total: 0,
+                },
+                collapse: {
+                    icon: "el-icon-arrow-down el-icon--right",
+                    label: "展开",
+                    flag: false,
+                },
+                tableList: [],
+                tableShowList: [],
+            <%for(dictName in dictNameSet){%>
+                ${dictName}List:[],
+            <%}%>
+            <%for(enumObj in enumNameList){ %>
+                ${enumObj.dataListName}:[],
+            <%}%>
+            <%for(urlObj in urlNameList){%>
+                ${urlObj.dataListName}:[],
+            <%}%>
+            <%for(jsonObj in jsonNameList){%>
+                ${jsonObj.dataListName}:[],
+            <%}%>
+            };
+        },
+        components: {
+            "form-edit": FormEdit,
+            "form-info": FormInfo,
+            pagination: FortressPagination,
+        },
+        created() {
+            this.leftTreeHeight = window.innerHeight * 0.8;
+            <%if(hasDictName){%>
+            this.queryDictList();
+            <%}%>
+            <%if(hasEnumName){%>
+            this.queryEnumList();
+            <%}%>
+            <%if(hasUrlName){%>
+            this.queryUrlList();
+            <%}%>
+            <%if(hasJsonName){%>
+            this.queryJsonList();
+            <%}%>
+            this.queryLeftTreeList();
+            this.initTableList();
+            this.queryList();
+        },
+        watch: {
+          leftTreeFilterText(val) {
+            this.$refs.tree.filter(val);
+           },
+        },
+        methods: {
+          <%if(hasDictName){%>
+            queryDictList(){
+              <%for(dictName in dictNameSet){%>
+              this.${dictName}List = [];
+              dictList("${dictName}").then((resp) => {
+                if (resp.code == 0) {
+                  this.${dictName}List = resp.data;
+                }
+              });
+              <%}%>
+            },
+          <%}%>
+          <%if(hasEnumName){%>
+            queryEnumList(){
+            <%for(enumObj in enumNameList){ %>
+              this.${enumObj.dataListName} = [];
+                enumList("${enumObj.enumName}","${enumObj.moduleName}").then((resp) => {
+                if (resp.code == 0) {
+                  this.${enumObj.dataListName} = resp.data;
+                }
+              });
+            <%}%>
+            },
+          <%}%>
+          <%if(hasUrlName){%>
+            queryUrlList(){
+            <%for(urlObj in urlNameList){%>
+              this.${urlObj.dataListName} = [];
+              urlList("${urlObj.urlName}").then((resp) => {
+                if (resp.code == 0) {
+                  if (resp.data) {
+                    resp.data.forEach((item) => {
+                      this.${urlObj.dataListName}.push({ code: item.${urlObj.code}, name: item.${urlObj.name} });
+                    });
+                  }
+                }
+              });
+            <%}%>
+            },
+          <%}%>
+          <%if(hasJsonName){%>
+            queryJsonList(){
+            <%for(jsonObj in jsonNameList){%>
+                this.${jsonObj.dataListName} = [];
+                let ${jsonObj.dataListName}Data = '${jsonObj.data}';
+                this.${jsonObj.dataListName} = JSON.parse(${jsonObj.dataListName}Data);
+            <%}%>
+            },
+          <%}%>
+            //查询左树数据
+            queryLeftTreeList() {
+              this.leftTreeData = [{ ${treeValue}: -1, ${treeLabel}: "全部" }];
+              leftTreeList().then((resp) => {
+                if (resp.code == 0) {
+                  this.leftTreesimple = resp.data;
+                  this.leftTreeData = this.leftTreeData.concat(this.leftTreesimple);
+                } else {
+                  this.$msg({
+                    message: resp.msg,
+                    type: "error",
+                  });
+                }
+              });
+            },
+            leftTreeFilterNode(value, data) {
+              if (!value) return true;
+              return data.name.indexOf(value) !== -1;
+            },
+            //点选左侧树
+            chooseLeftTree(data) {
+              if (data.${treeValue} == -1) {
+                this.sleLeftTreeId = "";
+                this.sleLeftTreeName="";
+                this.queryRightTable("");
+              } else {
+                this.sleLeftTreeId = data.${treeValue};
+                this.sleLeftTreeName=data.${treeLabel};
+                this.queryRightTable(data.${treeValue});
+              }
+            },
+            //点击左树筛选右侧表格数据
+            queryRightTable(sleLeftTreeId) {
+              this.queryForm.${tableCol} = sleLeftTreeId;
+              this.queryList();
+            },
+            refresh() {
+              this.tableData = [];
+              this.queryList({ current: 1 });
+            },
+            //查询表格数据
+            queryList(page) {
+                this.parentShow = true;
+                if (page) {
+                    this.page.current = page.current?page.current:this.page.current;
+                    this.page.size = page.size?page.size:this.page.size;
+                }
+                this.queryForm.current = this.page.current;
+                this.queryForm.size = this.page.size;
+                ${lowerEntitykey}Page(this.queryForm).then((resp) => {
+                    if (resp.code == 0) {
+                        this.tableData = resp.data.records;
+                        this.page.total = resp.data.total;
+                        //查询页大于总页数，重新查询
+                        let cu = this.page.total%this.page.size==0?parseInt(this.page.total/this.page.size):parseInt((this.page.total/this.page.size)+1);
+                        if(cu>0 && this.page.current>cu){
+                          this.queryList({current:cu});
+                        }
+                    } else {
+                        this.$msg({
+                            message: resp.msg,
+                            type: "error",
+                        });
+                    }
+                    this.parentShow = false;
+                });
+            },
+            //打开编辑窗口
+            handleEdit(row){
+                //新增
+                if(!row){
+                    if(!this.sleLeftTreeId){
+                      this.$msg({
+                        message: "请选择左侧架构",
+                        type: "error",
+                      });
+                      return;
+                    }
+                }
+                this.formEditVisible = true;
+                this.$nextTick(() => {
+                    if(row){
+                        this.$refs.formEdit.init(row.id);
+                    }else{
+                        this.$refs.formEdit.init(undefined,this.sleLeftTreeId,this.sleLeftTreeName);
+                    }
+
+                });
+            },
+            //打开详情窗口
+            handleInfo(id) {
+                this.formInfoVisible = true;
+                this.$nextTick(() => {
+                    this.$refs.formInfo.init(id);
+                });
+            },
+            //删除
+            handleDelete(row) {
+                this.$confirm('确认删除该记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                        ${lowerEntitykey}Del(row.id).then((resp) => {
+                        if (resp.code == 0) {
+                            this.$message({
+                                type: "success",
+                                message: "操作成功!",
+                            });
+                           //判断是否最后一页的最后一条记录
+                           let totalPages =
+                              (this.page.total - 1) % this.page.size == 0
+                                  ? (this.page.total - 1) / this.page.size
+                                  : (this.page.total - 1) / this.page.size + 1;
+                           if (this.page.current > totalPages && this.page.current != 1) {
+                            this.page.current = this.page.current - 1;
+                           }
+                            this.queryList();
+                        } else {
+                            this.$msg({
+                                message: resp.msg,
+                                type: "error",
+                            });
+                        }
+                    });
+                }).catch(() => {
+                });
+            },
+            //批量删除
+            handleDeleteBatch() {
+                let checkedRow = this.$refs.multipleTable.selection;
+                if (checkedRow.length > 0) {
+                    let ids = [];
+                    checkedRow.forEach((item) => {
+                        ids.push(item.id);
+                    });
+                    this.$confirm("确认删除该记录, 是否继续?", "提示", {
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        type: "warning",
+                    })
+                            .then(() => {
+                                ${lowerEntitykey}DelBatch(ids).then((resp) => {
+                                    if (resp.code == 0) {
+                                        this.$message({
+                                            type: "success",
+                                            message: "操作成功!",
+                                        });
+                                      //判断是否最后一页的最后一条记录
+                                      let totalPages =
+                                          (this.page.total - checkedRow.length) % this.page.size == 0
+                                              ? (this.page.total - checkedRow.length) / this.page.size
+                                              : (this.page.total - checkedRow.length) / this.page.size +
+                                              1;
+                                      if (this.page.current > totalPages && this.page.current != 1) {
+                                        this.page.current = this.page.current - 1;
+                                      }
+                                        this.queryList();
+                                    } else {
+                                        this.$msg({
+                                            message: resp.msg,
+                                            type: "error",
+                                        });
+                                    }
+                                });
+                            })
+                            .catch(() => {});
+                } else {
+                    this.$msg({
+                        message: "请选择数据进行删除",
+                        type: "error",
+                    });
+                }
+            },
+            //重置查询框
+            resetQueryForm() {
+                this.queryForm = {
+                <%for(field in colList){
+                    if(field.isQuery == 1){%>
+                        ${field.propName}:"",
+                    <%}
+                }%>
+                        ${tableCol}:this.sleLeftTreeId,
+                };
+            },
+            //切换查询条件收缩框
+            handleCollapseState() {
+                this.collapse.flag = !this.collapse.flag;
+                if (this.collapse.flag) {
+                    this.collapse.icon = "el-icon-arrow-up el-icon--right";
+                    this.collapse.label = "收起";
+                } else {
+                    this.collapse.icon = "el-icon-arrow-down el-icon--right";
+                    this.collapse.label = "展开";
+                }
+            },
+            //视图表格列表初始化
+            initTableList() {
+                viewTableList("${tbConfig.tbName}").then((resp) => {
+                    if (resp.code == 0) {
+                        this.tableList = resp.data;
+                        this.tableList.forEach((item) => {
+                            this.tableShowList.push(item.propName);
+                        });
+                    }
+                });
+            },
+            <%
+            //单选框和下拉列表格式化
+            for(field in colList){
+                if(field.isList == 1 && (field.formType == 4||field.formType == 5)  && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+            //${field.propDesc}格式化返回
+            ${field.propName}Fmt(row) {
+                let name = "";
+                if (this.${field.dataListName}) {
+                    this.${field.dataListName}.forEach(item =>{
+                        if(item.code == row.${field.propName}){
+                            name = item.name;
+                        }
+                    })
+                }
+                return name;
+            },
+                <%//复选框格式化
+                }else if(field.isList == 1 && (field.formType == 6) && !isEmpty(field.listdataConfig) && field.listdataType != null){%>
+            ${field.propName}Fmt(row) {
+                let name = "";
+                if (this.${field.dataListName} && row.${field.propName}) {
+                    let ${field.propName}Array = row.${field.propName}.split(";");
+                    this.${field.dataListName}.forEach(item =>{
+                        ${field.propName}Array.forEach((o) => {
+                            if (o == item.code) {
+                                name += item.name + " ";
+                            }
+                        });
+                    })
+                }
+                return name;
+            },
+                <%}//开关
+                else if(field.isList == 1 && (field.formType == 12)){%>
+            ${field.propName}Fmt(row) {
+                let name = "禁用";
+                <%if(field.propType == "Boolean"){%>
+                  if (row.${field.propName}) {
+                    name = "启用";
+                  }
+                  <%}else{%>
+                  if (row.${field.propName} == 1) {
+                    name = "启用";
+                  }
+                  <%}%>
+                  return name;
+            },
+                <%}//文件
+                else if(field.isList == 1 && (field.formType == 10)){%>
+            ${field.propName}Fmt(row) {
+                let name = "";
+                if (row.${field.propName}) {
+                  let ${field.propName}Array = JSON.parse(row.${field.propName});
+                  ${field.propName}Array.forEach((item) => {
+                    name = name + item.name + ",";
+                  });
+                }
+                if (name != "") {
+                  name = name.substring(0, name.length - 1);
+                }
+                return name;
+            },
+                <%}
+            }%>
+            //可见字段excel导出
+            handleExport() {
+              if (!this.tableShowList || this.tableShowList.length < 1) {
+                this.$msg({
+                  message: "请选择要导出的列",
+                  type: "error",
+                });
+                return;
+              }
+              let colNum = 1;
+              let headerList = [];
+              this.tableShowList.forEach((item) => {
+                let nameData = this.tableList.find((item2) => {
+                  return item2.propName == item;
+                });
+                let name = "";
+                if (nameData && nameData.propDesc) {
+                  name = nameData.propDesc;
+                } else {
+                  name = "未定义字段" + colNum++;
+                }
+                headerList.push({ name: name, code: item });
+              });
+            ${lowerEntitykey}DynamicExport({ headerList: headerList, dto: this.queryForm });
+            },
+        },
+    };
+</script>
+<style scoped>
+  .padding10 {
+    padding: 10px 20px;
+    background-color: #fff;
+    /* max-height: 600px; */
+    overflow: auto;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  }
+  .tree {
+    height: 600px;
+    overflow: auto;
+  }
+</style>

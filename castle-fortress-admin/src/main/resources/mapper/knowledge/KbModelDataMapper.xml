@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbModelDataMapper">
+    <insert id="saveData">
+        insert into ${tbName}
+        <foreach collection="propName" item="name" separator="," open="(" close=")">
+            ${name}
+        </foreach>
+        values
+        <foreach collection="propValue" item="v" separator="," open="(" close=")">
+            #{v}
+        </foreach>
+    </insert>
+    <update id="updateData">
+        update ${tbName} set
+        <foreach collection="dataMap" item="v" separator=",">
+            ${v.name}=#{v.value}
+        </foreach>
+        where id=#{id}
+    </update>
+    <delete id="removeByIds">
+        delete from ${tbName}
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteByDId">
+        delete  from ${tableName} where data_id=#{dId}
+    </delete>
+    <delete id="deleteByBIdHis">
+        delete  from ${tableName} where data_id in (  select id from  kb_basic_history where b_id=#{dId})
+    </delete>
+    <select id="queryById" resultType="java.util.Map">
+        select * from ${tbName} where id=#{id}
+    </select>
+    <select id="queryIdsRepeat" resultType="java.lang.Long">
+        select id
+        from ${tbName}
+        where ${colName} = #{colValue}
+    </select>
+    <select id="queryByDataId" resultType="java.util.Map">
+        select * from ${tbName} where data_Id = #{id}
+    </select>
+    <select id="selectComment" resultType="java.util.Map">
+        SELECT COLUMN_NAME,column_comment FROM INFORMATION_SCHEMA.Columns WHERE table_name= #{tbName} AND table_schema='knowledge_base'
+    </select>
+
+
+</mapper>

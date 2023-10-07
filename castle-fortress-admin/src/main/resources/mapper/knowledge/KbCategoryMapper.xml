@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbCategoryMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbCategoryMap" type="com.castle.fortress.admin.knowledge.entity.KbCategoryEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="sw_id" property="swId"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="kbCategoryExtendsMap" extends="kbCategoryMap"
+               type="com.castle.fortress.admin.knowledge.entity.KbCategoryEntity">
+        <result column="create_user_name" property="createUserName"/>
+    </resultMap>
+    <select id="extendsList" resultMap="kbCategoryExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_category t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbCategoryEntity.id != null'>
+            AND t.id like concat('%',#{kbCategoryEntity.id},'%')
+        </if>
+        <if test='kbCategoryEntity.name != null and kbCategoryEntity.name != ""'>
+            AND t.name like concat('%',#{kbCategoryEntity.name},'%')
+        </if>
+        <if test='kbCategoryEntity.swId != null'>
+            AND t.sw_id = #{kbCategoryEntity.swId}
+        </if>
+        <if test='kbCategoryEntity.sort != null'>
+            AND t.sort = #{kbCategoryEntity.sort}
+        </if>
+        <if test='kbCategoryEntity.status != null'>
+            AND t.status = #{kbCategoryEntity.status}
+        </if>
+        <if test='kbCategoryEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbCategoryEntity.createTime},'%')
+        </if>
+        <if test='kbCategoryEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbCategoryEntity.createUser},'%')
+        </if>
+        <if test='kbCategoryEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbCategoryEntity.updateUser},'%')
+        </if>
+        <if test='kbCategoryEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbCategoryEntity.updateTime},'%')
+        </if>
+        <if test='kbCategoryEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbCategoryEntity.isDeleted},'%')
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        kb_category t
+        WHERE
+        t.is_deleted = 2
+        <if test='kbCategoryEntity.id != null'>
+            AND t.id like concat('%',#{kbCategoryEntity.id},'%')
+        </if>
+        <if test='kbCategoryEntity.name != null and kbCategoryEntity.name != ""'>
+            AND t.name like concat('%',#{kbCategoryEntity.name},'%')
+        </if>
+        <if test='kbCategoryEntity.swId != null'>
+            AND t.sw_id = #{kbCategoryEntity.swId}
+        </if>
+        <if test='kbCategoryEntity.sort != null'>
+            AND t.sort = #{kbCategoryEntity.sort}
+        </if>
+        <if test='kbCategoryEntity.status != null'>
+            AND t.status = #{kbCategoryEntity.status}
+        </if>
+        <if test='kbCategoryEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbCategoryEntity.createTime},'%')
+        </if>
+        <if test='kbCategoryEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbCategoryEntity.createUser},'%')
+        </if>
+        <if test='kbCategoryEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{kbCategoryEntity.updateUser},'%')
+        </if>
+        <if test='kbCategoryEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{kbCategoryEntity.updateTime},'%')
+        </if>
+        <if test='kbCategoryEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbCategoryEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbCategoryExtendsMap">
+        SELECT t.*,
+               t1.real_name create_user_name
+        FROM kb_category t
+                 LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE t.is_deleted = 2
+          AND t.id = #{id}
+    </select>
+
+    <select id="findByUidAndAuthKbCategory" resultMap="kbCategoryMap">
+        select distinct ct.*
+        from kb_category ct
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id and au.status = 2
+        left join castle_sys_dept dept on(dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%')) and au.status = 3
+        join castle_sys_user user
+        on (au.user_id = user.id or (user.id = groupu.user_id) or
+        (user.dept_id = dept.id))
+        where au.is_deleted = 2
+        and ct.is_deleted = 2
+        and user.id= #{uid}
+        <if test='wh_id != null'>
+            and ct.sw_id =#{wh_id}
+        </if>
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        order by ct.sort desc, ct.create_time desc
+    </select>
+    <select id="findBySource" resultType="java.lang.String" parameterType="java.lang.Long">
+        select concat(ksw.name, "/", ct.name) source
+        from kb_category ct
+                 join kb_subject_warehouse ksw on ct.sw_id = ksw.id
+        where ct.id = #{id}
+    </select>
+    <select id="findByUidAuthHotKbCategoryAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbCategoryShowDto"
+            parameterType="int">
+        select ct.name, ct.id, sw.name as swName, sw.id as swId
+        from kb_category ct
+                 join kb_basic basic on ct.id = basic.category_id
+                 join kb_subject_warehouse sw on sw.id = ct.sw_id
+        where ct.is_deleted = 2
+          and basic.is_deleted = 2
+        group by ct.name, ct.id, sw.name, sw.id
+        order by count(ct.name) desc
+            limit #{topCount}
+    </select>
+    <select id="findByUidAuthHotKbCategory" resultType="com.castle.fortress.admin.knowledge.dto.KbCategoryShowDto">select distinct ct.name, ct.id,sw.name as swName,sw.id as swId
+        from kb_category ct
+        join kb_basic basic on ct.id = basic.category_id
+        join kb_warehouse_auth au
+        on ((basic.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (basic.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (basic.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join (select dept.id, user.id uid,dept.parents from castle_sys_dept dept  join castle_sys_user user on user.dept_id = dept.id  ) dept on  (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        join kb_subject_warehouse sw on sw.id = ct.sw_id
+        where ct.is_deleted = 2
+        and basic.is_deleted = 2
+        and au.is_deleted = 2
+        and (au.user_id =#{uid} or groupu.user_id=#{uid} or dept.uid=#{uid})
+        and au.kb_auth in (
+        <foreach collection="kbAuthList" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        group by ct.name,ct.id,sw.name,sw.id
+        order by count(ct.name) desc
+        limit #{topCount}
+    </select>
+    <select id="findVideoCategoryAdmin" resultMap="kbCategoryMap"
+            parameterType="java.lang.Long">
+        select ct.*
+        from kb_category ct
+        where ct.is_deleted = 2
+          and sw_id = #{swId}
+        order by ct.sort desc limit 2
+    </select>
+    <select id="findVideoCategory" resultMap="kbCategoryMap">
+        select distinct ct.*
+        from kb_category ct
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join castle_sys_dept dept on dept.id = au.user_id
+        left join castle_sys_user user on user.dept_id = dept.id
+        where ct.is_deleted = 2
+        and sw_id = #{swId}
+        and (au.user_id = #{uid} or groupu.user_id = #{uid} or user.id = #{uid})
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        order by ct.sort  desc
+        limit 2
+    </select>
+
+</mapper>

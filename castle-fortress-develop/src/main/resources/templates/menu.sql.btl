@@ -1,0 +1,12 @@
+INSERT INTO `castle_sys_menu`(`id`, `parent_id`, `permissions`, `name`,  `url`, `type`, `sort`,  `remark`, `status`,`is_deleted`)
+VALUES ('${menuId}', null, '${tbConfig.moduleName}:${entityKey}:pageList', '${tbConfig.tbDesc}',  '/page/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}',  1, 1, null, 1, 2);
+INSERT INTO `castle_sys_menu`(`id`, `parent_id`, `permissions`, `name`,  `url`, `type`, `sort`,  `remark`, `status`,`is_deleted`)
+VALUES ('${pageMenuId}', '${menuId}', '${tbConfig.moduleName}:${entityKey}:pageList', '分页列表', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/page',  3, 2, '分页列表', 1, 2);
+INSERT INTO `castle_sys_menu`(`id`, `parent_id`, `permissions`, `name`,  `url`, `type`, `sort`,  `remark`, `status`,`is_deleted`)
+VALUES ('${saveMenuId}', '${menuId}', '${tbConfig.moduleName}:${entityKey}:save', '添加', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/save',  3, 3, '添加', 1, 2);
+INSERT INTO `castle_sys_menu`(`id`, `parent_id`, `permissions`, `name`,  `url`, `type`, `sort`,  `remark`, `status`,`is_deleted`)
+VALUES ('${editMenuId}', '${menuId}', '${tbConfig.moduleName}:${entityKey}:edit', '编辑', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/edit',  3, 4, '编辑', 1, 2);
+INSERT INTO `castle_sys_menu`(`id`, `parent_id`, `permissions`, `name`,  `url`, `type`, `sort`,  `remark`, `status`,`is_deleted`)
+VALUES ('${removeMenuId}', '${menuId}', '${tbConfig.moduleName}:${entityKey}:delete', '删除', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/delete',  3, 5, '删除', 1, 2);
+INSERT INTO `castle_sys_menu`(`id`, `parent_id`, `permissions`, `name`,  `url`, `type`, `sort`,  `remark`, `status`,`is_deleted`)
+VALUES ('${infoMenuId}', '${menuId}', '${tbConfig.moduleName}:${entityKey}:info', '详情', '/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/info',  3, 6, '详情', 1, 2);

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.message.mail.mapper.CastleConfigMailMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleConfigMailMap" type="com.castle.fortress.admin.message.mail.entity.CastleConfigMailEntity">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="smtp" property="smtp"/>
+        <result column="port" property="port"/>
+        <result column="mail" property="mail"/>
+        <result column="password" property="password"/>
+        <result column="nick_Name" property="nickName"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_dept" property="createDept"/>
+        <result column="create_post" property="createPost"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <resultMap id="castleConfigMailExtendsMap" extends="castleConfigMailMap" type="com.castle.fortress.admin.message.mail.entity.CastleConfigMailEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="castleConfigMailExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_mail t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='castleConfigMailEntity.id != null'>
+            AND t.id like concat('%',#{castleConfigMailEntity.id},'%')
+        </if>
+        <if test='castleConfigMailEntity.smtp != null and castleConfigMailEntity.smtp != ""'>
+            AND t.smtp like concat('%',#{castleConfigMailEntity.smtp},'%')
+        </if>
+        <if test='castleConfigMailEntity.port != null'>
+            AND t.port like concat('%',#{castleConfigMailEntity.port},'%')
+        </if>
+        <if test='castleConfigMailEntity.mail != null and castleConfigMailEntity.mail != ""'>
+            AND t.mail like concat('%',#{castleConfigMailEntity.mail},'%')
+        </if>
+        <if test='castleConfigMailEntity.password != null and castleConfigMailEntity.password != ""'>
+            AND t.password like concat('%',#{castleConfigMailEntity.password},'%')
+        </if>
+        <if test='castleConfigMailEntity.nickName != null and castleConfigMailEntity.nickName != ""'>
+            AND t.nick_Name like concat('%',#{castleConfigMailEntity.nickName},'%')
+        </if>
+        <if test='castleConfigMailEntity.status != null'>
+            AND t.status = #{castleConfigMailEntity.status}
+        </if>
+        <if test='castleConfigMailEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleConfigMailEntity.createUser},'%')
+        </if>
+        <if test='castleConfigMailEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{castleConfigMailEntity.createDept},'%')
+        </if>
+        <if test='castleConfigMailEntity.createPost != null'>
+            AND t.create_post like concat('%',#{castleConfigMailEntity.createPost},'%')
+        </if>
+        <if test='castleConfigMailEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleConfigMailEntity.createTime},'%')
+        </if>
+        <if test='castleConfigMailEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleConfigMailEntity.updateUser},'%')
+        </if>
+        <if test='castleConfigMailEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleConfigMailEntity.updateTime},'%')
+        </if>
+        <if test='castleConfigMailEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleConfigMailEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_config_mail t
+        WHERE
+            t.is_deleted = 2
+        <if test='castleConfigMailEntity.id != null'>
+            AND t.id like concat('%',#{castleConfigMailEntity.id},'%')
+        </if>
+        <if test='castleConfigMailEntity.smtp != null and castleConfigMailEntity.smtp != ""'>
+            AND t.smtp like concat('%',#{castleConfigMailEntity.smtp},'%')
+        </if>
+        <if test='castleConfigMailEntity.port != null'>
+            AND t.port like concat('%',#{castleConfigMailEntity.port},'%')
+        </if>
+        <if test='castleConfigMailEntity.mail != null and castleConfigMailEntity.mail != ""'>
+            AND t.mail like concat('%',#{castleConfigMailEntity.mail},'%')
+        </if>
+        <if test='castleConfigMailEntity.password != null and castleConfigMailEntity.password != ""'>
+            AND t.password like concat('%',#{castleConfigMailEntity.password},'%')
+        </if>
+        <if test='castleConfigMailEntity.nickName != null and castleConfigMailEntity.nickName != ""'>
+            AND t.nick_Name like concat('%',#{castleConfigMailEntity.nickName},'%')
+        </if>
+        <if test='castleConfigMailEntity.status != null'>
+            AND t.status = #{castleConfigMailEntity.status}
+        </if>
+        <if test='castleConfigMailEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleConfigMailEntity.createUser},'%')
+        </if>
+        <if test='castleConfigMailEntity.createDept != null'>
+            AND t.create_dept like concat('%',#{castleConfigMailEntity.createDept},'%')
+        </if>
+        <if test='castleConfigMailEntity.createPost != null'>
+            AND t.create_post like concat('%',#{castleConfigMailEntity.createPost},'%')
+        </if>
+        <if test='castleConfigMailEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleConfigMailEntity.createTime},'%')
+        </if>
+        <if test='castleConfigMailEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleConfigMailEntity.updateUser},'%')
+        </if>
+        <if test='castleConfigMailEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleConfigMailEntity.updateTime},'%')
+        </if>
+        <if test='castleConfigMailEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleConfigMailEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="castleConfigMailExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_config_mail t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

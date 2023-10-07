@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.CastleHelpArticleTypeMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="castleHelpArticleTypeMap" type="com.castle.fortress.admin.system.entity.CastleHelpArticleTypeEntity">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="castleHelpArticleTypeExtendsMap" extends="castleHelpArticleTypeMap" type="com.castle.fortress.admin.system.entity.CastleHelpArticleTypeEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="castleHelpArticleTypeExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_help_article_type t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='castleHelpArticleTypeEntity.id != null'>
+            AND t.id like concat('%',#{castleHelpArticleTypeEntity.id},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.name != null and castleHelpArticleTypeEntity.name != ""'>
+            AND t.name like concat('%',#{castleHelpArticleTypeEntity.name},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.remark != null and castleHelpArticleTypeEntity.remark != ""'>
+            AND t.remark like concat('%',#{castleHelpArticleTypeEntity.remark},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.status != null'>
+            AND t.status like concat('%',#{castleHelpArticleTypeEntity.status},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleHelpArticleTypeEntity.createUser},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleHelpArticleTypeEntity.createTime},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleHelpArticleTypeEntity.updateUser},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleHelpArticleTypeEntity.updateTime},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleHelpArticleTypeEntity.isDeleted},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_help_article_type t
+        WHERE
+            t.is_deleted = 2
+        <if test='castleHelpArticleTypeEntity.id != null'>
+            AND t.id like concat('%',#{castleHelpArticleTypeEntity.id},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.name != null and castleHelpArticleTypeEntity.name != ""'>
+            AND t.name like concat('%',#{castleHelpArticleTypeEntity.name},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.remark != null and castleHelpArticleTypeEntity.remark != ""'>
+            AND t.remark like concat('%',#{castleHelpArticleTypeEntity.remark},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.status != null'>
+            AND t.status like concat('%',#{castleHelpArticleTypeEntity.status},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.createUser != null'>
+            AND t.create_user like concat('%',#{castleHelpArticleTypeEntity.createUser},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.createTime != null'>
+            AND t.create_time like concat('%',#{castleHelpArticleTypeEntity.createTime},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{castleHelpArticleTypeEntity.updateUser},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{castleHelpArticleTypeEntity.updateTime},'%')
+        </if>
+        <if test='castleHelpArticleTypeEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{castleHelpArticleTypeEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="castleHelpArticleTypeExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_help_article_type t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+    <select id="selectDataList"
+            resultType="com.castle.fortress.admin.system.entity.CastleHelpArticleTypeEntity">
+        SELECT
+            *
+        FROM
+            castle_help_article_type
+        WHERE
+            is_deleted = 2
+            <if test="status != null and status !=''">
+                and status = #{status}
+            </if>
+        order by create_time desc
+    </select>
+    <select id="selectListByArticleTitle"
+            resultType="com.castle.fortress.admin.system.entity.CastleHelpArticleTypeEntity">
+        SELECT
+            t.*
+        FROM
+            castle_help_article_type t
+                left join castle_help_article t1 on t.id = t1.type_id
+        WHERE
+        t.is_deleted = 2 and t1.is_deleted = 2
+            and t.status = 1 and t1.status = 1
+        <if test="title != null and title != ''">
+            and (t1.title like concat('%', #{title} ,'%')
+                or t.name like concat('%', #{title} ,'%'))
+        </if>
+        group by t.id order by t.create_time desc
+    </select>
+
+</mapper>

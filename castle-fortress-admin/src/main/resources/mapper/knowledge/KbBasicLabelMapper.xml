@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbBasicLabelMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbBasicLabelMap" type="com.castle.fortress.admin.knowledge.entity.KbBasicLabelEntity">
+        <result column="id" property="id"/>
+        <result column="b_id" property="bId"/>
+        <result column="l_id" property="lId"/>
+    </resultMap>
+    <resultMap id="kbBasicLabelExtendsMap" extends="kbBasicLabelMap" type="com.castle.fortress.admin.knowledge.entity.KbBasicLabelEntity">
+    </resultMap>
+    <delete id="delectByIds" >
+        delete from kb_basic_label where b_id = #{b_id}
+    </delete>
+    <delete id="deleteByBid" parameterType="java.util.ArrayList">
+        delete from kb_basic_label where l_id in (
+        <foreach collection="arrayList" item="item" separator=",">
+            #{item}
+        </foreach>)
+    </delete>
+    <select id="extendsList" resultMap="kbBasicLabelExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_basic_label t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbBasicLabelEntity.id != null'>
+            AND t.id like concat('%',#{kbBasicLabelEntity.id},'%')
+        </if>
+        <if test='kbBasicLabelEntity.bId != null'>
+            AND t.b_id like concat('%',#{kbBasicLabelEntity.bId},'%')
+        </if>
+        <if test='kbBasicLabelEntity.lId != null'>
+            AND t.l_id like concat('%',#{kbBasicLabelEntity.lId},'%')
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        kb_basic_label t
+        WHERE
+            t.is_deleted = 2
+        <if test='kbBasicLabelEntity.id != null'>
+            AND t.id like concat('%',#{kbBasicLabelEntity.id},'%')
+        </if>
+        <if test='kbBasicLabelEntity.bId != null'>
+            AND t.b_id like concat('%',#{kbBasicLabelEntity.bId},'%')
+        </if>
+        <if test='kbBasicLabelEntity.lId != null'>
+            AND t.l_id like concat('%',#{kbBasicLabelEntity.lId},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbBasicLabelExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_basic_label t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        AND t.id = #{id}
+    </select>
+    <select id="findById" resultType="com.castle.fortress.admin.knowledge.entity.KbBasicLabelEntity">
+        select id from kb_basic_label where l_id  = #{l_id}  and  b_id =#{bId}
+    </select>
+    <select id="selectBidByLid" resultType="java.lang.Long">
+        select b_id from kb_basic_label where l_id = #{id}
+    </select>
+    <select id="findByUidAuthLabelAdmin" resultType="java.lang.String">
+
+        select mlable.name
+        from kb_basic_label label
+                 join kb_basic bs on bs.id = label.b_id
+                 join kb_model_label mlable on mlable.id = label.l_id
+        group by mlable.name
+        order by count(1) desc
+            limit #{TopNum}
+    </select>
+    <select id="findByUidAuthLabel" resultType="java.lang.String">
+        select mlable.name
+        from kb_basic_label label
+        join kb_basic bs on bs.id = label.b_id
+        join kb_model_label mlable on mlable.id = label.l_id
+        join kb_category ct on ct.id = bs.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id and au.status = 2
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%')) and au.status = 3
+        join castle_sys_user user
+        on (au.user_id = user.id or (user.id = groupu.user_id) or
+        (user.dept_id = dept.id))
+        where
+        user.id= #{uid}
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        group by mlable.name
+        order by count(1) desc
+        limit #{TopNum}
+    </select>
+    <select id="labelCount" resultType="java.lang.Integer">
+        select count(1)
+        from kb_basic_label
+        where l_id = #{lebalId}
+    </select>
+    <select id="listBybId" resultType="com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity">
+        SELECT kml.*
+        FROM kb_basic_label kbl
+        left join kb_basic kb on kbl.b_id = kb.id
+         join kb_model_label kml on kbl.l_id = kml.id
+        where kbl.b_id = #{basicId}
+    </select>
+    <select id="findByLabelIdToBasic" resultType="java.util.Map">
+        select b_id as bid,name
+        from kb_basic_label join kb_model_label kml on kml.id=l_id  where l_id in (
+        <foreach collection="list" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+    <select id="findByBid" resultType="com.castle.fortress.admin.knowledge.entity.KbBaseLabelTaskEntity"
+            parameterType="java.util.ArrayList">
+        SELECT * FROM kb_basic_label WHERE b_id IN (
+            <foreach collection="arrayList" item="item" separator=",">
+        #{item.id}
+    </foreach>)
+    </select>
+    <select id="selectLidByBid" resultType="com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity">
+        select * from kb_basic_label kbl left join kb_model_label kml on kbl.l_id = kml.id
+        where b_id = #{basicId}
+    </select>
+
+
+</mapper>

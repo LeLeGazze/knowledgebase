@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbBasicLogMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbBaiscLogMap" type="com.castle.fortress.admin.knowledge.entity.KbBasicLogEntity">
+        <result column="id" property="id"/>
+        <result column="basic_id" property="basicId"/>
+        <result column="old_category" property="oldCategory"/>
+        <result column="new_category" property="newCategory"/>
+        <result column="create_user" property="createUser"/>
+		<result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+	<delete id="deleteByid">
+		delete from kb_basic_log where basic_id = #{basicId}
+	</delete>
+	<delete id="deleteByIds">
+		delete from kb_basic_log where id in
+		<foreach collection="ids" item="id" separator="," open="(" close=")">
+			#{id}
+		</foreach>
+	</delete>
+	<select id="queryList" resultMap="kbBaiscLogMap">
+		SELECT
+		t.*
+		FROM
+		kb_basic_log t
+		WHERE
+		1 = 1
+		<if test='kbBasicLogEntity.id != null'>
+			AND t.id like concat('%',#{kbBaiscLogEntity.id},'%')
+		</if>
+		<if test='kbBasicLogEntity.basicId != null'>
+			AND t.basic_id like concat('%',#{kbBaiscLogEntity.basicId},'%')
+		</if>
+		<if test='kbBasicLogEntity.oldCategory != null'>
+			AND t.old_category like concat('%',#{kbBaiscLogEntity.oldCategory},'%')
+		</if>
+		<if test='kbBasicLogEntity.newCategory != null'>
+			AND t.new_category like concat('%',#{kbBaiscLogEntity.newCategory},'%')
+		</if>
+		<if test='kbBasicLogEntity.createUser != null'>
+			AND t.create_user like concat('%',#{kbBaiscLogEntity.createUser},'%')
+		</if>
+		<if test='kbBasicLogEntity.createTime != null'>
+			AND t.create_time like concat('%',#{kbBaiscLogEntity.createTime},'%')
+		</if>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+    <select id="selectByBasic" resultType="com.castle.fortress.admin.knowledge.entity.KbBasicLogEntity">
+		select * from kb_basic_log where basic_id = #{basicId}
+	</select>
+	<select id="selectLog" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,
+		       kbl.id as logId,
+		       kb.title as title,
+			   csu.real_name as createUser,
+			   kbl.create_time as pubTime,
+			   kc.name as ctName,
+			   kc1.name as oldctName
+		from kb_basic_log kbl
+		 join kb_basic kb on kbl.basic_id = kb.id
+		left join castle_sys_user csu on kbl.create_user = csu.id
+		left join kb_category kc on kbl.new_category = kc.id
+		left join kb_category kc1 on kbl.old_category = kc1.id
+		<where>
+			kbl.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kbl.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+			<if test="kbBaseShowDto.userName != null and kbBaseShowDto.userName != ''">
+				and csu.real_name like concat('%',#{kbBaseShowDto.userName},'%')
+			</if>
+			<if test="userId != null and userId != ''">
+				and kbl.create_user = #{userId}
+			</if>
+		</where>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectLogCount" resultType="java.lang.Integer">
+		select count(1)
+		from kb_basic_log kbl
+		 join kb_basic kb on kbl.basic_id = kb.id
+		left join castle_sys_user csu on kbl.create_user = csu.id
+		left join kb_category kc on kbl.new_category = kc.id
+		left join kb_category kc1 on kbl.old_category = kc1.id
+		<where>
+			kbl.type = 1
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kbl.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+			<if test="kbBaseShowDto.userName != null and kbBaseShowDto.userName != ''">
+				and csu.real_name like concat('%',#{kbBaseShowDto.userName},'%')
+			</if>
+			<if test="userId != null and userId != ''">
+				and kbl.create_user = #{userId}
+			</if>
+		</where>
+	</select>
+	<select id="selectLogVideo" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
+		select kb.id as id,
+		kbl.id as logId,
+		kb.title as title,
+		csu.real_name as createUser,
+		kbl.create_time as pubTime,
+		kc.name as ctName,
+		kc1.name as oldctName
+		from kb_basic_log kbl
+		 join kb_video kb on kbl.basic_id = kb.id
+		left join castle_sys_user csu on kbl.create_user = csu.id
+		left join kb_category kc on kbl.new_category = kc.id
+		left join kb_category kc1 on kbl.old_category = kc1.id
+		<where>
+			kbl.type = 2
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kbl.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+			<if test="kbBaseShowDto.userName != null and kbBaseShowDto.userName != ''">
+				and csu.real_name like concat('%',#{kbBaseShowDto.userName},'%')
+			</if>
+			<if test="userId != null and userId != ''">
+				and kbl.create_user = #{userId}
+			</if>
+		</where>
+		<if test="map != null">
+			limit #{map.offset},#{map.rows}
+		</if>
+	</select>
+	<select id="selectLogVideoCount" resultType="java.lang.Integer">
+		select count(1)
+		from kb_basic_log kbl
+		 join kb_video kb on kbl.basic_id = kb.id
+		left join castle_sys_user csu on kbl.create_user = csu.id
+		left join kb_category kc on kbl.new_category = kc.id
+		left join kb_category kc1 on kbl.old_category = kc1.id
+		<where>
+			kbl.type = 2
+			and kb.is_deleted = 2
+			<if test="kbBaseShowDto.title!=null and kbBaseShowDto.title != ''">
+				and kb.title like concat('%',#{kbBaseShowDto.title},'%')
+			</if>
+			<if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
+				and kbl.create_time like concat(#{kbBaseShowDto.fromTime},'%')
+			</if>
+			<if test="kbBaseShowDto.userName != null and kbBaseShowDto.userName != ''">
+				and csu.real_name like concat('%',#{kbBaseShowDto.userName},'%')
+			</if>
+			<if test="userId != null and userId != ''">
+				and kbl.create_user = #{userId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

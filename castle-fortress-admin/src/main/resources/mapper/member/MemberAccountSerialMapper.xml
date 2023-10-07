@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberAccountSerialMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberAccountSerialMap" type="com.castle.fortress.admin.member.entity.MemberAccountSerialEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="member_account_id" property="memberAccountId"/>
+        <result column="money" property="money"/>
+        <result column="type" property="type"/>
+        <result column="category" property="category"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+    </resultMap>
+    <resultMap id="memberAccountSerialExtendsMap" extends="memberAccountSerialMap" type="com.castle.fortress.admin.member.entity.MemberAccountSerialEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="memberAccountSerialExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_account_serial t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='memberAccountSerialEntity.id != null'>
+            AND t.id like concat('%',#{memberAccountSerialEntity.id},'%')
+        </if>
+        <if test='memberAccountSerialEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberAccountSerialEntity.memberId},'%')
+        </if>
+        <if test='memberAccountSerialEntity.memberAccountId != null'>
+            AND t.member_account_id like concat('%',#{memberAccountSerialEntity.memberAccountId},'%')
+        </if>
+        <if test='memberAccountSerialEntity.money != null and memberAccountSerialEntity.money != ""'>
+            AND t.money like concat('%',#{memberAccountSerialEntity.money},'%')
+        </if>
+        <if test='memberAccountSerialEntity.type != null'>
+            AND t.type like concat('%',#{memberAccountSerialEntity.type},'%')
+        </if>
+        <if test='memberAccountSerialEntity.category != null'>
+            AND t.category like concat('%',#{memberAccountSerialEntity.category},'%')
+        </if>
+        <if test='memberAccountSerialEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberAccountSerialEntity.createUser},'%')
+        </if>
+        <if test='memberAccountSerialEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberAccountSerialEntity.createTime},'%')
+        </if>
+        <if test='memberAccountSerialEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberAccountSerialEntity.updateUser},'%')
+        </if>
+        <if test='memberAccountSerialEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberAccountSerialEntity.updateTime},'%')
+        </if>
+        <if test='memberAccountSerialEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberAccountSerialEntity.isDeleted},'%')
+        </if>
+        <if test='memberAccountSerialEntity.status != null'>
+            AND t.status like concat('%',#{memberAccountSerialEntity.status},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        member_account_serial t
+        WHERE
+            t.is_deleted = 2
+        <if test='memberAccountSerialEntity.id != null'>
+            AND t.id like concat('%',#{memberAccountSerialEntity.id},'%')
+        </if>
+        <if test='memberAccountSerialEntity.memberId != null'>
+            AND t.member_id like concat('%',#{memberAccountSerialEntity.memberId},'%')
+        </if>
+        <if test='memberAccountSerialEntity.memberAccountId != null'>
+            AND t.member_account_id like concat('%',#{memberAccountSerialEntity.memberAccountId},'%')
+        </if>
+        <if test='memberAccountSerialEntity.money != null and memberAccountSerialEntity.money != ""'>
+            AND t.money like concat('%',#{memberAccountSerialEntity.money},'%')
+        </if>
+        <if test='memberAccountSerialEntity.type != null'>
+            AND t.type like concat('%',#{memberAccountSerialEntity.type},'%')
+        </if>
+        <if test='memberAccountSerialEntity.category != null'>
+            AND t.category like concat('%',#{memberAccountSerialEntity.category},'%')
+        </if>
+        <if test='memberAccountSerialEntity.createUser != null'>
+            AND t.create_user like concat('%',#{memberAccountSerialEntity.createUser},'%')
+        </if>
+        <if test='memberAccountSerialEntity.createTime != null'>
+            AND t.create_time like concat('%',#{memberAccountSerialEntity.createTime},'%')
+        </if>
+        <if test='memberAccountSerialEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{memberAccountSerialEntity.updateUser},'%')
+        </if>
+        <if test='memberAccountSerialEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{memberAccountSerialEntity.updateTime},'%')
+        </if>
+        <if test='memberAccountSerialEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{memberAccountSerialEntity.isDeleted},'%')
+        </if>
+        <if test='memberAccountSerialEntity.status != null'>
+            AND t.status like concat('%',#{memberAccountSerialEntity.status},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="memberAccountSerialExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        member_account_serial t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

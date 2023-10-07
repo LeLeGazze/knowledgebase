@@ -1,0 +1,294 @@
+package <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}%><%if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>controller;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.castle.fortress.admin.core.constants.GlobalConstants;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>entity.${className}Entity;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>dto.${className}Dto;
+import <%if(isNotEmpty(tbConfig.packageBase)){%>${tbConfig.packageBase}.<%}if(isNotEmpty(tbConfig.moduleName)){%>${tbConfig.moduleName}.<%}%><%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}.<%}%>service.${className}Service;
+import com.castle.fortress.common.utils.ConvertUtil;
+import com.castle.fortress.common.entity.RespBody;
+import com.castle.fortress.common.exception.BizException;
+import com.castle.fortress.common.respcode.GlobalRespCode;
+import com.castle.fortress.common.enums.OperationTypeEnum;
+import com.castle.fortress.admin.core.annotation.CastleLog;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
+import org.apache.logging.log4j.util.Strings;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import com.castle.fortress.admin.utils.ExcelUtils;
+import javax.servlet.http.HttpServletResponse;
+import com.castle.fortress.common.entity.DynamicExcelEntity;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.hutool.core.util.StrUtil;
+import com.castle.fortress.common.respcode.BizErrorCode;
+
+/**
+ * ${classDdsc} 控制器
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Api(tags="${classDdsc}管理控制器")
+@Controller
+public class ${className}Controller {
+    @Autowired
+    private ${className}Service ${entityKey}Service;
+
+	/**
+	 * ${classDdsc}的分页展示
+	 * @param ${entityKey}Dto ${classDdsc}实体类
+	 * @param current 当前页
+	 * @param size  每页记录数
+	 * @return
+	 */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.QUERY)
+	@ApiOperation("${classDdsc}分页展示")
+	@GetMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/page")
+	@ResponseBody
+	@RequiresPermissions("${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:pageList")
+	public RespBody<IPage<${className}Dto>> page${className}(${className}Dto ${entityKey}Dto, @RequestParam(required = false) Integer current, @RequestParam(required = false)Integer size){
+		Integer pageIndex= current==null? GlobalConstants.DEFAULT_PAGE_INDEX:current;
+		Integer pageSize= size==null? GlobalConstants.DEFAULT_PAGE_SIZE:size;
+		Page<${className}Dto> page = new Page(pageIndex, pageSize);
+        <%if(hasSuperEntity){%>
+			IPage<${className}Dto> pages = ${entityKey}Service.page${className}Extends(page, ${entityKey}Dto);
+        <%}else{%>
+			IPage<${className}Dto> pages = ${entityKey}Service.page${className}(page, ${entityKey}Dto);
+        <%}%>
+
+		return RespBody.data(pages);
+	}
+
+    /**
+     * ${classDdsc}的树形展示
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.QUERY)
+    @ApiOperation("${classDdsc}分页展示")
+    @GetMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/tree")
+    @ResponseBody
+    public RespBody<List<${className}Dto>> tree${className}(${className}Dto ${entityKey}Dto){
+	    List<${className}Dto> list = ${entityKey}Service.list${className}(${entityKey}Dto);
+	    //展示时需要展示到顶级
+	    Set<Long> ids=new HashSet<>();
+	    for(${className}Dto s:list){
+		    ids.add(s.getId());
+	    }
+	    List<Long> parentId =new ArrayList<>();
+	    List<${className}Dto> parentList=new ArrayList<>();
+	    for(${className}Dto s:list){
+		    if(s.getParentId()!=null&&!ids.contains(s.getParentId())){
+			    parentId.add(s.getParentId());
+		    }
+	    }
+	    if(!parentId.isEmpty()){
+		    QueryWrapper<${className}Entity> wrapper=new QueryWrapper<>();
+		    wrapper.in("id",parentId);
+		    parentList= ConvertUtil.transformObjList(${entityKey}Service.list(wrapper),${className}Dto.class);
+		    list.addAll(parentList);
+	    }
+	    do{
+		    parentId =new ArrayList<>();
+		    for(${className}Dto s:parentList){
+			    if(s.getParentId()!=null){
+				    parentId.add(s.getParentId());
+			    }
+		    }
+		    if(!parentId.isEmpty()){
+			    QueryWrapper<${className}Entity> wrapper=new QueryWrapper<>();
+			    wrapper.in("id",parentId);
+			    parentList= ConvertUtil.transformObjList(${entityKey}Service.list(wrapper),${className}Dto.class);
+			    list.addAll(parentList);
+		    }
+	    }while(!parentId.isEmpty());
+	    return RespBody.data(ConvertUtil.listToTree(list));
+    }
+
+    /**
+     * ${classDdsc}的列表展示
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.QUERY)
+    @ApiOperation("${classDdsc}列表展示")
+    @GetMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/list")
+    @ResponseBody
+    public RespBody<List<${className}Dto>> list${className}(${className}Dto ${entityKey}Dto){
+        List<${className}Dto> list = ${entityKey}Service.list${className}(${entityKey}Dto);
+        return RespBody.data(list);
+    }
+
+    /**
+     * ${classDdsc}保存
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.INSERT)
+    @ApiOperation("${classDdsc}保存")
+    @PostMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/save")
+    @ResponseBody
+    @RequiresPermissions("${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:save")
+    public RespBody<String> save${className}(@RequestBody ${className}Dto ${entityKey}Dto){
+        if(${entityKey}Dto == null ){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+        ${className}Entity ${entityKey}Entity = ConvertUtil.transformObj(${entityKey}Dto,${className}Entity.class);
+	    if(${entityKey}Entity.getParentId()!=null){
+            ${className}Entity parent = ${entityKey}Service.getById(${entityKey}Entity.getParentId());
+		    if(StrUtil.isEmpty(parent.getParents())){
+                ${entityKey}Entity.setParents(parent.getId()+"");
+		    }else{
+                ${entityKey}Entity.setParents(parent.getParents()+","+parent.getId());
+		    }
+	    }
+        if(${entityKey}Service.save(${entityKey}Entity)){
+            return RespBody.data("保存成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+    /**
+     * ${classDdsc}编辑
+     * @param ${entityKey}Dto ${classDdsc}实体类
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.UPDATE)
+    @ApiOperation("${classDdsc}编辑")
+    @PostMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/edit")
+    @ResponseBody
+    @RequiresPermissions("${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:edit")
+    public RespBody<String> update${className}(@RequestBody ${className}Dto ${entityKey}Dto){
+        if(${entityKey}Dto == null || ${entityKey}Dto.getId() == null || ${entityKey}Dto.getId().equals(0L)){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+        ${className}Entity ${entityKey}Entity = ConvertUtil.transformObj(${entityKey}Dto,${className}Entity.class);
+	    if(${entityKey}Entity.getParentId()!=null){
+	    	//校验父级是否是子集
+            QueryWrapper<${className}Entity> wrapper=new QueryWrapper<>();
+            wrapper.like("parents",${entityKey}Entity.getId());
+			wrapper.eq("id",${entityKey}Entity.getParentId());
+            List<${className}Entity> sons = ${entityKey}Service.list(wrapper);
+            if(sons!=null && sons.size()>0){
+	            throw new BizException(BizErrorCode.PARENT_IS_SON_ERROR);
+            }
+            ${className}Entity parent = ${entityKey}Service.getById(${entityKey}Entity.getParentId());
+		    if(StrUtil.isEmpty(parent.getParents())){
+                ${entityKey}Entity.setParents(parent.getId()+"");
+		    }else{
+                ${entityKey}Entity.setParents(parent.getParents()+","+parent.getId());
+		    }
+	    }
+        if(${entityKey}Service.updateById(${entityKey}Entity)){
+            return RespBody.data("保存成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+    /**
+     * ${classDdsc}删除
+     * @param id
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.DELETE)
+    @ApiOperation("${classDdsc}删除")
+    @PostMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/delete")
+    @ResponseBody
+    @RequiresPermissions("${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:delete")
+    public RespBody<String> delete${className}(@RequestParam Long id){
+        if(id == null ){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+	    QueryWrapper<${className}Entity> wrapper=new QueryWrapper<>();
+	    wrapper.eq("id",id);
+	    wrapper.or().like("parents",id);
+	    if(${entityKey}Service.remove(wrapper)) {
+            return RespBody.data("删除成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+
+    /**
+     * ${classDdsc}批量删除
+     * @param ids
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.DELETE)
+    @ApiOperation("${classDdsc}批量删除")
+    @PostMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/deleteBatch")
+    @ResponseBody
+    @RequiresPermissions("${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:deleteBatch")
+    public RespBody<String> delete${className}Batch(@RequestBody List<Long> ids){
+        if(ids == null || ids.size()<1){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+	    QueryWrapper<${className}Entity> wrapper=new QueryWrapper<>();
+	    wrapper.in("id",ids);
+	    for(Long d:ids){
+		    wrapper.or().like("parents",d);
+	    }
+	    if(${entityKey}Service.remove(wrapper)) {
+            return RespBody.data("删除成功");
+        }else{
+            return RespBody.fail(GlobalRespCode.OPERATE_ERROR);
+        }
+    }
+
+    /**
+     * ${classDdsc}详情
+     * @param id ${classDdsc}id
+     * @return
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.QUERY)
+    @ApiOperation("${classDdsc}详情")
+    @GetMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/info")
+    @ResponseBody
+    @RequiresPermissions("${tbConfig.moduleName}:<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}:<%}%>${entityKey}:info")
+    public RespBody<${className}Dto> info${className}(@RequestParam Long id){
+        if(id == null){
+            throw new BizException(GlobalRespCode.PARAM_MISSED);
+        }
+        <%if(hasSuperEntity){%>
+        ${className}Dto ${entityKey}Dto =  ${entityKey}Service.getByIdExtends(id);
+        <%}else{%>
+        ${className}Entity ${entityKey}Entity = ${entityKey}Service.getById(id);
+        ${className}Dto ${entityKey}Dto = ConvertUtil.transformObj(${entityKey}Entity,${className}Dto.class);
+        <%}%>
+
+        return RespBody.data(${entityKey}Dto);
+    }
+
+	/**
+     * 动态表头导出 依据展示的字段导出对应报表
+     * @param dynamicExcelEntity
+     * @param response
+     * @throws Exception
+     */
+    @CastleLog(operLocation="${classDdsc}",operType = OperationTypeEnum.EXPORT)
+	@PostMapping("/${tbConfig.moduleName}/<%if(isNotEmpty(tbConfig.subModuleName)){%>${tbConfig.subModuleName}/<%}%>${entityKey}/exportDynamic")
+	@ApiOperation("动态表头导出，依据展示的字段导出对应报表")
+	public void exportDynamic(@RequestBody DynamicExcelEntity<${className}Dto> dynamicExcelEntity, HttpServletResponse response) throws Exception {
+		List<${className}Dto> list = ${entityKey}Service.list${className}(dynamicExcelEntity.getDto());
+		//字典、枚举、接口、json常量等转义后的列表数据 根据实际情况初始化该对象，null为list数据直接导出
+		List<List<Object>> dataList = null;
+		/**
+        * 根据实际情况初始化dataList,可参照 com.castle.fortress.admin.system.controller.TmpDemoController类中方法：exportDynamic
+        */
+		ExcelUtils.exportDynamic(response,dynamicExcelEntity.getFileName()+".xlsx",null,list,dynamicExcelEntity.getHeaderList(),dataList);
+	}
+
+
+}

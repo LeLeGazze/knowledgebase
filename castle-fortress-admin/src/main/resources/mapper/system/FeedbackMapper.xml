@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.FeedbackMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="feedbackMap" type="com.castle.fortress.admin.system.entity.FeedbackEntity">
+        <result column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="img" property="img"/>
+        <result column="type_id" property="typeId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="contact_way" property="contactWay"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_user" property="updateUser"/>
+    </resultMap>
+    <resultMap id="feedbackExtendsMap" extends="feedbackMap" type="com.castle.fortress.admin.system.entity.FeedbackEntity">
+        <result column="create_user_name" property="createUserName" />
+    </resultMap>
+    <select id="extendsList" resultMap="feedbackExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_feedback t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='feedbackEntity.id != null'>
+            AND t.id like concat('%',#{feedbackEntity.id},'%')
+        </if>
+        <if test='feedbackEntity.content != null and feedbackEntity.content != ""'>
+            AND t.content like concat('%',#{feedbackEntity.content},'%')
+        </if>
+        <if test='feedbackEntity.img != null and feedbackEntity.img != ""'>
+            AND t.img like concat('%',#{feedbackEntity.img},'%')
+        </if>
+        <if test='feedbackEntity.typeId != null'>
+            AND t.type_id = #{feedbackEntity.typeId}
+        </if>
+        <if test='feedbackEntity.memberId != null'>
+            AND t.member_id = #{feedbackEntity.memberId}
+        </if>
+        <if test='feedbackEntity.contactWay != null and feedbackEntity.contactWay != ""'>
+            AND t.contact_way like concat('%',#{feedbackEntity.contactWay},'%')
+        </if>
+        <if test='feedbackEntity.createTime != null'>
+            AND t.create_time like concat('%',#{feedbackEntity.createTime},'%')
+        </if>
+        <if test='feedbackEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{feedbackEntity.updateTime},'%')
+        </if>
+        <if test='feedbackEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{feedbackEntity.isDeleted},'%')
+        </if>
+        <if test='feedbackEntity.status != null'>
+            AND t.status like concat('%',#{feedbackEntity.status},'%')
+        </if>
+        <if test='feedbackEntity.createUser != null'>
+            AND t.create_user like concat('%',#{feedbackEntity.createUser},'%')
+        </if>
+        <if test='feedbackEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{feedbackEntity.updateUser},'%')
+        </if>
+            order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+            count(1)
+        FROM
+        castle_feedback t
+        WHERE
+            t.is_deleted = 2
+        <if test='feedbackEntity.id != null'>
+            AND t.id like concat('%',#{feedbackEntity.id},'%')
+        </if>
+        <if test='feedbackEntity.content != null and feedbackEntity.content != ""'>
+            AND t.content like concat('%',#{feedbackEntity.content},'%')
+        </if>
+        <if test='feedbackEntity.img != null and feedbackEntity.img != ""'>
+            AND t.img like concat('%',#{feedbackEntity.img},'%')
+        </if>
+        <if test='feedbackEntity.typeId != null'>
+            AND t.type_id = #{feedbackEntity.typeId}
+        </if>
+        <if test='feedbackEntity.memberId != null'>
+            AND t.member_id = #{feedbackEntity.memberId}
+        </if>
+        <if test='feedbackEntity.contactWay != null and feedbackEntity.contactWay != ""'>
+            AND t.contact_way like concat('%',#{feedbackEntity.contactWay},'%')
+        </if>
+        <if test='feedbackEntity.createTime != null'>
+            AND t.create_time like concat('%',#{feedbackEntity.createTime},'%')
+        </if>
+        <if test='feedbackEntity.updateTime != null'>
+            AND t.update_time like concat('%',#{feedbackEntity.updateTime},'%')
+        </if>
+        <if test='feedbackEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{feedbackEntity.isDeleted},'%')
+        </if>
+        <if test='feedbackEntity.status != null'>
+            AND t.status like concat('%',#{feedbackEntity.status},'%')
+        </if>
+        <if test='feedbackEntity.createUser != null'>
+            AND t.create_user like concat('%',#{feedbackEntity.createUser},'%')
+        </if>
+        <if test='feedbackEntity.updateUser != null'>
+            AND t.update_user like concat('%',#{feedbackEntity.updateUser},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="feedbackExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        castle_feedback t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user  = t1.id
+        WHERE
+        t.is_deleted = 2
+        AND t.id = #{id}
+    </select>
+
+</mapper>

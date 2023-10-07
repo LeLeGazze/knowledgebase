@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.member.mapper.MemberAccountMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="memberAccountMap" type="com.castle.fortress.admin.member.entity.MemberAccountEntity">
+        <result column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="balance" property="balance"/>
+        <result column="frozen" property="frozen"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+</mapper>

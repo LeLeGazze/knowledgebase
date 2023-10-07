@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.system.mapper.SysRoleMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="sysUserMap" type="com.castle.fortress.admin.system.entity.SysRole">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="remark" property="remark"/>
+        <result column="is_admin" property="isAdmin"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <select id="queryListByUser" resultMap="sysUserMap">
+        select t.*
+        from castle_sys_role t,castle_sys_user_role t1
+        where t.is_deleted = 2
+        and t.`status`= 1
+        and t.id= t1.role_id
+        and t1.user_id =#{userId}
+    </select>
+</mapper>

@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.castle.fortress.admin.knowledge.mapper.KbVideoMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="kbVideoMap" type="com.castle.fortress.admin.knowledge.entity.KbVideoEntity">
+        <result column="id" property="id"/>
+        <result column="wh_id" property="whId"/>
+        <result column="title" property="title"/>
+        <result column="auth" property="auth"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="pub_time" property="pubTime"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="model_id" property="modelId"/>
+        <result column="exp_time" property="expTime"/>
+        <result column="cover" property="cover"/>
+        <result column="video_url" property="videoUrl"/>
+        <result column="video_src" property="videoSrc"/>
+        <result column="label" property="label"/>
+        <result column="model_code" property="modelCode"/>
+        <result column="remark" property="remark"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+    <resultMap id="kbVideoExtendsMap" extends="kbVideoMap"
+               type="com.castle.fortress.admin.knowledge.entity.KbVideoEntity">
+        <result column="create_user_name" property="createUserName"/>
+    </resultMap>
+    <update id="deletedByid">
+        update kb_video set is_deleted =1 where id = #{id}
+    </update>
+    <update id="updateByVideo">
+        update kb_video set is_deleted =2 where id = #{basicId}
+    </update>
+    <select id="extendsList" resultMap="kbVideoExtendsMap">
+        SELECT
+        t.*,
+        t1.real_name create_user_name
+        FROM
+        kb_video t
+        LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE
+        t.is_deleted = 2
+        <if test='kbVideoEntity.id != null'>
+            AND t.id like concat('%',#{kbVideoEntity.id},'%')
+        </if>
+        <if test='kbVideoEntity.whId != null'>
+            AND t.wh_id like concat('%',#{kbVideoEntity.whId},'%')
+        </if>
+        <if test='kbVideoEntity.title != null and kbVideoEntity.title != ""'>
+            AND t.title like concat('%',#{kbVideoEntity.title},'%')
+        </if>
+        <if test='kbVideoEntity.auth != null'>
+            AND t.auth like concat('%',#{kbVideoEntity.auth},'%')
+        </if>
+        <if test='kbVideoEntity.deptId != null'>
+            AND t.dept_id like concat('%',#{kbVideoEntity.deptId},'%')
+        </if>
+        <if test='kbVideoEntity.pubTime != null'>
+            AND t.pub_time like concat('%',#{kbVideoEntity.pubTime},'%')
+        </if>
+        <if test='kbVideoEntity.categoryId != null'>
+            AND t.category_id like concat('%',#{kbVideoEntity.categoryId},'%')
+        </if>
+        <if test='kbVideoEntity.modelId != null'>
+            AND t.model_id like concat('%',#{kbVideoEntity.modelId},'%')
+        </if>
+        <if test='kbVideoEntity.expTime != null'>
+            AND t.exp_time like concat('%',#{kbVideoEntity.expTime},'%')
+        </if>
+        <if test='kbVideoEntity.cover != null and kbVideoEntity.cover != ""'>
+            AND t.cover like concat('%',#{kbVideoEntity.cover},'%')
+        </if>
+        <if test='kbVideoEntity.videoUrl != null and kbVideoEntity.videoUrl != ""'>
+            AND t.video_url like concat('%',#{kbVideoEntity.videoUrl},'%')
+        </if>
+        <if test='kbVideoEntity.videoSrc != null and kbVideoEntity.videoSrc != ""'>
+            AND t.video_src like concat('%',#{kbVideoEntity.videoSrc},'%')
+        </if>
+        <if test='kbVideoEntity.label != null and kbVideoEntity.label != ""'>
+            AND t.label like concat('%',#{kbVideoEntity.label},'%')
+        </if>
+        <if test='kbVideoEntity.modelCode != null and kbVideoEntity.modelCode != ""'>
+            AND t.model_code like concat('%',#{kbVideoEntity.modelCode},'%')
+        </if>
+        <if test='kbVideoEntity.remark != null and kbVideoEntity.remark != ""'>
+            AND t.remark like concat('%',#{kbVideoEntity.remark},'%')
+        </if>
+        <if test='kbVideoEntity.sort != null'>
+            AND t.sort like concat('%',#{kbVideoEntity.sort},'%')
+        </if>
+        <if test='kbVideoEntity.status != null'>
+            AND t.status like concat('%',#{kbVideoEntity.status},'%')
+        </if>
+        <if test='kbVideoEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbVideoEntity.createTime},'%')
+        </if>
+        <if test='kbVideoEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbVideoEntity.createUser},'%')
+        </if>
+        <if test='kbVideoEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbVideoEntity.isDeleted},'%')
+        </if>
+        order by create_time desc
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="extendsCount" resultType="java.lang.Long">
+        SELECT
+        count(1)
+        FROM
+        kb_video t
+        WHERE
+        t.is_deleted = 2
+        <if test='kbVideoEntity.id != null'>
+            AND t.id like concat('%',#{kbVideoEntity.id},'%')
+        </if>
+        <if test='kbVideoEntity.whId != null'>
+            AND t.wh_id like concat('%',#{kbVideoEntity.whId},'%')
+        </if>
+        <if test='kbVideoEntity.title != null and kbVideoEntity.title != ""'>
+            AND t.title like concat('%',#{kbVideoEntity.title},'%')
+        </if>
+        <if test='kbVideoEntity.auth != null'>
+            AND t.auth like concat('%',#{kbVideoEntity.auth},'%')
+        </if>
+        <if test='kbVideoEntity.deptId != null'>
+            AND t.dept_id like concat('%',#{kbVideoEntity.deptId},'%')
+        </if>
+        <if test='kbVideoEntity.pubTime != null'>
+            AND t.pub_time like concat('%',#{kbVideoEntity.pubTime},'%')
+        </if>
+        <if test='kbVideoEntity.categoryId != null'>
+            AND t.category_id like concat('%',#{kbVideoEntity.categoryId},'%')
+        </if>
+        <if test='kbVideoEntity.modelId != null'>
+            AND t.model_id like concat('%',#{kbVideoEntity.modelId},'%')
+        </if>
+        <if test='kbVideoEntity.expTime != null'>
+            AND t.exp_time like concat('%',#{kbVideoEntity.expTime},'%')
+        </if>
+        <if test='kbVideoEntity.cover != null and kbVideoEntity.cover != ""'>
+            AND t.cover like concat('%',#{kbVideoEntity.cover},'%')
+        </if>
+        <if test='kbVideoEntity.videoUrl != null and kbVideoEntity.videoUrl != ""'>
+            AND t.video_url like concat('%',#{kbVideoEntity.videoUrl},'%')
+        </if>
+        <if test='kbVideoEntity.videoSrc != null and kbVideoEntity.videoSrc != ""'>
+            AND t.video_src like concat('%',#{kbVideoEntity.videoSrc},'%')
+        </if>
+        <if test='kbVideoEntity.label != null and kbVideoEntity.label != ""'>
+            AND t.label like concat('%',#{kbVideoEntity.label},'%')
+        </if>
+        <if test='kbVideoEntity.modelCode != null and kbVideoEntity.modelCode != ""'>
+            AND t.model_code like concat('%',#{kbVideoEntity.modelCode},'%')
+        </if>
+        <if test='kbVideoEntity.remark != null and kbVideoEntity.remark != ""'>
+            AND t.remark like concat('%',#{kbVideoEntity.remark},'%')
+        </if>
+        <if test='kbVideoEntity.sort != null'>
+            AND t.sort like concat('%',#{kbVideoEntity.sort},'%')
+        </if>
+        <if test='kbVideoEntity.status != null'>
+            AND t.status like concat('%',#{kbVideoEntity.status},'%')
+        </if>
+        <if test='kbVideoEntity.createTime != null'>
+            AND t.create_time like concat('%',#{kbVideoEntity.createTime},'%')
+        </if>
+        <if test='kbVideoEntity.createUser != null'>
+            AND t.create_user like concat('%',#{kbVideoEntity.createUser},'%')
+        </if>
+        <if test='kbVideoEntity.isDeleted != null'>
+            AND t.is_deleted like concat('%',#{kbVideoEntity.isDeleted},'%')
+        </if>
+    </select>
+    <select id="getByIdExtends" resultMap="kbVideoExtendsMap">
+        SELECT t.*,
+               t1.real_name create_user_name
+        FROM kb_video t
+                 LEFT OUTER JOIN castle_sys_user t1 ON t.create_user = t1.id
+        WHERE t.is_deleted = 2
+          AND t.id = #{id}
+    </select>
+    <select id="pageKbVideoAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoShowDto">
+        select kb.id as id,
+        ct.sw_id as swId,
+        kb.title as title,
+        ct.name as categoryName,
+        user.real_name as userName,
+        kb.pub_time as createTime,
+        kb.status AS status,
+        kb.dept_id as deptId,
+        kb.remark as remark,
+        kb.cover as cover,
+        case when t2.num is null then 0 else t2.num end as readCount
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join castle_sys_user user on user.id = kb.auth
+        left join (select b_id, count(1) num from kb_basic_user t where t.type = 1 group by b_id) t2
+        on t2.b_id = kb.id
+        where kb.is_deleted = 2
+        and ct.is_deleted = 2
+        and ct.sw_id=#{kbVideoShowDto.swId}
+        <if test='kbVideoShowDto.title != null and kbVideoShowDto.title != ""'>
+            AND kb.title like concat('%',#{kbVideoShowDto.title},'%')
+        </if>
+
+        <if test='kbVideoShowDto.deptId != null and kbVideoShowDto.deptId != ""'>
+            AND kb.dept_id = #{kbVideoShowDto.deptId}
+        </if>
+
+        <if test='kbVideoShowDto.userName != null and kbVideoShowDto.userName != ""'>
+            AND user.real_name like concat('%', #{kbVideoShowDto.userName},'%')
+        </if>
+
+        <if test='kbVideoShowDto.status != null and kbVideoShowDto.status != ""'>
+            AND kb.status = #{kbVideoShowDto.status}
+        </if>
+        <if test='kbVideoShowDto.fromTime != null and kbVideoShowDto.fromTime != "" and kbVideoShowDto.endTime !=null  and kbVideoShowDto.endTime !="" '>
+            AND (kb.pub_time >= #{kbVideoShowDto.fromTime } and kb.pub_time &lt;= #{kbVideoShowDto.endTime})
+        </if>
+        <if test='kbVideoShowDto.categoryIds != null and kbVideoShowDto.categoryIds != ""'>
+            and ct.id in (
+            <foreach collection="kbVideoShowDto.categoryIds" item="categoryId" separator=",">
+                #{categoryId}
+            </foreach>
+            )
+        </if>
+
+        <if test='kbVideoShowDto.sortType == "ASC" and kbVideoShowDto.sortField == "pub_time"'>
+            order by kb.pub_time ASC
+        </if>
+
+        <if test='kbVideoShowDto.sortType == "DESC" and kbVideoShowDto.sortField == "pub_time"'>
+            order by kb.pub_time DESC
+        </if>
+
+        <if test='kbVideoShowDto.sortType ==  "DESC" and kbVideoShowDto.sortField == "readCount"'>
+            order by CAST( readCount AS UNSIGNED) DESC
+        </if>
+        <if test='kbVideoShowDto.sortType ==  "ASC" and kbVideoShowDto.sortField == "readCount"'>
+            order by CAST( readCount AS UNSIGNED) ASC
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="pageKbVideoAdminCount" resultType="java.lang.Long"
+            parameterType="com.castle.fortress.admin.knowledge.dto.KbVideoShowDto">
+        select count(1)
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join castle_sys_user user on user.id = kb.auth
+        left join (select b_id, count(1) num from kb_basic_user t where t.type = 1 group by b_id) t2
+        on t2.b_id = kb.id
+        where kb.is_deleted = 2
+        and ct.is_deleted = 2
+        and ct.sw_id=#{kbVideoShowDto.swId}
+        <if test='kbVideoShowDto.title != null and kbVideoShowDto.title != ""'>
+            AND kb.title like concat('%',#{kbVideoShowDto.title},'%')
+        </if>
+
+        <if test='kbVideoShowDto.deptId != null and kbVideoShowDto.deptId != ""'>
+            AND kb.dept_id = #{kbVideoShowDto.deptId}
+        </if>
+
+        <if test='kbVideoShowDto.userName != null and kbVideoShowDto.userName != ""'>
+            AND user.real_name like concat('%', #{kbVideoShowDto.userName},'%')
+        </if>
+
+        <if test='kbVideoShowDto.status != null and kbVideoShowDto.status != ""'>
+            AND kb.status = #{kbVideoShowDto.status}
+        </if>
+        <if test='kbVideoShowDto.fromTime != null and kbVideoShowDto.fromTime != "" and kbVideoShowDto.endTime !=null  and kbVideoShowDto.endTime !="" '>
+            AND (kb.pub_time >= #{kbVideoShowDto.fromTime } and kb.pub_time &lt;= #{kbVideoShowDto.endTime})
+        </if>
+        <if test='kbVideoShowDto.categoryIds != null and kbVideoShowDto.categoryIds != ""'>
+            and ct.id in (
+            <foreach collection="kbVideoShowDto.categoryIds" item="categoryId" separator=",">
+                #{categoryId}
+            </foreach>
+            )
+        </if>
+
+    </select>
+    <select id="pageKbVideo" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoShowDto">
+
+        select distinct * from (select kb.id                                           as id,
+        ct.sw_id                                        as swId,
+        kb.title                                        as title,
+        ct.name                                         as categoryName,
+        user.real_name                                  as userName,
+        kb.pub_time                                     as createTime,
+        kb.status                                       AS status,
+        kb.dept_id                                      as deptId,
+        kb.remark                                       as remark,
+        kb.cover                                        as cover,
+        case when t2.num is null then 0 else t2.num end as readCount
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join (select dept.id,user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on
+        user.dept_id=dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%', au.user_id, '%'))
+        join castle_sys_user user on kb.auth = user.id
+        left join (select b_id, count(1) num from kb_basic_user t where t.type = 1 group by b_id) t2
+        on t2.b_id = kb.id
+        where kb.is_deleted = 2
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and (kb.exp_time >= now() or kb.exp_time is null)
+        and  (au.user_id =#{uid} or groupu.user_id=#{uid} or dept.uid=#{uid})
+        and ((kb.status in(1,2) and kb.auth=#{uid}) or kb.status=1 )
+        and ct.sw_id=#{kbVideoShowDto.swId}
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        <if test='kbVideoShowDto.title != null and kbVideoShowDto.title != ""'>
+            AND kb.title like concat('%',#{kbVideoShowDto.title},'%')
+        </if>
+
+        <if test='kbVideoShowDto.authId != null and kbVideoShowDto.authId != ""'>
+            AND ct.id = #{kbVideoShowDto.authId}
+        </if>
+
+        <if test='kbVideoShowDto.deptId != null and kbVideoShowDto.deptId != ""'>
+            AND kb.dept_id = #{kbVideoShowDto.deptId}
+        </if>
+
+        <if test='kbVideoShowDto.userName != null and kbVideoShowDto.userName != ""'>
+            AND user.real_name like concat('%', #{kbVideoShowDto.userName},'%')
+        </if>
+
+        <if test='kbVideoShowDto.status != null and kbVideoShowDto.status != ""'>
+            AND kb.status = #{kbVideoShowDto.status}
+        </if>
+        <if test='kbVideoShowDto.fromTime != null and kbVideoShowDto.fromTime != "" and kbVideoShowDto.endTime !=null  and kbVideoShowDto.endTime !="" '>
+            AND (kb.pub_time >= #{kbVideoShowDto.fromTime } and kb.pub_time &lt;= #{kbVideoShowDto.endTime})
+        </if>
+        <if test='kbVideoShowDto.categoryIds != null and kbVideoShowDto.categoryIds != ""'>
+            and ct.id in (
+            <foreach collection="kbVideoShowDto.categoryIds" item="categoryId" separator=",">
+                #{categoryId}
+            </foreach>
+            )
+        </if>
+        union
+        select distinct kb.id as id,
+        ct.sw_id as swId,
+        kb.title as title,
+        ct.name as categoryName,
+        user.real_name as userName,
+        kb.pub_time as createTime,
+        kb.status AS status,
+        kb.dept_id as deptId,
+        kb.remark as remark,
+        kb.cover as cover,
+        case when t2.num is null then 0 else t2.num end as readCount
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        join castle_sys_user user
+        on (user.id = kb.auth and au.user_id = user.id or (user.id = groupu.user_id and user.id = kb.auth) or
+        (user.dept_id = dept.id and user.id = kb.auth))
+        left join (select b_id, count(1) num from kb_basic_user t where t.type = 1 group by b_id) t2
+        on t2.b_id = kb.id
+        where kb.is_deleted = 2
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and user.id=#{uid}
+        and ct.sw_id=#{kbVideoShowDto.swId}
+        and ((kb.status in(1,2) and kb.auth=#{uid}) or kb.status=1 )
+        and au.kb_auth =3
+        <if test='kbVideoShowDto.title != null and kbVideoShowDto.title != ""'>
+            AND kb.title like concat('%',#{kbVideoShowDto.title},'%')
+        </if>
+
+        <if test='kbVideoShowDto.authId != null and kbVideoShowDto.authId != ""'>
+            AND ct.id = #{kbVideoShowDto.authId}
+        </if>
+
+        <if test='kbVideoShowDto.deptId != null and kbVideoShowDto.deptId != ""'>
+            AND kb.dept_id = #{kbVideoShowDto.deptId}
+        </if>
+
+        <if test='kbVideoShowDto.userName != null and kbVideoShowDto.userName != ""'>
+            AND user.real_name like concat('%', #{kbVideoShowDto.userName},'%')
+        </if>
+
+        <if test='kbVideoShowDto.status != null and kbVideoShowDto.status != ""'>
+            AND kb.status = #{kbVideoShowDto.status}
+        </if>
+        <if test='kbVideoShowDto.fromTime != null and kbVideoShowDto.fromTime != "" and kbVideoShowDto.endTime !=null  and kbVideoShowDto.endTime !="" '>
+            AND (kb.pub_time >= #{kbVideoShowDto.fromTime } and kb.pub_time &lt;= #{kbVideoShowDto.endTime})
+        </if>
+        <if test='kbVideoShowDto.categoryIds != null and kbVideoShowDto.categoryIds != ""'>
+            and ct.id in (
+            <foreach collection="kbVideoShowDto.categoryIds" item="categoryId" separator=",">
+                #{categoryId}
+            </foreach>
+            )
+        </if>
+        ) t
+        <if test='kbVideoShowDto.sortType == "ASC" and kbVideoShowDto.sortField == "pub_time"'>
+            order by t.createTime ASC
+        </if>
+
+        <if test='kbVideoShowDto.sortType == "DESC" and kbVideoShowDto.sortField == "pub_time"'>
+            order by t.createTime DESC
+        </if>
+
+        <if test='kbVideoShowDto.sortType ==  "DESC" and kbVideoShowDto.sortField == "readCount"'>
+            order by CAST( readCount AS UNSIGNED) DESC
+        </if>
+        <if test='kbVideoShowDto.sortType ==  "ASC" and kbVideoShowDto.sortField == "readCount"'>
+            order by CAST( readCount AS UNSIGNED) ASC
+        </if>
+        <if test="map != null">
+            limit #{map.offset},#{map.rows}
+        </if>
+    </select>
+    <select id="findById" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoDto">
+        select vi.id          as                                        id,
+               vi.wh_id       as                                        whId,
+               vi.title       as                                        title,
+               vi.auth        as                                        auth,
+               vi.dept_id     as                                        deptId,
+               vi.pub_time    as                                        pubTime,
+               vi.category_id as                                        categoryId,
+               vi.model_id    as                                        modelId,
+               vi.exp_time    as                                        expTime,
+               vi.cover       as                                        cover,
+               replace(JSON_EXTRACT(vi.video_src, "$[0].url"), '"', '') videoUrl,
+               vi.label       as                                        label,
+               vi.model_code  as                                        modelCode,
+               vi.remark      as                                        remark,
+               vi.sort        as                                        sort,
+               vi.status      as                                        status,
+               vi.create_time as                                        createTime,
+               vi.create_user as                                        createUser,
+               vi.is_deleted  as                                        isDeleted,
+               user.real_name as                                        authName,
+               ct.name        as                                        categoryName,
+               dept.name      as                                        deptName,
+               ct.sw_id                                                  swId,
+               sw.name  as subjectWarehouseName
+
+        from kb_video vi
+                 join kb_category ct on vi.category_id = ct.id
+                 join kb_subject_warehouse  sw on sw.id = ct.sw_id
+                 join castle_sys_user user
+                      on vi.auth = user.id
+                 join castle_sys_dept dept on dept.id = vi.dept_id
+        where vi.id =#{id}
+    </select>
+    <select id="pageKbVideoCount" resultType="java.lang.Long"
+            parameterType="com.castle.fortress.admin.knowledge.dto.KbVideoShowDto">
+        select count(distinct t.id)  from (select kb.id                                           as id,
+        ct.sw_id                                        as swId,
+        kb.title                                        as title,
+        ct.name                                         as categoryName,
+        user.real_name                                  as userName,
+        kb.pub_time                                     as createTime,
+        ct.status                                       AS status,
+        kb.dept_id                                      as deptId,
+        kb.remark                                       as remark,
+        kb.cover                                        as cover,
+        case when t2.num is null then 0 else t2.num end as readCount
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join (select dept.id,user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on
+        user.dept_id=dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%', au.user_id, '%'))
+        join castle_sys_user user on kb.auth = user.id
+        left join (select b_id, count(1) num from kb_basic_user t where t.type = 1 group by b_id) t2
+        on t2.b_id = kb.id
+        where kb.is_deleted = 2
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and (kb.exp_time >= now() or kb.exp_time is null)
+        and  (au.user_id =#{uid} or groupu.user_id=#{uid} or dept.uid=#{uid})
+        and ((kb.status in(1,2) and kb.auth=#{uid}) or kb.status=1 )
+        and ct.sw_id=#{kbVideoShowDto.swId}
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        <if test='kbVideoShowDto.title != null and kbVideoShowDto.title != ""'>
+            AND kb.title like concat('%',#{kbVideoShowDto.title},'%')
+        </if>
+
+        <if test='kbVideoShowDto.authId != null and kbVideoShowDto.authId != ""'>
+            AND ct.id = #{kbVideoShowDto.authId}
+        </if>
+
+        <if test='kbVideoShowDto.deptId != null and kbVideoShowDto.deptId != ""'>
+            AND kb.dept_id = #{kbVideoShowDto.deptId}
+        </if>
+
+        <if test='kbVideoShowDto.userName != null and kbVideoShowDto.userName != ""'>
+            AND user.real_name like concat('%', #{kbVideoShowDto.userName},'%')
+        </if>
+
+        <if test='kbVideoShowDto.status != null and kbVideoShowDto.status != ""'>
+            AND kb.status = #{kbVideoShowDto.status}
+        </if>
+        <if test='kbVideoShowDto.fromTime != null and kbVideoShowDto.fromTime != "" and kbVideoShowDto.endTime !=null  and kbVideoShowDto.endTime !="" '>
+            AND (kb.pub_time >= #{kbVideoShowDto.fromTime } and kb.pub_time &lt;= #{kbVideoShowDto.endTime})
+        </if>
+        <if test='kbVideoShowDto.categoryIds != null and kbVideoShowDto.categoryIds != ""'>
+            and ct.id in (
+            <foreach collection="kbVideoShowDto.categoryIds" item="categoryId" separator=",">
+                #{categoryId}
+            </foreach>
+            )
+        </if>
+        union
+        select distinct kb.id as id,
+        ct.sw_id as swId,
+        kb.title as title,
+        ct.name as categoryName,
+        user.real_name as userName,
+        kb.pub_time as createTime,
+        ct.status AS status,
+        kb.dept_id as deptId,
+        kb.remark as remark,
+        kb.cover as cover,
+        case when t2.num is null then 0 else t2.num end as readCount
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        join castle_sys_user user
+        on (user.id = kb.auth and au.user_id = user.id or (user.id = groupu.user_id and user.id = kb.auth) or
+        (user.dept_id = dept.id and user.id = kb.auth))
+        left join (select b_id, count(1) num from kb_basic_user t where t.type = 1 group by b_id) t2
+        on t2.b_id = kb.id
+        where kb.is_deleted = 2
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and user.id=#{uid}
+        and ct.sw_id=#{kbVideoShowDto.swId}
+        and ((kb.status in(1,2) and kb.auth=#{uid}) or kb.status=1 )
+        and au.kb_auth =3
+        <if test='kbVideoShowDto.title != null and kbVideoShowDto.title != ""'>
+            AND kb.title like concat('%',#{kbVideoShowDto.title},'%')
+        </if>
+
+        <if test='kbVideoShowDto.authId != null and kbVideoShowDto.authId != ""'>
+            AND ct.id = #{kbVideoShowDto.authId}
+        </if>
+
+        <if test='kbVideoShowDto.deptId != null and kbVideoShowDto.deptId != ""'>
+            AND kb.dept_id = #{kbVideoShowDto.deptId}
+        </if>
+
+        <if test='kbVideoShowDto.userName != null and kbVideoShowDto.userName != ""'>
+            AND user.real_name like concat('%', #{kbVideoShowDto.userName},'%')
+        </if>
+
+        <if test='kbVideoShowDto.status != null and kbVideoShowDto.status != ""'>
+            AND kb.status = #{kbVideoShowDto.status}
+        </if>
+        <if test='kbVideoShowDto.fromTime != null and kbVideoShowDto.fromTime != "" and kbVideoShowDto.endTime !=null  and kbVideoShowDto.endTime !="" '>
+            AND (kb.pub_time >= #{kbVideoShowDto.fromTime } and kb.pub_time &lt;= #{kbVideoShowDto.endTime})
+        </if>
+        <if test='kbVideoShowDto.categoryIds != null and kbVideoShowDto.categoryIds != ""'>
+            and ct.id in (
+            <foreach collection="kbVideoShowDto.categoryIds" item="categoryId" separator=",">
+                #{categoryId}
+            </foreach>
+            )
+        </if>
+        ) t
+
+    </select>
+    <select id="findByIdAuth" resultMap="kbVideoMap">
+        select distinct vi.*,
+        user.real_name as userName,
+        ct.name        as cateName,
+        vi.dept_id   as deptId
+        from kb_video vi
+        join kb_category ct on ct.id = vi.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join (select dept.id,user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on
+        user.dept_id=dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%', au.user_id, '%'))
+        join castle_sys_user user on vi.auth = user.id
+        where vi.is_deleted = 2
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and vi.id =#{vid}
+        and (au.user_id = #{uid} or groupu.user_id =  #{uid} or dept.uid =  #{uid})
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+    </select>
+    <select id="showListVideoAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoDto"
+            parameterType="java.lang.Long">
+        select video.*,ct.sw_id as swId ,bu.readCount
+        from kb_video video
+        left join (select count(1) as readCount, b_id from kb_basic_user where type = 1 group by 2) bu on video.id =
+        bu.b_id
+        left join kb_category ct on ct.id =video.category_id
+        <where>
+            video.is_deleted = 2 and video.status=1
+            <if test='swId !=null and swId !="" '>
+                and video.category_id =#{swId}
+            </if>
+        </where>
+
+
+        order by readCount desc ,pub_time desc
+        limit 4
+    </select>
+    <select id="showListVideo" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoDto">
+        select distinct * from (select video.*, readCount,ct.sw_id as swId
+        from kb_video video
+        left join (select count(1) readCount, b_id from kb_basic_user where type = 1 group by 2) bu
+        on video.id = bu.b_id
+        join kb_category ct on ct.id = video.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        left join castle_sys_user user on user.dept_id = dept.id
+        where (au.user_id = #{uid} or groupu.user_id = #{uid} or user.id = #{uid})
+        and   (video.exp_time >=now() or video.exp_time is null)
+          and video.is_deleted = 2
+        and ((video.status in(1) and video.auth=#{uid}) or video.status=1 )
+        <if test='swId !=null and swId !="" '>
+            and video.category_id =#{swId}
+        </if>
+        and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+
+        union
+        select video.*, readCount,ct.sw_id as swId
+        from kb_video video
+        left join (select count(1) readCount, b_id from kb_basic_user where type = 1 group by 2) bu
+        on video.id = bu.b_id
+        join kb_category ct on ct.id = video.category_id
+        join kb_subject_warehouse sw on sw.id = ct.sw_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        left join castle_sys_user user on (user.id = video.auth and au.user_id = user.id or (user.id = groupu.user_id and user.id = video.auth) or
+        (user.dept_id = dept.id and user.id = video.auth))
+        where user.id = #{uid}
+        and au.kb_auth = 3 and  video.is_deleted = 2
+        and ((video.status in(1,2) and video.auth=#{uid}) or video.status=1 )
+        and   (video.exp_time >=now() or video.exp_time is null)
+        <if test='swId !=null and swId !="" '>
+            and video.category_id =#{swId}
+        </if>
+        )t
+        order by t.readCount desc ,t.pub_time desc
+        limit 4
+    </select>
+    <select id="randVideoListAdmin" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoDto">
+        select video.*, user.real_name authName ,ct.sw_id as swId
+        from kb_video video
+                 left join castle_sys_user user on user.id = video.auth
+            join  kb_category ct on ct.id =video.category_id
+        where   video.is_deleted = 2 and video.status=1
+        order by rand()
+            limit 5
+    </select>
+    <select id="randVideoList" resultType="com.castle.fortress.admin.knowledge.dto.KbVideoDto">
+        select distinct t.*
+        from (select kb.*,user.real_name authName ,ct.sw_id as swId
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join (select dept.id,user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on
+        user.dept_id=dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%', au.user_id, '%'))
+        join castle_sys_user user on kb.auth = user.id
+        where kb.is_deleted = 2
+        and kb.status = 1
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and (kb.exp_time >= now() or kb.exp_time is null)
+        and  (au.user_id =#{uid} or groupu.user_id=#{uid} or dept.uid=#{uid})
+         and au.kb_auth in (
+        <foreach collection="kb_auths" item="kb_auth" separator=",">
+            #{kb_auth}
+        </foreach>
+        )
+        union
+        select kb.*,user.real_name createName ,ct.sw_id as swId
+        from kb_video kb
+        join kb_category ct on ct.id = kb.category_id
+        join kb_warehouse_auth au
+        on ((ct.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (ct.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join castle_sys_dept dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        join castle_sys_user user
+        on (user.id = kb.auth and au.user_id = user.id or (user.id = groupu.user_id and user.id = kb.auth) or
+        (user.dept_id = dept.id and user.id = kb.auth))
+        where kb.is_deleted = 2
+        and au.is_deleted = 2
+        and ct.is_deleted = 2
+        and user.id=#{uid}
+        and kb.status=1
+        and au.kb_auth =3
+        ) t order by rand()
+        limit 5
+    </select>
+
+</mapper>
