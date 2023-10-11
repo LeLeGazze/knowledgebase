@@ -207,5 +207,10 @@ public class KbModelLabelServiceImpl extends ServiceImpl<KbModelLabelMapper, KbM
         saveBatch(newLabel); //保存新增标签
         return RespBody.success("保存成功");
     }
+
+    @Override
+    public List<KbModelLabelEntity> findByBId(Long bid) {
+        return baseMapper.findByUserId(bid);
+    }
 }
 

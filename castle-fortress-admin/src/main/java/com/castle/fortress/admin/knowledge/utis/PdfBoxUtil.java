@@ -12,6 +12,7 @@ import org.apache.pdfbox.util.Matrix;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 @Slf4j
@@ -20,11 +21,16 @@ public class PdfBoxUtil {
 
 
     public void watermarkPDF(String originalPath, String userName, String watermarkPath) throws Exception {
-        File fileStored = new File(originalPath);
         File tmpPDF;
         PDDocument doc;
         tmpPDF = new File(watermarkPath);
-        doc = PDDocument.load(fileStored);
+        if (originalPath.startsWith("http")){
+            doc= PDDocument.load(new URL(originalPath).openStream());
+        }else {
+            File fileStored = new File(originalPath);
+            doc = PDDocument.load(fileStored);
+        }
+
         // 加载中文字体
         InputStream chineseFontPath = this.getClass().getClassLoader().getResource("simhei.ttf").openStream();
         System.out.println(chineseFontPath);
@@ -48,7 +54,7 @@ public class PdfBoxUtil {
             cs.endText();
             cs.close();
         }
-       log.debug("文件添加水印 " + watermarkPath + " user:" + userName);
+        log.debug("文件添加水印 " + watermarkPath + " user:" + userName);
         doc.save(tmpPDF);
     }
 

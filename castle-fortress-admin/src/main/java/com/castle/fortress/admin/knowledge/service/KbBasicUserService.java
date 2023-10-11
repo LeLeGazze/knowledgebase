@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 知识浏览收藏评论 服务类
  *
- * @author 
+ * @author
  * @since 2023-05-05
  */
 public interface KbBasicUserService extends IService<KbBasicUserEntity> {
@@ -78,4 +78,6 @@ public interface KbBasicUserService extends IService<KbBasicUserEntity> {
     KbModelTransmitDto selectUpCount();
 
     void removeBasicUser(Long auth, Long id);
+
+    void addVideoUser(Long auth, Long id);
 }

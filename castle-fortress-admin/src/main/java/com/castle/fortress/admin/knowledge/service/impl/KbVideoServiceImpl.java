@@ -324,6 +324,7 @@ public class KbVideoServiceImpl extends ServiceImpl<KbVideoMapper, KbVideoEntity
         } else {
             esSearchService.deleteByid(kbVideoDto.getId());
         }
+        kbBasicUserService.addVideoUser(kbVideoDto.getAuth(),kbBasicUserEntity.getId());
         return true;
     }
 
@@ -493,6 +494,7 @@ public class KbVideoServiceImpl extends ServiceImpl<KbVideoMapper, KbVideoEntity
             //  将视频插入到es中
             esSearchService.saveEsFileVideo(kbVideoDto);
         }
+        kbBasicUserService.addVideoUser(kbVideoDto.getAuth(),kbBasicUserEntity.getId());
 
         return true;
     }

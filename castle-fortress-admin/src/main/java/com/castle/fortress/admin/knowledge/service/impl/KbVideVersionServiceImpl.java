@@ -39,6 +39,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -254,7 +255,7 @@ public class KbVideVersionServiceImpl extends ServiceImpl<KbVideVersionMapper, K
             stopWatch.start("开启水印下载");
             PdfBoxUtil pdfBoxUtil = new PdfBoxUtil();
             fileListPath = entityList.stream().map(item -> {
-                String watermarkPath = FileUtil.getWatermarkPath(item.getDownloadUrl(), userName);
+                String watermarkPath = FileUtil.getWatermarkPath(configOssService.getFilePathPrefix(),item.getDownloadUrl(), userName);
                 if (!FileUtil.isFileExist(watermarkPath)) {
                     try {
                         pdfBoxUtil.watermarkPDF(item.getDownloadUrl(), userName, watermarkPath);
@@ -292,6 +293,14 @@ public class KbVideVersionServiceImpl extends ServiceImpl<KbVideVersionMapper, K
             if (fileUrl == null) {
                 // 如果文件不存在 说明在转换中 给一个磨人的
                 inputStream = this.getClass().getClassLoader().getResourceAsStream("default.pdf");
+            }
+            if (fileUrl!=null && fileUrl.startsWith("http")){
+                try {
+                    URL url = new URL(fileUrl);
+                    inputStream = url.openStream();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
             String fileName = kbVideVersionEntity.getFileName().replace(StringUtils.getFilenameExtension(kbVideVersionEntity.getFileName()), "pdf");
             response.reset();

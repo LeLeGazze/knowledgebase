@@ -8,14 +8,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.castle.fortress.common.entity.RespBody;
 
-import java.io.Serializable;
-import java.util.Map;
 import java.util.List;
 
 /**
  * 标签管理表 服务类
  *
- * @author 
+ * @author
  * @since 2023-04-26
  */
 public interface KbModelLabelService extends IService<KbModelLabelEntity> {
@@ -81,4 +79,5 @@ public interface KbModelLabelService extends IService<KbModelLabelEntity> {
      */
     RespBody<String> saveLabels(List<KbModelLabelDto> kbModelLabelDtos);
 
+    List<KbModelLabelEntity> findByBId(Long auth);
 }

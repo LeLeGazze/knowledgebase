@@ -2,6 +2,7 @@ package com.castle.fortress.admin.utils;
 
 import com.castle.fortress.admin.check.entity.MapKey;
 import com.castle.fortress.admin.check.entity.Sentence;
+import com.castle.fortress.admin.knowledge.utis.FileUtil;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -16,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +53,7 @@ public class FortressParseUtil {
 //        String fileName = "D:\\明资料\\测试文档\\pom.xml";
 //        String fileName = "D:\\明资料\\测试文档\\123.doc";
 //        String fileName = "D:\\明资料\\测试文档\\测试文档.zip";
-        String fileName = "C:\\Users\\hcses\\Downloads\\金融服务平台部署安装方案v1.0.pdf";
+        String fileName = "https://hcses-1251334741.cos.ap-nanjing.myqcloud.com/knowledgeonline/file/1695882391916.pdf";
         FortressParseUtil fortressParseUtil = new FortressParseUtil();
         String s = fortressParseUtil.parserFile(fileName);
         System.out.println("s = " + s);
@@ -89,8 +91,8 @@ public class FortressParseUtil {
 
         String[] split = content.split("\\n");
         List<Sentence> sentenceList = Arrays.asList(split).stream().filter(item -> item.length() > readDataLength).map(item -> new Sentence(item)).collect(Collectors.toList());
-        hashMap.put(new MapKey(content.substring(0, 4),1), sentenceList);
-        hashMap.put(new MapKey("length",0), content.length());
+        hashMap.put(new MapKey(content.substring(0, 4), 1), sentenceList);
+        hashMap.put(new MapKey("length", 0), content.length());
         return hashMap;
     }
 
@@ -99,7 +101,16 @@ public class FortressParseUtil {
         BodyContentHandler handler = new BodyContentHandler(-1);
         Metadata metadata = new Metadata();
         ParseContext pcontext = new ParseContext();
-        FileInputStream inputstream = new FileInputStream(new File(fileName));
+        FileInputStream inputstream = null;
+        if (fileName.startsWith("http")) {
+            try {
+                inputstream= FileUtil.convertToFileInputStream( new URL(fileName).openStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            inputstream= new FileInputStream(new File(fileName));
+        }
         parser.parse(inputstream, handler, metadata, pcontext);
         String content = "";
         if (handler != null) {

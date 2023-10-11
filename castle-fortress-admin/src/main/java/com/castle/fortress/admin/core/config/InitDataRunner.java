@@ -1,5 +1,6 @@
 package com.castle.fortress.admin.core.config;
 
+import com.castle.fortress.admin.es.EsSearchService;
 import com.castle.fortress.admin.system.service.SysRegionService;
 import com.castle.fortress.admin.utils.SpringUtils;
 import org.springframework.boot.ApplicationArguments;
@@ -19,7 +20,7 @@ import javax.servlet.ServletContext;
 public class InitDataRunner implements ApplicationRunner, ServletContextAware {
     private ServletContext servletContext;
     private SysRegionService sysRegionService;
-
+    private EsSearchService esSearchService;
 
     @Override
     public void setServletContext(ServletContext servletContext) {
@@ -34,9 +35,14 @@ public class InitDataRunner implements ApplicationRunner, ServletContextAware {
             if(sysRegionService == null){
                 sysRegionService = (SysRegionService) cxt.getBean(SysRegionService.class);
             }
+            if(esSearchService == null){
+                esSearchService = (EsSearchService) cxt.getBean(EsSearchService.class);
+            }
         }
         //初始化redis 地区tree
         sysRegionService.initRegionTree();
+        // 初始化es
+        esSearchService.initData();
     }
 
 }

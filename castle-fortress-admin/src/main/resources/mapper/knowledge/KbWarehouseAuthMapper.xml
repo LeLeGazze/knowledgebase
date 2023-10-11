@@ -121,17 +121,17 @@
         </foreach>
         )
     </select>
-<!--            select distinct ct.id
-        from kb_warehouse_auth au
-        join kb_category ct on ((ct.id = au.wh_id and au.category = 01) or (ct.sw_id = au.wh_id and au.category = 02))
-        where user_id = #{uid}
-        and au.is_deleted = 2
-        and ct.is_deleted = 2
-        and kb_auth in (
-        <foreach collection="kb_auths" item="kb_auth" separator=",">
-            #{kb_auth}
-        </foreach>
-        )-->
+    <!--            select distinct ct.id
+            from kb_warehouse_auth au
+            join kb_category ct on ((ct.id = au.wh_id and au.category = 01) or (ct.sw_id = au.wh_id and au.category = 02))
+            where user_id = #{uid}
+            and au.is_deleted = 2
+            and ct.is_deleted = 2
+            and kb_auth in (
+            <foreach collection="kb_auths" item="kb_auth" separator=",">
+                #{kb_auth}
+            </foreach>
+            )-->
     <select id="findBySwIdAuth" resultType="com.castle.fortress.admin.knowledge.dto.KbWarehouseAuthDto">
         select kb.id                                                                                          as id,
                kb.wh_id                                                                                       as whId,
@@ -158,32 +158,32 @@
         select kb.*
         from kb_warehouse_auth kb
                  left join (select * from castle_sys_user where is_deleted = 2) user on user.id = kb.user_id
-                 left join (select dept.id, user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on user.dept_id = dept.id) dept on  (dept.id = kb.user_id or dept.parents like concat('%',kb.user_id,'%'))
-                 left join (select * from kb_groups_user) gr on gr.group_id = kb.user_id
-                 join kb_subject_warehouse sw on sw.id = kb.wh_id
+            left join (select dept.id, user.id uid,dept.parents from castle_sys_dept dept join castle_sys_user user on user.dept_id = dept.id) dept on  (dept.id = kb.user_id or dept.parents like concat('%',kb.user_id,'%'))
+            left join (select * from kb_groups_user) gr on gr.group_id = kb.user_id
+            join kb_subject_warehouse sw on sw.id = kb.wh_id
         where kb.is_deleted = 2
           and sw.status=2
           and sw.is_deleted=2
           and kb.category = #{category}
-        and  (kb.user_id =#{uid} or gr.user_id=#{uid} or dept.uid=#{uid})
+          and  (kb.user_id =#{uid} or gr.user_id=#{uid} or dept.uid=#{uid})
         order by kb.sort
     </select>
     <!--   1.0  -->
-<!--    <select id="findBySwIdAuth" resultType="com.castle.fortress.admin.knowledge.dto.KbWarehouseAuthDto">-->
-<!--        select kb.id          as id,-->
-<!--               kb.wh_id       as whId,-->
-<!--               kb.category    as category,-->
-<!--               kb.user_id     as userId,-->
-<!--               kb.kb_auth     as kbAuth,-->
-<!--               kb.wh_auth     as whAuth,-->
-<!--               user.real_name as userName-->
-<!--        from kb_warehouse_auth kb,-->
-<!--             castle_sys_user user-->
-<!--        where kb.is_deleted = 2-->
-<!--          and user.is_deleted = 2-->
-<!--          and user.id = kb.user_id-->
-<!--          and wh_id = #{swId}-->
-<!--        and kb.category =#{category}-->
-<!--    </select>-->
+    <!--    <select id="findBySwIdAuth" resultType="com.castle.fortress.admin.knowledge.dto.KbWarehouseAuthDto">-->
+    <!--        select kb.id          as id,-->
+    <!--               kb.wh_id       as whId,-->
+    <!--               kb.category    as category,-->
+    <!--               kb.user_id     as userId,-->
+    <!--               kb.kb_auth     as kbAuth,-->
+    <!--               kb.wh_auth     as whAuth,-->
+    <!--               user.real_name as userName-->
+    <!--        from kb_warehouse_auth kb,-->
+    <!--             castle_sys_user user-->
+    <!--        where kb.is_deleted = 2-->
+    <!--          and user.is_deleted = 2-->
+    <!--          and user.id = kb.user_id-->
+    <!--          and wh_id = #{swId}-->
+    <!--        and kb.category =#{category}-->
+    <!--    </select>-->
 
 </mapper>

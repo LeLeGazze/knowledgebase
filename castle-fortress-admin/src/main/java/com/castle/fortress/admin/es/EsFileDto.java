@@ -26,7 +26,7 @@ import java.util.List;
 @Data
 @ApiModel(value = "KbFileDto对象", description = "知识库文件对象")
 //indexName名字如果是字母那么必须是小写字母
-@Document(indexName = "kbfilevto2", createIndex = true)
+@Document(indexName = "kbfilevt343", createIndex = true)
 public class EsFileDto implements Serializable {
     private static final long serialVersionUID = 1L;
     @JsonSerialize(using = ToStringSerializer.class)

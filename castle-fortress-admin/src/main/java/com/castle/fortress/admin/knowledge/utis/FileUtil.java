@@ -1,5 +1,7 @@
 package com.castle.fortress.admin.knowledge.utis;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.castle.fortress.admin.knowledge.entity.KbVideVersionEntity;
 import com.castle.fortress.common.exception.BizException;
@@ -15,10 +17,8 @@ import org.apache.commons.io.input.NullInputStream;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,6 +63,25 @@ public class FileUtil {
         return tmpFilePath + outPutWatermark + ".pdf";
     }
 
+    public static String getWatermarkPath(String ossFile, String originalPath, String userName) {
+        String format = simpleDateFormat.format(new Date());
+        String outPutWatermark = SecureUtil.md5(originalPath + userName + format);
+        if (originalPath.startsWith("http")) {
+            String date = DateUtil.today().replace("-", "");
+            String path = "upload/" + date + "/" + outPutWatermark + ".pdf";
+            return ossFile + path;
+        }
+        String osName = System.getProperty("os.name");
+        String tmpFilePath = "";
+        tmpFilePath = originalPath.substring(0, (originalPath.lastIndexOf("/") + 1));
+//        if (osName.contains("Windows")) {
+//
+//        } else {
+//            tmpFilePath = originalPath.substring(0, (originalPath.lastIndexOf("/") + 1));
+//        }
+        return tmpFilePath + outPutWatermark + ".pdf";
+    }
+
     public static boolean isFileExist(String filePath) {
         return new File(filePath).exists();
     }
@@ -75,6 +94,21 @@ public class FileUtil {
             return filePath.substring((filePath.lastIndexOf("/") + 1));
         }
 
+    }
+
+    public static FileInputStream convertToFileInputStream(InputStream inputStream) throws IOException {
+        File tempFile = File.createTempFile("temp", ".tmp");
+        tempFile.deleteOnExit();
+
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+
+        return new FileInputStream(tempFile);
     }
 
     public static void downloadFile(HttpServletResponse response, List<String> fileListPath) {
@@ -91,9 +125,15 @@ public class FileUtil {
             response.setContentType("application/octet-stream;charset=utf-8");
             String fileName = getFileName(filePath);
             response.setHeader("Content-disposition", "attachment; filename=" + fileName);
-            response.setHeader("suffix", fileName.substring(fileName.lastIndexOf(".")+1));
+            response.setHeader("suffix", fileName.substring(fileName.lastIndexOf(".") + 1));
             try {
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filePath));
+                BufferedInputStream bis = null;
+                if (filePath.startsWith("http")) {
+                    bis = new BufferedInputStream(new URL(filePath).openStream());
+                } else {
+                    bis = new BufferedInputStream(new FileInputStream(filePath));
+                }
+
                 BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream());
                 int len;
                 byte[] buff = new byte[1024];
@@ -109,7 +149,7 @@ public class FileUtil {
         }
         try {
             response.setContentType("application/octet-stream;charset=utf-8");
-            response.setHeader("suffix","zip");
+            response.setHeader("suffix", "zip");
             response.setHeader("Content-disposition", "attachment; filename=" + "ss.zip");
             // 使用多线程读取文件
             ExecutorService executorService = Executors.newFixedThreadPool(fileListPath.size());
@@ -117,10 +157,16 @@ public class FileUtil {
             ZipArchiveOutputStream zipArchiveOutputStream = new ZipArchiveOutputStream(response.getOutputStream());
             zipArchiveOutputStream.setEncoding("UTF-8");
             for (String filePath : fileListPath) {
-                FileInputStream in = new FileInputStream(filePath);
+                FileInputStream in = null;
+                if (filePath.startsWith("http")) {
+                    in = FileUtil.convertToFileInputStream(new URL(filePath).openStream());
+                } else {
+                    in = new FileInputStream(filePath);
+                }
+                FileInputStream finalIn = in;
                 final InputStreamSupplier inputStreamSupplier = () -> {
                     try {
-                        return in;
+                        return finalIn;
                     } catch (Exception e) {
                         e.printStackTrace();
                         return new NullInputStream(0);
@@ -145,7 +191,7 @@ public class FileUtil {
     public static void main(String[] args) {
         System.out.println(suffixFromFileName("D:\\hcses\\project\\knowledge-base\\knowledge-base-admin\\kbfiles\\test.pdf"));
         System.out.println(getFileName("D:\\hcses\\project\\knowledge-base\\knowledge-base-admin\\kbfiles\\upload/20230718/达州城市通APP项目设计方案.pdf"));
-        System.out.println(getWatermarkPath("D:\\hcses\\project\\knowledge-base\\knowledge-base-admin\\kbfiles\\upload/20230718/达州城市通APP项目设计方案.pdf","张三"));
+        System.out.println(getWatermarkPath("D:\\hcses\\project\\knowledge-base\\knowledge-base-admin\\kbfiles\\upload/20230718/达州城市通APP项目设计方案.pdf", "张三"));
 //        getWatermarkPath("D:\\hcses\\project\\knowledge-base\\knowledge-base-admin\\kbfiles\\test.pdf", "1686822525984");
     }
 

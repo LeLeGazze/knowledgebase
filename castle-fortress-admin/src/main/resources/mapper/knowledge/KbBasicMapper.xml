@@ -382,13 +382,13 @@
                ksw.id           as swId,
                base.word_cloud      as wordCloud
         from kb_basic base
-            left join kb_model model on model.id = base.model_id
-            left join castle_sys_user user on user.id = base.auth
+                 left join kb_model model on model.id = base.model_id
+                 left join castle_sys_user user on user.id = base.auth
             left join castle_sys_dept dept on dept.id = base.dept_id
             left join kb_category ct on ct.id = base.category_id
             left join kb_subject_warehouse ksw on ct.sw_id = ksw.id
         where
-        base.id = #{id};
+            base.id = #{id};
     </select>
     <select id="findByKbBasic" resultMap="kbBasicMap">
         select *
@@ -414,9 +414,9 @@
         or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
         or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
         left join kb_groups_user groupu on groupu.group_id = au.user_id
-        left join (select dept.id, user.id uid
+        left join (select dept.id, user.id uid,dept.parents
         from castle_sys_dept dept
-        join castle_sys_user user on (dept.id = user.dept_id or dept.parents like concat('%',user.dept_id,'%'))) dept on dept.id = au.user_id
+        join castle_sys_user user on user.dept_id = dept.id) dept on ( dept.id = au.user_id  or dept.parents like concat('%',au.user_id,'%'))
         join castle_sys_user user on base.auth = user.id
         where base.is_deleted = 2
         and au.is_deleted = 2
@@ -585,7 +585,7 @@
             t.is_deleted=2
             and t.status = 1
             <if test='swId != null and swId != ""'>
-               and ct.sw_id = #{swId}
+                and ct.sw_id = #{swId}
             </if>
         </where>
 
@@ -762,11 +762,11 @@
         <if test='swId != null and swId != ""'>
             and ct.sw_id = #{swId}
         </if>
-<!--        and auth.kb_auth in (-->
-<!--        <foreach collection="kb_auths" item="kb_auth" separator=",">-->
-<!--            #{kb_auth}-->
-<!--        </foreach>-->
-<!--        )-->
+        <!--        and auth.kb_auth in (-->
+        <!--        <foreach collection="kb_auths" item="kb_auth" separator=",">-->
+        <!--            #{kb_auth}-->
+        <!--        </foreach>-->
+        <!--        )-->
         ORDER BY base_user.create_time desc) t2 order by t2.createTime desc
         limit #{size}
     </select>
@@ -795,8 +795,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -854,8 +854,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and kbu.user_id = #{userId}
@@ -888,7 +888,7 @@
         <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
             and kbu.create_time like concat(#{kbBaseShowDto.fromTime},'%')
         </if>
-            ) t2 order by t2.pubTime desc
+        ) t2 order by t2.pubTime desc
         <if test="map != null">
             limit #{map.offset},#{map.rows}
         </if>
@@ -919,8 +919,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -978,8 +978,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1039,8 +1039,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1098,8 +1098,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1132,7 +1132,7 @@
         <if test="kbBaseShowDto.fromTime!=null and kbBaseShowDto.fromTime != ''">
             and kbu.create_time like concat(#{kbBaseShowDto.fromTime},'%')
         </if>
-            ) t2 order by t2.pubTime desc
+        ) t2 order by t2.pubTime desc
         <if test="map != null">
             limit #{map.offset},#{map.rows}
         </if>
@@ -1163,8 +1163,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1222,8 +1222,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1262,7 +1262,7 @@
         select DISTINCT t1.name as realName
         from (select kb.auth as auth, user.real_name as name
               from kb_basic kb
-                        join castle_sys_user user on user.id = kb.auth where kb.is_deleted = 2) t1
+                       join castle_sys_user user on user.id = kb.auth where kb.is_deleted = 2) t1
             limit 15
     </select>
     <select id="findBaseAuth" resultType="com.castle.fortress.admin.system.entity.SysUser">
@@ -1299,11 +1299,11 @@
         t.status as status,
         ct.sw_id as swId,
         user.real_name as createUser,
-        kbu.create_time as pubTime,
+        case when kbu.type=2 then t.pub_time else  kbu.create_time  end as pubTime,
         ct.name as ctName,
         ku.readCount
-        from (select max(create_time) create_time, b_id,status from kb_basic_user where type= #{kbBaseShowDto.status}
-        group by b_id,status) kbu
+        from (select max(create_time) create_time, b_id,status ,type from kb_basic_user where type= #{kbBaseShowDto.status}
+        group by b_id,status,type) kbu
         left join kb_basic t on kbu.b_id = t.id
         left join castle_sys_user user on user.id = t.auth
         left join kb_category ct on t.category_id = ct.id
@@ -1346,10 +1346,10 @@
         title,
         ct.sw_id as swId,
         user.real_name as createUser,
-        kbu.create_time as pubTime,
+        case when kbu.type=2 then t.pub_time else  kbu.create_time  end as pubTime,
         ct.name as ctName
-        from (select max(create_time) create_time, b_id,status from kb_basic_user where type=#{kbBaseShowDto.status}
-        group by b_id,status) kbu
+        from (select max(create_time) create_time, b_id,status ,type from kb_basic_user where type=#{kbBaseShowDto.status}
+        group by b_id,status,type) kbu
         left join kb_basic t on kbu.b_id = t.id
         left join castle_sys_user user on user.id = t.auth
         left join kb_category ct on t.category_id = ct.id
@@ -1383,37 +1383,37 @@
     <select id="findBasicByUploud" resultType="com.castle.fortress.admin.knowledge.dto.KbModelTransmitDto">
         select distinct t2.*
         from (select t.id,
-                     title,
-                     t.status as status,
-                     ct.sw_id as swId,
-                     user.real_name as createUser,
-                     kbu.create_time as pubTime,
-                     ct.name as ctName,
-                     ku.readCount
-              from (select max(create_time) create_time, b_id,status from kb_basic_user where type= 2
-                    group by b_id,status) kbu
-                    left join kb_basic t on kbu.b_id = t.id
-                    left join castle_sys_user user on user.id = t.auth
-                    left join kb_category ct on ct.id = t.category_id
-                    left join kb_warehouse_auth au
-                    on ((t.id = au.wh_id and au.category = 01 and au.status = 1)
-                    or (t.id = au.wh_id and au.category = 01 and au.status = 2)
-                    or (t.id = au.wh_id and au.category = 01 and au.status = 3)
-                    or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
-                    or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
-                    or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
-                    left join kb_groups_user groupu on groupu.group_id = au.user_id
-                    left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
-                    group by b_id) ku on t.id = ku.b_id
-                    left join (select dept.id, user.id uid from castle_sys_dept dept
-                        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
-                    where
-                    ct.is_deleted = 2
-                    and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
-                    and t.auth = #{userId}
-                    and kbu.status = #{kbBaseShowDto.type}
-                    and t.is_deleted = 2
-                    and au.kb_auth in (
+        title,
+        t.status as status,
+        ct.sw_id as swId,
+        user.real_name as createUser,
+        kbu.create_time as pubTime,
+        ct.name as ctName,
+        ku.readCount
+        from (select max(create_time) create_time, b_id,status from kb_basic_user where type= 2
+        group by b_id,status) kbu
+        left join kb_basic t on kbu.b_id = t.id
+        left join castle_sys_user user on user.id = t.auth
+        left join kb_category ct on ct.id = t.category_id
+        left join kb_warehouse_auth au
+        on ((t.id = au.wh_id and au.category = 01 and au.status = 1)
+        or (t.id = au.wh_id and au.category = 01 and au.status = 2)
+        or (t.id = au.wh_id and au.category = 01 and au.status = 3)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 1)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
+        or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
+        left join kb_groups_user groupu on groupu.group_id = au.user_id
+        left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
+        group by b_id) ku on t.id = ku.b_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
+        where
+        ct.is_deleted = 2
+        and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
+        and t.auth = #{userId}
+        and kbu.status = #{kbBaseShowDto.type}
+        and t.is_deleted = 2
+        and au.kb_auth in (
         <foreach collection="kb_auths" item="kb_auth" separator=",">
             #{kb_auth}
         </foreach>
@@ -1468,8 +1468,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1528,8 +1528,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1591,8 +1591,8 @@
         left join kb_groups_user groupu on groupu.group_id = au.user_id
         left join (select count(1) as readCount,b_id from kb_basic_user where type= 1
         group by b_id) ku on t.id = ku.b_id
-        left join (select dept.id, user.id uid from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where
         ct.is_deleted = 2
         and   (au.user_id =#{userId} or groupu.user_id=#{userId} or dept.uid=#{userId})
@@ -1633,11 +1633,11 @@
         t.status as status,
         ct.sw_id as swId,
         user.real_name as createUser,
-        kbu.create_time as pubTime,
+        case when kbu.type=2 then t.pub_time else  kbu.create_time  end as pubTime,
         ct.name as ctName,
         ku.readCount
-        from (select max(create_time) create_time, b_id,status from kb_basic_user where type= 2
-        group by b_id,status) kbu
+        from (select max(create_time) create_time, b_id,status,type from kb_basic_user where status= 2
+        group by b_id,status,type) kbu
         left join kb_video t on kbu.b_id = t.id
         left join castle_sys_user user on user.id = t.auth
         left join kb_category ct on t.category_id = ct.id
@@ -1645,7 +1645,7 @@
         group by b_id) ku on t.id = ku.b_id
         <where>
             ct.is_deleted = 2
-            and kbu.status = 2
+            and kbu.type =#{kbBaseShowDto.status}
             and t.is_deleted = 2
             <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
                 and t.category_id in (
@@ -1680,11 +1680,11 @@
         title,
         ct.sw_id as swId,
         user.real_name as createUser,
-        kbu.create_time as pubTime,
+        case when kbu.type=2 then t.pub_time else  kbu.create_time  end as pubTime,
         ct.name as ctName,
         ku.readCount
-        from (select max(create_time) create_time, b_id,status from kb_basic_user where type= 2
-        group by b_id,status) kbu
+        from (select max(create_time) create_time, b_id,status,type from kb_basic_user where status= 2
+        group by b_id,status,type) kbu
         left join kb_video t on kbu.b_id = t.id
         left join castle_sys_user user on user.id = t.auth
         left join kb_category ct on t.category_id = ct.id
@@ -1692,7 +1692,7 @@
         group by b_id) ku on t.id = ku.b_id
         <where>
             ct.is_deleted = 2
-            and kbu.status = 2
+            and kbu.type =#{kbBaseShowDto.status}
             and t.is_deleted = 2
             <if test="kbBaseShowDto.categoryIds != null and kbBaseShowDto.categoryIds != ''">
                 and t.category_id in (
@@ -1720,13 +1720,13 @@
     <select id="getTheLatest12QuantitiesAdmin" resultType="java.util.Map">
         select t.date_value as yyyyM, ifnull(t2.count, 0) as num
         from (select distinct date_format(date_value, '%Y-%m') date_value
-        from kb_date
-        where date_format(date_value, '%Y-%m') &lt;= date_format(now(), '%Y-%m')
-        order by date_format(date_value, '%Y-%m') desc
-        limit 12) t
-        left join (select date_format(pub_time, '%Y-%m') pub_time, count(1) count
-        from kb_basic
-        group by date_format(pub_time, '%Y-%m')) t2 on t.date_value = t2.pub_time order by 1
+              from kb_date
+              where date_format(date_value, '%Y-%m') &lt;= date_format(now(), '%Y-%m')
+              order by date_format(date_value, '%Y-%m') desc
+                  limit 12) t
+                 left join (select date_format(pub_time, '%Y-%m') pub_time, count(1) count
+                            from kb_basic
+                            group by date_format(pub_time, '%Y-%m')) t2 on t.date_value = t2.pub_time order by 1
     </select>
     <select id="findByAuth" resultType="java.lang.Long">
         select distinct t.category_id
@@ -1741,9 +1741,8 @@
         or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 2)
         or (ct.sw_id = au.wh_id and au.category = 02 and au.status = 3))
         left join kb_groups_user groupu on groupu.group_id = au.user_id
-        left join (select dept.id, user.id uid
-        from castle_sys_dept dept
-        join castle_sys_user user on user.dept_id = dept.id) dept on dept.id = au.user_id
+        left join (select dept.id, user.id uid,parents from castle_sys_dept dept
+        join castle_sys_user user on user.dept_id = dept.id) dept on (dept.id = au.user_id or dept.parents like concat('%',au.user_id,'%'))
         where ct.is_deleted = 2
         and t.status = 1
         and (au.user_id =#{userId} or groupu.user_id = #{userId} or dept.uid = #{userId})
@@ -1784,7 +1783,7 @@
         from (select t1.name, t1.sort, sum(ifnull(t3.count, 0)) num
         from (select * from kb_subject_warehouse where is_deleted = 2 and status = 1) t1
         left join (select * from kb_category where is_deleted = 2) t2 on t1.id = t2.sw_id
-         join (select category_id, count(1) count
+        join (select category_id, count(1) count
         from kb_basic
         where is_deleted = 2
         and status = 1

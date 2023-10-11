@@ -91,11 +91,11 @@ public class KbBasicUserServiceImpl extends ServiceImpl<KbBasicUserMapper, KbBas
 
     @Override
     public void saveKnowUser(KbModelAcceptanceDto formDataDto) {
-        SysUser sysUser = WebUtil.currentUser();
-        Long id = sysUser.getId();
+//        SysUser sysUser = WebUtil.currentUser();
+//        Long id = sysUser.getId();
         //删除原有中间表关系
         LambdaQueryWrapper<KbBasicUserEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(KbBasicUserEntity::getUserId, id);
+        wrapper.eq(KbBasicUserEntity::getUserId, formDataDto.getAuth());
         wrapper.eq(KbBasicUserEntity::getBId, formDataDto.getId());
         wrapper.eq(KbBasicUserEntity::getType, 2);
         wrapper.eq(KbBasicUserEntity::getStatus, 1);
@@ -103,7 +103,7 @@ public class KbBasicUserServiceImpl extends ServiceImpl<KbBasicUserMapper, KbBas
         //保存新的中间表关系
         KbBasicUserEntity kbBasicUserEntity = new KbBasicUserEntity();
         kbBasicUserEntity.setBId(formDataDto.getId());
-        kbBasicUserEntity.setUserId(id);
+        kbBasicUserEntity.setUserId(formDataDto.getAuth());
         kbBasicUserEntity.setType(2);
         kbBasicUserEntity.setStatus(1);
         baseMapper.insert(kbBasicUserEntity);
@@ -189,6 +189,24 @@ public class KbBasicUserServiceImpl extends ServiceImpl<KbBasicUserMapper, KbBas
     @Override
     public void removeBasicUser(Long auth, Long id) {
         kbBasicUserMapper.removeBasicUser(auth,id);
+    }
+
+    @Override
+    public void addVideoUser(Long auth, Long videoId   ) {
+        //删除原有中间表关系
+        LambdaQueryWrapper<KbBasicUserEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(KbBasicUserEntity::getUserId, videoId);
+        wrapper.eq(KbBasicUserEntity::getBId, auth);
+        wrapper.eq(KbBasicUserEntity::getType, 2);
+        wrapper.eq(KbBasicUserEntity::getStatus, 2);
+        remove(wrapper);
+        //保存新的中间表关系
+        KbBasicUserEntity kbBasicUserEntity = new KbBasicUserEntity();
+        kbBasicUserEntity.setBId(auth);
+        kbBasicUserEntity.setUserId(videoId);
+        kbBasicUserEntity.setType(2);
+        kbBasicUserEntity.setStatus(2);
+        baseMapper.insert(kbBasicUserEntity);
     }
 }
 

@@ -3,7 +3,9 @@ package com.castle.fortress.admin.es;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.castle.fortress.admin.check.es.EsCheckLine;
 import com.castle.fortress.admin.knowledge.dto.KbBasicDto;
 import com.castle.fortress.admin.knowledge.dto.KbModelAcceptanceDto;
@@ -12,11 +14,13 @@ import com.castle.fortress.admin.knowledge.dto.KbVideoDto;
 import com.castle.fortress.admin.knowledge.entity.KbBaseLabelTaskEntity;
 import com.castle.fortress.admin.knowledge.entity.KbBasicEntity;
 import com.castle.fortress.admin.knowledge.entity.KbModelEntity;
+import com.castle.fortress.admin.knowledge.entity.KbModelLabelEntity;
 import com.castle.fortress.admin.knowledge.enums.FileTypeEnum;
 import com.castle.fortress.admin.knowledge.enums.FromTypeEnum;
 import com.castle.fortress.admin.knowledge.mapper.KbBasicMapper;
 import com.castle.fortress.admin.knowledge.mapper.KbCategoryMapper;
 import com.castle.fortress.admin.knowledge.service.*;
+import com.castle.fortress.admin.knowledge.utis.FileUtil;
 import com.castle.fortress.admin.system.dto.ConfigOssDto;
 import com.castle.fortress.admin.system.dto.OssPlatFormDto;
 import com.castle.fortress.admin.system.entity.SysUser;
@@ -51,6 +55,7 @@ import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import java.io.*;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -95,6 +100,11 @@ public class EsSearchService {
 
     @Autowired
     private IJcsegService iJcsegService;
+
+    @Autowired
+    private EsFileRepository esFileRepository;
+    @Autowired
+    private KbModelLabelService kbModelLabelService;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
@@ -253,7 +263,11 @@ public class EsSearchService {
                 ParseContext pcontext = new ParseContext();
                 FileInputStream inputstream = null;
                 try {
-                    inputstream = new FileInputStream(new File(filePathPrefix + checkLine.getFilePath()));
+                    if (checkLine.getFilePath().startsWith("http")){
+                        inputstream= FileUtil.convertToFileInputStream(new URL(checkLine.getFilePath()).openStream());
+                    }else {
+                        inputstream = new FileInputStream(new File(filePathPrefix+checkLine.getFilePath()));
+                    }
                     parser.parse(inputstream, handler, metadata, pcontext);
                     String content = "";
                     if (handler != null) {
@@ -271,23 +285,17 @@ public class EsSearchService {
                             esCheckLines.add(newEsCheckLine);
                             if (i % count == 0 && i != 0) {
                                 esTemplate.save(esCheckLines);
-                                log.debug("按行写入成功 size{} , fileName {}",esCheckLines.size(),esCheckLines.get(0).getFileName());
+                                log.debug("按行写入成功 size{} , fileName {}", esCheckLines.size(), esCheckLines.get(0).getFileName());
                                 esCheckLines = new ArrayList<>();
                             }
                         }
                         if (esCheckLines.size() > 0) {
                             esTemplate.save(esCheckLines);
-                            log.debug("按行写入成功 size{} , fileName {}",esCheckLines.size(),esCheckLines.get(0).getFileName());
+                            log.debug("按行写入成功 size{} , fileName {}", esCheckLines.size(), esCheckLines.get(0).getFileName());
                         }
 
                     });
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (TikaException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (SAXException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 } finally {
                     if (inputstream != null) {
@@ -310,7 +318,7 @@ public class EsSearchService {
     @Async
     public void asyncUpdateES(KbModelAcceptanceDto kbModelAcceptanceDto) {
         List<EsFileDto> fileDto = getEsFileDto(kbModelAcceptanceDto);
-        if (fileDto ==null || fileDto.size()==0){
+        if (fileDto == null || fileDto.size() == 0) {
             return;
         }
 //        // 将数据插入到es中
@@ -630,12 +638,12 @@ public class EsSearchService {
                 try {
                     JSONObject jsonObject = JSONObject.parseObject(attachment.toString());
                     String url = jsonObject.getString("url");
-                    String fileName = url.replace(fileUrl, filePositon + "/");
-                    log.debug("正在提取name: {}", fileName);
+//                    String fileName = url.replace(fileUrl, filePositon + "/");
+                    log.debug("正在提取name: {}", url);
                     FortressParseUtil fortressParseUtil = new FortressParseUtil();
                     HashMap<String, String> map = new HashMap<>();
-                    String s = fortressParseUtil.parserFile(fileName);
-                    map.put("content",  s.length()>999999? s.substring(0,999999):s);
+                    String s = fortressParseUtil.parserFile(url);
+                    map.put("content", s.length() > 999999 ? s.substring(0, 999999) : s);
                     map.put("fileName", jsonObject.getString("name"));
                     resMap.put(url.replace(fileUrl, ""), map);
                 } catch (Exception e) {
@@ -709,5 +717,20 @@ public class EsSearchService {
         // 来源
         fileDto.setSource(kbCategoryMapper.findBySource(kbVideoDto.getCategoryId()));
         return fileDto;
+    }
+
+    public void initData() {
+        boolean res = !esFileRepository.findAll().iterator().hasNext();
+        if (res) {
+            log.debug("初始化基础数据·········");
+            List<KbBasicEntity> kbBasicEntities = kbBasicMapper.selectList(new QueryWrapper<>());
+            for (KbBasicEntity kbBasicEntity : kbBasicEntities) {
+                KbModelAcceptanceDto kbModelAcceptanceDto = ConvertUtil.transformObj(kbBasicEntity, KbModelAcceptanceDto.class);
+                kbModelAcceptanceDto.setAttachments(JSONArray.parseArray(kbBasicEntity.getAttachment()));
+                List<KbModelLabelEntity>  labelEntities=kbModelLabelService.findByBId(kbBasicEntity.getId());
+                kbModelAcceptanceDto.setLabel(labelEntities.stream().map(KbModelLabelEntity::getName).collect(Collectors.toList()));
+                asyncSaveES(kbModelAcceptanceDto);
+            }
+        }
     }
 }
