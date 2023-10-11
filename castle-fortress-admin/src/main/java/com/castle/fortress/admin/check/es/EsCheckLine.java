@@ -27,7 +27,7 @@ import java.util.List;
 @Data
 @ApiModel(value = "KbFileDto对象", description = "知识库文件对象")
 //indexName名字如果是字母那么必须是小写字母
-@Document(indexName = "escheckl234", createIndex = true)
+@Document(indexName = "escheckline", createIndex = true)
 @Accessors(chain = true)
 public class EsCheckLine implements Serializable {
     private static final long serialVersionUID = 1L;
