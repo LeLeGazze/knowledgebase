@@ -12263,7 +12263,7 @@ CREATE TABLE `castle_sys_user`  (
 -- ----------------------------
 -- Records of castle_sys_user
 -- ----------------------------
-INSERT INTO `castle_sys_user` VALUES (1375360470249771009, 'admin', '系统管理员', '超级管理员', '99609baa5bc28f6da03db7ae114873e2965c8f9e13d26e1e99c725fd30309c3b', '2671782438@qq.com', '13280159716', 'm', '2020-07-19', 'https://hcses-1251334741.cos.ap-nanjing.myqcloud.com/knowledgeonline/img/1695718145901.jpg', '', '', '请你不要迷恋哥  哥只是个传说～～～', -1, -1, 1, -1, NULL, NULL, '2021-03-26 16:14:24', 1375360470249771009, '2023-09-28 17:31:51', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `castle_sys_user` VALUES (1375360470249771009, 'admin', '系统管理员', '超级管理员', '465c194afb65670f38322df087f0a9bb225cc257e43eb4ac5a0c98ef5b3173ac', '2671782438@qq.com', '13280159716', 'm', '2020-07-19', 'https://hcses-1251334741.cos.ap-nanjing.myqcloud.com/knowledgeonline/img/1695718145901.jpg', '', '', '请你不要迷恋哥  哥只是个传说～～～', -1, -1, 1, -1, NULL, NULL, '2021-03-26 16:14:24', 1375360470249771009, '2023-09-28 17:31:51', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `castle_sys_user` VALUES (1707241195564183553, 's893334248', '浪漫经典', '孙余伟', '242fbd136e350bc28deb6ffa98e352464b6d9f04262ad540af6d791716ffdfb9', 'sun@hcses.com', '13455656999', 'm', NULL, NULL, NULL, NULL, NULL, 1707241015288803330, NULL, 1, 1375360470249771009, -1, -1, '2023-09-28 11:49:55', 1375360470249771009, '2023-09-28 11:50:50', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '05368184803');
 
 -- ----------------------------
