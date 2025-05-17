@@ -38,6 +38,11 @@ public class JcsegServiceImpl extends TextRankKeywordsExtractor implements IJcse
 
     }
 
+
+    @Value("${lexicon.path}")
+    private String lexiconPath;
+
+
     public static void main(String[] args) throws TikaException, IOException, SAXException {
         //Identifications
         //1500 1102
@@ -91,7 +96,7 @@ public class JcsegServiceImpl extends TextRankKeywordsExtractor implements IJcse
         config.setClearStopwords(true);
         String osName = System.getProperty("os.name");
         if (!osName.contains("Windows")) {
-            String[] lexiconPaths = {"/www/wwwroot/zsk.chinahcses.top/jar/lexicon"};
+            String[] lexiconPaths = {lexiconPath};
 //            String[] lexiconPaths = {"/www/wwwroot/stms.crssg.com/jar/lexicon"};
             System.out.println("字典路径:" + lexiconPaths[0]);
             config.setLexiconPath(lexiconPaths);
