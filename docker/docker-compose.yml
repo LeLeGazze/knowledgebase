@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  es:
+    image:  registry.cn-hangzhou.aliyuncs.com/open_knowledgebase/open_elasticsearch:7.17.28
+    container_name: castle_es
+    networks:
+      - knowledgebase
+    environment:
+      - discovery.type=single-node
+      - cluster.name=es-docker-cluster
+      - bootstrap.memory_lock=true
+      - ELASTIC_PASSWORD=ws$#gM6s # elastic
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data/elasticsearch/data:/usr/share/elasticsearch/data
+      - ./data/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+      - ./data/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+  redis:
+    container_name: castle_redis
+    image: registry.cn-hangzhou.aliyuncs.com/open_knowledgebase/open_redis:1.0.0
+    restart: always
+    networks:
+      - knowledgebase
+    command: redis-server --bind 0.0.0.0 --requirepass af8729fdafa
+    volumes:
+      - ./data/redis/data:/data
+  knowledgebase:
+    container_name: castle_knowledgebase
+    image: registry.cn-hangzhou.aliyuncs.com/open_knowledgebase/open_knowledgebase-admin:v2.0.0
+    restart: always
+    depends_on:
+      - es
+      - mysql
+    networks:
+      - knowledgebase
+    environment:
+      - es_url=http://es:9200
+      - es_password=ws$#gM6s
+      - mysql_url=jdbc:mysql://mysql:3306/knowledge_base_v2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+      - mysql_username=root
+      - mysql_password=A@asd123456
+      - html_toll=wkhtmltopdf
+      - pdf_url=http://docpreview:8302
+      - redis_url=redis
+      - redis_port=6379
+      - redis_password=af8729fdafa
+      - TZ=Asia/Shanghai
+      - lexicon_path=/app/lexicon
+    volumes:
+      - ./data/knowledgebase:/data
+  docpreview:
+    container_name: castle_docpreview
+    image: registry.cn-hangzhou.aliyuncs.com/open_knowledgebase/open_docpreview:1.0.1
+    restart: always
+    depends_on:
+      - mysql
+    #    ports:
+    #      - 8302:8302
+    networks:
+      - knowledgebase
+    environment:
+      - mysql_url=jdbc:mysql://mysql:3306/knowledge_base_v2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+      - mysql_username=root
+      - mysql_password=A@asd123456
+      - LANG=zh_CN.UTF-8
+      - LC_ALL=zh_CN.UTF-8
+    volumes:
+      - ./data/knowledgebase:/data
+  nginx:
+    container_name: castle_nginx
+    image: registry.cn-hangzhou.aliyuncs.com/open_knowledgebase/open_nginx:v1.0.0
+    restart: always
+    ports:
+      - 23000:80
+    networks:
+      - knowledgebase
+    volumes:
+      - ./data/knowledgebase:/data/
+      - ./data/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+  mysql:
+    image: registry.cn-hangzhou.aliyuncs.com/open_knowledgebase/open_mysql:8.0.39
+    container_name: castle_mysql
+    restart: always
+    networks:
+      - knowledgebase
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      # 默认root密码，仅首次运行有效
+      MYSQL_ROOT_PASSWORD: A@asd123456
+      MYSQL_DATABASE: knowledge_base_v2
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql
+
+
+networks:
+  knowledgebase:
+
+
