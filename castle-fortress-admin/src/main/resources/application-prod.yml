@@ -113,7 +113,7 @@ spring:
   main:
     allow-circular-references: true
 pdf:
-  url: http://localhost:8303
+  url: https://knowledgebase-production-fa4d.up.railway.app
   html:
     toll: wkhtmltopdf
 lexicon:
