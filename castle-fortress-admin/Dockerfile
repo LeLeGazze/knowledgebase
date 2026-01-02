@@ -1,7 +1,13 @@
-# 此文件用于云效流水线
-FROM java:8
-EXPOSE 9081
+# 多阶段构建 - 第一阶段：构建
+FROM maven:3.8-openjdk-8 AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-VOLUME /tmp
-COPY castle-fortress-admin.jar /admin.jar
-ENTRYPOINT ["java", "-jar", "admin.jar", "--spring.profiles.active=prod"]
+# 第二阶段：运行
+FROM openjdk:8-jre-slim
+WORKDIR /app
+EXPOSE 9081
+COPY --from=builder /app/target/castle-fortress-admin.jar /app/admin.jar
+ENTRYPOINT ["java", "-jar", "/app/admin.jar", "--spring.profiles.active=prod"]
