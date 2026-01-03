@@ -1,9 +1,12 @@
-# 多阶段构建 - 第一阶段：构建
+# ... 其他部分保持不变
 FROM maven:3.8.6-openjdk-8 AS builder
-WORKDIR /app
+WORKDIR /build
+# 关键修正：复制正确的源码路径
 COPY pom.xml .
-COPY src ./src
+COPY src/main ./src/main
+# COPY src/test ./src/test
 RUN mvn clean package -DskipTests
+# ... 后续保持不变
 
 # 第二阶段：运行
 FROM eclipse-temurin:8-jre-alpine  # 【主要修改在这里】
