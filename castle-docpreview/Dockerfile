@@ -10,4 +10,4 @@ FROM openjdk:8-jre-slim
 WORKDIR /app
 EXPOSE 8302
 COPY --from=builder /app/target/castle-docpreview.jar /app/docpreview.jar
-ENTRYPOINT ["java", "-jar", "/app/docpreview.jar"]
+ENTRYPOINT ["java", "-Xmx128m", "-Xms128m", "-XX:+UseG1GC", "-jar", "/app/docpreview.jar"]
