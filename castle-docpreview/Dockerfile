@@ -1,5 +1,5 @@
 # 多阶段构建 - 第一阶段：从项目根目录构建
-FROM maven:3.8.6-openjdk-8 AS builder
+FROM maven:3.8.6-openjdk-11 AS builder  # 修改点 1: 将 `openjdk-8` 改为 `openjdk-11`
 
 # 1. 设置工作目录并复制整个项目（关键步骤）
 WORKDIR /workspace
@@ -10,7 +10,7 @@ COPY . .
 RUN mvn clean package -pl castle-docpreview -am -DskipTests
 
 # 第二阶段：运行
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:11-jre-alpine       # 修改点 2: 将 `8-jre-alpine` 改为 `11-jre-alpine`
 WORKDIR /app
 EXPOSE 8302
 
