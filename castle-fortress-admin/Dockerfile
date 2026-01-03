@@ -1,10 +1,10 @@
 # ... 其他部分保持不变
 FROM maven:3.8.6-openjdk-8 AS builder
 WORKDIR /build
-# 关键修正：复制正确的源码路径
-COPY pom.xml .
-COPY src/main ./src/main
-# COPY src/test ./src/test
+# 关键修正：路径前缀改为 castle-fortress-admin
+COPY castle-fortress-admin/pom.xml .
+COPY castle-fortress-admin/src/main ./src/main
+# COPY castle-fortress-admin/src/test ./src/test
 RUN mvn clean package -DskipTests
 # ... 后续保持不变
 
