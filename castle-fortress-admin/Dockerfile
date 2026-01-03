@@ -10,4 +10,4 @@ FROM openjdk:8-jre-slim
 WORKDIR /app
 EXPOSE 9081
 COPY --from=builder /app/target/castle-fortress-admin.jar /app/admin.jar
-ENTRYPOINT ["java", "-jar", "/app/admin.jar", "--spring.profiles.active=prod"]
+ENTRYPOINT ["java", "-Xmx256m", "-Xms256m", "-XX:+UseG1GC", "-jar", "/app/admin.jar", "--spring.profiles.active=prod"]
