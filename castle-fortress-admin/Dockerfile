@@ -1,5 +1,5 @@
 # 多阶段构建 - 第一阶段：构建
-FROM maven:3.8.7-openjdk-8 AS builder
+FROM maven:3.8.6-openjdk-8 AS builder
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
