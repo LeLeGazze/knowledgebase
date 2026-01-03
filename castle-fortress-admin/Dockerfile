@@ -5,7 +5,9 @@ WORKDIR /build
 COPY castle-fortress-admin/pom.xml .
 COPY castle-fortress-admin/src/main ./src/main
 # COPY castle-fortress-admin/src/test ./src/test
-RUN mvn clean package -DskipTests
+# ... 第一阶段相同 ...
+RUN mvn clean package -pl castle-fortress-admin -am -DskipTests
+# ... 后续相同，注意JAR包路径和端口 ...
 # ... 后续保持不变
 
 # 第二阶段：运行
