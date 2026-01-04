@@ -1,25 +1,24 @@
 server:
-  port: 8302  # 直接使用数字，而非“$082”
+  port: 8302
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db.bxoerylywbasbftwrvbx.supabase.co:5432/postgres?sslmode=require}  # 确保URL完整、正确
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD}  # 确保Koyeb环境变量已设置此密码
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
-# 以下是修正后的关键部分，请特别注意缩进和拼写
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus  # 使用英文逗号分隔
+        include: health,info,metrics,prometheus
       base-path: /actuator
   endpoint:
     health:
       enabled: true
-      show-details: always  # 正确属性名为“show-details”
+      show-details: always
     metrics:
-      enabled: true  # 节点名是复数“metrics”，缩进与“health”同级
+      enabled: true
     prometheus:
-      enabled: true  # 节点名是“prometheus”
+      enabled: true
