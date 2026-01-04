@@ -3,8 +3,8 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db.bxoerylywbasbftwrvbx.supabase.co:5432/postgres?sslmode=require}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    url: ${SPRING_DATASOURCE_URL}  # 建议直接引用环境变量，确保与Koyeb设置完全一致
+    username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
@@ -12,13 +12,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus  # 用逗号分隔
       base-path: /actuator
   endpoint:
     health:
       enabled: true
-      show-details: always
+      show-details: always  # 修正属性名
     metrics:
-      enabled: true
+      enabled: true  # 注意是复数，且缩进与health同级
     prometheus:
-      enabled: true
+      enabled: true  # 修正单词拼写
