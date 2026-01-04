@@ -2,7 +2,6 @@ server:
   port: 8302
   servlet:
     context-path: /
-
 spring:
   messages:
     encoding: UTF-8
@@ -30,14 +29,13 @@ spring:
       poolPreparedStatements: true
       maxPoolPreparedStatementPerConnectionSize: 20
       filters: stat,wall,slf4j
-      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
       web-stat-filter:
         enabled: true
         url-pattern: "/*"
         exclusions: "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"
       stat-view-servlet:
         url-pattern: "/druid/*"
-
 management:
   endpoints:
     web:
@@ -52,7 +50,6 @@ management:
       enabled: true
     prometheus:
       enabled: true
-
 mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
   typeAliasesPackage: com.castle.pdftools.entity
