@@ -1,8 +1,6 @@
-# 应用基础配置
 server:
   port: 8302
 
-# 数据源配置
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -10,12 +8,11 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
-# Actuator 监控端点配置 (关键！)
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health, info, metrics, prometheus
       base-path: /actuator
   endpoint:
     health:
@@ -25,3 +22,4 @@ management:
       enabled: true
     prometheus:
       enabled: true
+      
