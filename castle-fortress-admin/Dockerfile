@@ -7,8 +7,8 @@ COPY pom.xml .
 # 下载依赖
 RUN mvn dependency:go-offline -B
 
-# 复制源码 - 使用相对路径
-COPY src ./src
+# 复制源码 - 复制src/main目录
+COPY src/main ./src/main
 
 # 构建应用
 RUN mvn clean package -DskipTests
